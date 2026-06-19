@@ -6,14 +6,15 @@ El camino feliz, de principio a fin. Elige tu caso de uso **una vez** y sigue su
 
 ---
 
-## Arranca: pega esto en Claude Code
+## Arranca
+
+Un solo riel: los comandos `/stark-*`. No hay prompt que copiar ni nada que memorizar.
 
 ```
-Lee docs/documentacion/PRINCIPIOS.md y docs/documentacion/QUICKSTART.md.
-Mi caso es <nuevo | reingeniería | mantenimiento | prototipo>.
-Guíame fase por fase, una a la vez, esperando mi aprobación entre cada gate humano.
-No avances sin que yo apruebe explícitamente.
+/stark-init
 ```
+
+Te pregunta tu caso, prepara el terreno y te dice **textualmente** cuál es el siguiente comando. De ahí avanzas comando por comando, aprobando cada gate humano. Eso es todo.
 
 ---
 
@@ -37,11 +38,12 @@ Cada caso es una sola secuencia de comandos, de arriba a abajo. `[ ]` = opcional
 ### Nuevo
 
 1. `/stark-init` — confirma caso, deja `docs/inputs/` listo.
-2. `/stark-requirements` — material → `docs/requirements.md` (EARS). ✋
-3. `[ ]` `/stark-prototype` — si hay UI: mockup desplegable + loop con cliente. ✋ cliente.
-4. `/stark-design` — requirements → `docs/design.md` (9 secciones). ✋
-5. `/stark-tasks` — design → `docs/tasks.md` (**walking skeleton + rebanadas verticales**). ✋
-6. `/stark-build` — ejecuta **un Slice por sesión**; tú revisas y apruebas. ✋ por lote.
+2. **Pon tu material** (entrevistas, notas, imágenes, PDFs) en `docs/inputs/`. Sin esto, requirements no tiene de dónde partir.
+3. `/stark-requirements` — material → `docs/requirements.md` (EARS). ✋
+4. `[ ]` `/stark-prototype` — si hay UI: mockup desplegable + loop con cliente. ✋ cliente.
+5. `/stark-design` — requirements → `docs/design.md` (9 secciones). ✋
+6. `/stark-tasks` — design → `docs/tasks.md` (**walking skeleton + rebanadas verticales**). ✋
+7. `/stark-build` — ejecuta **un Slice por sesión**; tú revisas y apruebas. ✋ por lote.
 
 ### Reingeniería
 

@@ -29,9 +29,9 @@ Muestra la secuencia stark del caso ([ ] = opcional) y cuál comando sigue:
 
 ## 3. Ejecuta el setup del caso
 
-- **NUEVO** → asegura que exista `docs/inputs/` para el material de levantamiento (transcripciones, notas, entrevistas). Siguiente: `/stark-requirements`.
+- **NUEVO** → asegura que exista `docs/inputs/`. Indícale **explícitamente al humano** que el siguiente paso es suyo: debe colocar su material de levantamiento (transcripciones, notas, entrevistas, imágenes, PDFs) dentro de `docs/inputs/` **antes** de correr `/stark-requirements`, porque sin material el analista no tiene de dónde partir. Siguiente: el humano llena `docs/inputs/` y luego invoca `/stark-requirements`.
 
-- **REINGENIERÍA** → genera el sustrato sobre el código vivo: corre la skill `onboarding` (produce `docs/CLAUDE.md` y `docs/BIG_PICTURE.md`) y la skill `reglas-negocio` (produce `docs/REGLAS_DE_NEGOCIO.md`). Siguiente: `/stark-requirements`.
+- **REINGENIERÍA** → genera el sustrato sobre el código vivo: corre la skill `onboarding` (produce `docs/CLAUDE.md` y `docs/BIG_PICTURE.md`) y la skill `reglas-negocio` (produce `docs/REGLAS_DE_NEGOCIO.md`). Indícale **explícitamente al humano** que, si tiene material de arqueología previa, lo coloque en `docs/analysis/` antes de requirements. Siguiente: `/stark-requirements`.
 
 - **MANTENIMIENTO** → genera el sustrato (skills `onboarding` + `reglas-negocio`) y crea `docs/features/$ARGUMENTS/intent.md` desde `templates/intent.md` para capturar la intención de la feature. Siguiente: `/stark-requirements`.
 

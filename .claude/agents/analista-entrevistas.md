@@ -30,7 +30,7 @@ Vas a encontrar en `docs/inputs/` una mezcla de:
 
 No asumas qué hay. Empieza siempre por listar el contenido de `docs/inputs/` con Glob.
 
-Si no existe `docs/inputs/` o está vacío, **detente y pregúntale al humano dónde está el material**.
+Si no existe `docs/inputs/` o está vacío, **detente y dile al humano la acción concreta**: "Coloca tu material de levantamiento (transcripciones, notas, imágenes, PDFs) dentro de `docs/inputs/` y vuelve a invocarme." No te quedes esperando en silencio ni asumas contenido.
 
 ### Input adicional (caso de uso secundario)
 
