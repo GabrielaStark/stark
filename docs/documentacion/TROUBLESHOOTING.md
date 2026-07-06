@@ -66,7 +66,7 @@ Esto es el modo de falla más común de SDD. Causas:
 - Verifica manualmente que se cumple el criterio EARS referenciado en el footer.
 - Si vas a aceptar `[x]` solo por la declaración del agente, mínimo lee el diff completo del código que generó.
 
-**Solución estructural:** en el siguiente ciclo, considera meter un subagente verificador independiente (no incluido en este framework v1) que revise el output con goal opuesto: encontrar fallas, no completar.
+**Solución estructural:** corre `/stark-review` sobre el diff de la tarea (revisa contra los Principios: sobre-ingeniería + seguridad) antes de marcar `[x]`. Para casos críticos, considera además un subagente verificador independiente que revise el output con goal opuesto: encontrar fallas, no completar.
 
 ### "El agente entró en loop preguntándome cosas que ya respondí"
 

@@ -15,6 +15,17 @@ Es un **mockup interactivo de alta fidelidad** desplegable en una URL real, usad
 
 Regla de oro: **si alguien podría confundirlo con el sistema final, falló como prototipo**. El banner permanente, los datos falsos obvios y el visual deliberadamente "estilizado pero no terminado" existen para esto.
 
+### Carpeta base según el pipeline
+
+La fase es transversal a los pipelines. La carpeta base (`<prototype>/` en el resto de este skill) y el requirements de entrada dependen del caso de uso:
+
+| Pipeline | Requirements de entrada | Carpeta del prototipo |
+|---|---|---|
+| Nuevo / reingeniería | `docs/requirements.md` | `docs/prototype/` |
+| Mantenimiento | `docs/features/<slug>/requirements.md` | `docs/features/<slug>/prototype/` |
+
+Todas las reglas de este skill aplican igual en ambos casos; solo cambia la carpeta base (ver DECISIONES.md B-D6).
+
 ## 2. Estructura obligatoria de la carpeta
 
 ```
@@ -218,7 +229,7 @@ Cada iteración del prototipo se acompaña de un archivo `validation-log-v{N}.md
 
 [ ] Aprobado para pasar a design.md
 [ ] Iterar a v{N+1}
-[ ] Volver a analista-entrevistas (cambios estructurales detectados)
+[ ] Volver al analista (cambios estructurales detectados)
 
 ## Notas adicionales
 
@@ -231,7 +242,7 @@ Reglas:
 
 - **El dev llena este archivo**, no el cliente. Transcripción honesta.
 - **NUNCA** se sobrescribe entre iteraciones. La v2 lee la v1 como historia.
-- **Aprobación final**: la última línea del último validation-log debe decir `Status: APROBADO` con fecha. Sin esa línea, `disenador-arquitecto` no debe arrancar.
+- **Aprobación final**: la última línea del último validation-log debe decir `Status: APROBADO` con fecha. Sin esa línea, el diseñador de la fase 4 (`disenador-arquitecto`, o `disenador-delta-mantenimiento` en mantenimiento) no debe arrancar.
 - Cambios estructurales detectados disparan la **válvula de retorno al analista** — ver §8.
 
 ## 7. Política de iteración
@@ -249,7 +260,7 @@ El agente itera cuando recibe un `validation-log-v{N}.md` cuyo Status es `REQUIE
 
 ### 7.3 Cuándo detenerse y devolver al humano
 
-- Status del último log es `APROBADO` → fin del loop, listo para `disenador-arquitecto`.
+- Status del último log es `APROBADO` → fin del loop, listo para la fase de design (`disenador-arquitecto` o `disenador-delta-mantenimiento`).
 - Cambios marcados como estructurales en el log → válvula de retorno (§8).
 - El dev pide explícitamente detenerse para revisión humana intermedia.
 
@@ -257,11 +268,13 @@ El agente itera cuando recibe un `validation-log-v{N}.md` cuyo Status es `REQUIE
 
 Si la iteración actual es **v3 o superior** y el último log tiene **3 o más cambios estructurales acumulados** desde v1, el agente debe reportar:
 
-> *"Iteración v{N} detectó cambios estructurales acumulados. Patrón: requirements.md posiblemente incompleto. Recomiendo pausar el loop y volver a `analista-entrevistas` para una pasada completa antes de continuar."*
+> *"Iteración v{N} detectó cambios estructurales acumulados. Patrón: requirements.md posiblemente incompleto. Recomiendo pausar el loop y volver al analista para una pasada completa antes de continuar."*
 
 No es una regla dura — es una alerta para que el humano decida.
 
 ## 8. Válvula de retorno al analista (cambios estructurales)
+
+El "analista" de esta válvula es el del pipeline en curso: `analista-entrevistas` en nuevo/reingeniería, `analista-feature-mantenimiento` en mantenimiento.
 
 ### 8.1 Qué cuenta como cambio estructural
 
@@ -277,12 +290,12 @@ Cualquiera de estas señales en el feedback del cliente:
 
 1. NO intenta resolverlo en HTML.
 2. Anota el cambio en la sección "Cambios estructurales" del próximo `validation-log` (o lo confirma si el dev ya lo marcó así).
-3. Reporta al humano: *"Detecté un cambio estructural: [descripción]. Esto requiere actualizar `requirements.md`. Recomiendo invocar `analista-entrevistas` antes de continuar la iteración."*
+3. Reporta al humano: *"Detecté un cambio estructural: [descripción]. Esto requiere actualizar `requirements.md`. Recomiendo invocar al analista del pipeline antes de continuar la iteración."*
 4. Espera instrucción explícita: (a) volver al analista, (b) ignorar ese feedback en esta iteración y continuar con el resto, (c) detenerse hasta nueva orden.
 
 ### 8.3 Qué hace el flujo después del retorno
 
-1. El `analista-entrevistas` actualiza `requirements.md` añadiendo el Requirement nuevo con su User Story y EARS.
+1. El analista del pipeline actualiza el `requirements.md` correspondiente añadiendo el Requirement nuevo con su User Story y EARS.
 2. El humano valida el requirements actualizado (gate humano).
 3. El humano vuelve a invocar al `prototipador-visual` para una nueva iteración con el contexto enriquecido.
 

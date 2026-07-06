@@ -1,6 +1,6 @@
 ---
 name: sdd-tasks
-description: Use this skill whenever generating, validating, or editing a tasks.md file for Spec-Driven Development. Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS traceability footer), the two grouping structures per delivery_strategy (vertical/default — Walking Skeleton + feature slices demonstrable end-to-end; layered — by architectural layer, only for infra/migration/refactor without UI), the four operational rules, useful patterns (spike, preventive refactor, validation tasks, optional tasks), execution discipline (one task per agent session), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved design.md into tasks.md, or when reviewing an existing tasks.md.
+description: Use this skill whenever generating, validating, or editing a tasks.md file for Spec-Driven Development. Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS traceability footer), the two grouping structures per delivery_strategy (vertical/default — Walking Skeleton + feature slices demonstrable end-to-end; layered — by architectural layer, only for infra/migration/refactor without UI), the four operational rules, useful patterns (spike, preventive refactor, validation tasks, optional tasks), execution discipline (batched execution: one lote — a full Slice in vertical mode or a contiguous same-layer group in layered mode — per session, tasks executed one by one in order, human review per lote, validation tasks always alone), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved design.md into tasks.md, or when reviewing an existing tasks.md.
 ---
 
 # SDD Tasks — Constitución
@@ -82,10 +82,11 @@ Cada tarea en `tasks.md` SIEMPRE tiene esta estructura:
 
 ## 3. Las 4 reglas operacionales
 
-### Regla 1: Una tarea = una sesión del agente
+### Regla 1: Tareas atómicas (cada una cabe en una sesión del agente)
 
 - Heurística: 1-3 archivos tocados, 50-200 líneas de código.
 - Si una tarea no se termina en una conversación con el agente codificador, está demasiado grande. Partirla.
+- (Esto es una regla de TAMAÑO, no de ejecución: la ejecución agrupa varias tareas atómicas en un lote — ver Sección 6.)
 - Tareas gigantes ("implementar el módulo completo") garantizan pérdida de contexto e inconsistencia.
 
 ### Regla 2: Orden por dependencias técnicas, NO por valor
@@ -286,15 +287,19 @@ Permite arrancar con MVP rápido y endurecer después.
 
 ## 6. Cómo se EJECUTA tasks.md
 
-### Patrón correcto
+### Patrón correcto: por lotes (encapsulado en `/stark-build`)
 
-1. Leer la siguiente tarea pendiente.
-2. **Conversación nueva** con el agente codificador, contexto mínimo enfocado (la tarea + design relevante + requirements relevantes).
-3. El agente ejecuta SOLO esa tarea.
-4. **El humano revisa el resultado** (no el agente).
-5. Iterar dentro de esa conversación hasta que esté bien.
-6. Marcar `[x]`, cerrar conversación.
-7. Conversación nueva para la siguiente tarea.
+La unidad de ejecución es el **lote**: en modo vertical (default), un lote = UN Slice completo; en modo `layered`, un grupo contiguo de tareas de la misma capa.
+
+1. **Conversación nueva**. El agente lee COMPLETOS `tasks.md`, `requirements.md` y `design.md`, UNA sola vez.
+2. El agente ejecuta las tareas del lote **una por una, en orden numérico**, únicamente desde lo especificado. Si algo es ambiguo, se detiene y pregunta — no infiere.
+3. Al terminar cada tarea reporta: archivos tocados, criterio de hecho, resultado de tests. **NO marca `[x]`**.
+4. **El humano revisa el lote completo** (corre tests, verifica cada criterio de hecho) y marca `[x]` solo lo que pasa.
+5. Siguiente lote: en la misma conversación si sigue sana (contexto ya cargado), o conversación nueva.
+
+Las tareas de **validación intermedia** van SOLAS, nunca loteadas: son puntos de control donde el humano decide si el bloque anterior quedó bien.
+
+El detalle operativo completo (prompts, encadenamiento, cuándo cerrar la conversación) vive en `docs/documentacion/REFERENCIA.md` §6.
 
 ### Anti-patrón fatal
 
@@ -305,7 +310,7 @@ Meter todo `tasks.md` al agente con "ejecuta todo". Rompe por:
 - Propagación de errores sin revisión
 - Imposibilidad de rollback granular
 
-Una tarea = una sesión = una revisión humana = un `[x]`. Sin atajos.
+Un lote = una revisión humana = los `[x]` que el humano marca. Sin atajos. La diferencia con "ejecuta todo": un lote son pocas tareas de un mismo Slice/capa que el humano revisa al cerrar; "ejecuta todo" es todo el archivo de corrido sin revisión.
 
 ## 7. Anti-patrones que matan tasks.md
 

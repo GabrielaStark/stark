@@ -789,4 +789,4 @@ Aunque son de stark, son agnósticas al pipeline SDD per se — sirven para anal
 
 Para el camino feliz lineal, usa [`QUICKSTART.md`](QUICKSTART.md). Si algo se trabó, [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Para el "por qué" detrás de cada decisión, [`PRINCIPIOS.md`](PRINCIPIOS.md) y [`DECISIONES.md`](DECISIONES.md).
 
-Recuerda: una fase a la vez, una tarea por sesión, tú apruebas.
+Recuerda: una fase a la vez, un lote por sesión, tú apruebas.

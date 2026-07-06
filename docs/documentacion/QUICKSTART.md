@@ -48,8 +48,8 @@ Cada caso es una sola secuencia de comandos, de arriba a abajo. `[ ]` = opcional
 ### Reingeniería
 
 Igual que **Nuevo**, con dos diferencias:
-- En el paso 1, `/stark-init` genera el **sustrato** (`CLAUDE.md`, `BIG_PICTURE.md`, `REGLAS_DE_NEGOCIO.md`) corriendo `onboarding` y `reglas-negocio`.
-- En el paso 2, `/stark-requirements` levanta los requirements **desde el código legacy** (`docs/analysis/` + el código).
+- En el paso 1, `/stark-init` genera el **sustrato** (`docs/CLAUDE.md`, `docs/BIG_PICTURE.md`, `docs/REGLAS_DE_NEGOCIO.md`) corriendo `onboarding` y `reglas-negocio`.
+- En el paso 2 colocas tu **arqueología previa** en `docs/analysis/` (en lugar de material de entrevistas), y en el paso 3 `/stark-requirements` levanta los requirements **desde el código legacy** (`docs/analysis/` + el código).
 
 Secuencia: `init (+sustrato)` → `requirements` → `[prototype]` → `design` → `tasks` → `build`. Misma entrega vertical.
 

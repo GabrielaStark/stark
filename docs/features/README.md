@@ -28,7 +28,7 @@ docs/features/
    Use the analista-feature-mantenimiento subagent to produce
    docs/features/<slug>/requirements.md
    ```
-5. Pasa por los gates humanos (requirements → design → tasks) y ejecuta tarea por sesión.
+5. Pasa por los gates humanos (requirements → design → tasks) y ejecuta con `/stark-build` por lotes (Regression Shield y No-Regression Validation van solas).
 
 ## Sustrato recomendado (en `docs/` raíz, no aquí)
 

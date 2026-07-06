@@ -26,7 +26,7 @@ Si el feature requiere cambiar arquitectura, reescribir módulos enteros o redec
 
 ## Tu interlocutor
 
-El humano que te invoca es ingeniera/o que conoce (o está aprendiendo) el sistema en producción. Habla con ella en español, registro técnico-directo. Ella es quien resuelve "¿esta invariante es real o estoy paranoiquea?" y "¿esto sí debe tocarse?" cuando dudes.
+El humano que te invoca es ingeniera/o que conoce (o está aprendiendo) el sistema en producción. Habla con ella en español, registro técnico-directo. Ella es quien resuelve "¿esta invariante es real o es paranoia?" y "¿esto sí debe tocarse?" cuando dudes.
 
 ## Pre-condición obligatoria
 

@@ -87,7 +87,7 @@ Vía principal: los comandos slash `/stark-*`. Las fases están numeradas; el pr
 3  /stark-prototype      ← (transversal) requirements → mockup desplegable + loop con cliente
 4  /stark-design         ← requirements → design.md
 5  /stark-tasks          ← design → tasks.md
-6  /stark-build          ← ejecuta una tarea por sesión
+6  /stark-build          ← ejecuta un lote (Slice) por sesión
 
    /stark-review   ← transversal: revisa el diff actual contra los Principios (sobre-ingeniería + seguridad)
    /stark-audit    ← transversal: audita el repo completo contra los Principios
@@ -119,7 +119,7 @@ Use the disenador-delta-mantenimiento subagent to produce docs/features/<slug>/d
 Use the descompositor-tareas subagent to produce docs/tasks.md                                   # construcción
 Use the descompositor-riesgo-mantenimiento subagent to produce docs/features/<slug>/tasks.md     # mantenimiento
 
-# Fase 6 — Build: una tarea por sesión
+# Fase 6 — Build: un lote (Slice) por sesión — patrón encapsulado en /stark-build
 ```
 
 ### Documentación completa
@@ -231,7 +231,7 @@ entrevistas               codigo                       mantenimiento
                │                                              │
                └────────────────────┬─────────────────────────┘
                                     ▼
-                        tarea por sesión + revisión humana → código + tests
+                        lote por sesión + revisión humana → código + tests
 ```
 
 **Los gates humanos no son opcionales.** Saltarse uno propaga errores 10x a la siguiente fase.
@@ -244,7 +244,7 @@ entrevistas               codigo                       mantenimiento
 
 ## Reglas no negociables
 
-1. **Una tarea = una sesión del agente codificador.** Nunca "ejecuta todo tasks.md".
+1. **La unidad de ejecución es el lote** (un Slice vertical, o un grupo contiguo de la misma capa/sección), con revisión humana al cerrar cada lote. Nunca "ejecuta todo tasks.md". Las tareas de validación — y en mantenimiento el Regression Shield y la No-Regression Validation — van solas.
 2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente.
 3. **Los SKILLs son absolutos.** Si una regla no encaja en un caso, el caso probablemente no es para stark — no inventes excepciones.
 4. **Trazabilidad bidireccional.** Cada línea de código se justifica en una tarea → decisión de design → criterio EARS → historia de usuario.

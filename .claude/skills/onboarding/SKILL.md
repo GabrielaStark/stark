@@ -1,6 +1,7 @@
 ---
-description: "Protocolo de reconocimiento para proyectos heredados o de mantenimiento. Genera CLAUDE.md y BIG_PICTURE.md con análisis completo del estado actual del proyecto."
-allowed-tools: Read, Grep, Glob, Bash(find:*), Bash(wc:*), Bash(cat:*), Bash(head:*), Bash(tail:*), Bash(ls:*)
+name: onboarding
+description: "Protocolo de reconocimiento para proyectos heredados o de mantenimiento. Genera docs/CLAUDE.md y docs/BIG_PICTURE.md con análisis completo del estado actual del proyecto."
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash(find:*), Bash(wc:*), Bash(cat:*), Bash(head:*), Bash(tail:*), Bash(ls:*)
 ---
 
 # Reconocimiento de Proyecto — Protocolo de Onboarding
@@ -20,9 +21,9 @@ Este es un proyecto existente que voy a mantener. **No lo construí yo.** Necesi
 5. Revisa si existen tests y qué tipo (unitarios, integración, E2E)
 6. Busca documentación existente (README, docs/, wiki, comentarios relevantes)
 
-### Fase 2: Genera `CLAUDE.md`
+### Fase 2: Genera `docs/CLAUDE.md`
 
-Crea el archivo `CLAUDE.md` en la raíz del proyecto con las siguientes secciones:
+Crea el archivo `docs/CLAUDE.md` con las siguientes secciones. Va en `docs/`, NO en la raíz: la raíz del repo puede tener (o tener después) un `CLAUDE.md` de memoria de Claude Code, y el resto del framework (agentes de mantenimiento, `REGLAS_DE_NEGOCIO.md`) espera el sustrato en `docs/`.
 
 ```markdown
 # CLAUDE.md — [Nombre del Proyecto]
@@ -46,9 +47,9 @@ Crea el archivo `CLAUDE.md` en la raíz del proyecto con las siguientes seccione
 <!-- Variables de entorno necesarias, archivos de config, requisitos del sistema -->
 ```
 
-### Fase 3: Genera `BIG_PICTURE.md`
+### Fase 3: Genera `docs/BIG_PICTURE.md`
 
-Crea el archivo `BIG_PICTURE.md` en la raíz del proyecto con las siguientes secciones:
+Crea el archivo `docs/BIG_PICTURE.md` (misma regla: en `docs/`, no en la raíz) con las siguientes secciones:
 
 ```markdown
 # BIG_PICTURE.md — [Nombre del Proyecto]

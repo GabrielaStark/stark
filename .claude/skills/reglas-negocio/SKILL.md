@@ -1,4 +1,5 @@
 ---
+name: reglas-negocio
 description: "Extrae y documenta las reglas de negocio de un proyecto existente: roles, permisos, flujos de estados, validaciones y mapa funcional. Genera docs/REGLAS_DE_NEGOCIO.md."
 allowed-tools: Read, Grep, Glob, Bash(find:*), Bash(wc:*), Bash(ls:*), Task, Write
 ---
@@ -7,7 +8,7 @@ allowed-tools: Read, Grep, Glob, Bash(find:*), Bash(wc:*), Bash(ls:*), Task, Wri
 
 ## Contexto
 
-Este proyecto ya tiene `CLAUDE.md` y/o `BIG_PICTURE.md` con la visión técnica. Ahora necesito entender **qué hace el sistema a nivel funcional**: quién usa qué, con qué permisos, bajo qué reglas, y con qué restricciones. Esto es para que un programador de mantenimiento pueda tocar funcionalidad sin romper lógica de negocio que no conoce.
+Este proyecto ya tiene `docs/CLAUDE.md` y/o `docs/BIG_PICTURE.md` con la visión técnica. Ahora necesito entender **qué hace el sistema a nivel funcional**: quién usa qué, con qué permisos, bajo qué reglas, y con qué restricciones. Esto es para que un programador de mantenimiento pueda tocar funcionalidad sin romper lógica de negocio que no conoce.
 
 ## Prerrequisitos
 

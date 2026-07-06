@@ -39,7 +39,6 @@ graph TB
     A[Componente A] --> B[Componente B]
     ...
 ```
-````
 
 ### Componentes
 
@@ -107,8 +106,7 @@ con el componente que lo implementa y el test que lo valida.]
 | ----------- | -------------- | --------- | ---- |
 | Req 1       | 1.1            | ...       | ...  |
 | Req 1       | 1.2            | ...       | ...  |
-
-```
+````
 
 ## 3. Las dos reglas absolutas
 

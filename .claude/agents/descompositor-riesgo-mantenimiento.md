@@ -147,7 +147,7 @@ El humano hace revisión final. Cierras solo con aprobación explícita.
 
 Recuerda al humano los siguientes pasos:
 
-> *"Tasks del feature `<feature>` aprobado. Siguiente paso: ejecutar UNA tarea por sesión, en orden numérico. La primera tarea (Regression Shield #1) es ejecutar la suite existente — NO toques código hasta que esa pase. Si rompe algo, detenerse y reportar antes de seguir."*
+> *"Tasks del feature `<feature>` aprobado. Siguiente paso: ejecutar con `/stark-build` por lotes (grupos contiguos de la misma sección), tareas en orden numérico. Las tareas de Regression Shield y la No-Regression Validation van SOLAS, nunca loteadas. La primera tarea (Regression Shield #1) es ejecutar la suite existente — NO toques código hasta que esa pase. Si rompe algo, detenerse y reportar antes de seguir."*
 
 ## Anti-patrones que NO debes cometer
 

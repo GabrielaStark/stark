@@ -5,7 +5,7 @@ description: Use this skill whenever generating, validating, or editing a requir
 
 # SDD Requirements — Constitución
 
-Este skill es la fuente de verdad para producir `requirements.md` en este repo. Ambos subagentes (`sintetizador-levantamiento` y `arqueologo-codigo`) consultan este archivo. Cualquier `requirements.md` producido debe cumplir TODAS las reglas de aquí.
+Este skill es la fuente de verdad para producir `requirements.md` en este repo. Ambos subagentes (`analista-entrevistas` y `arqueologo-codigo`) consultan este archivo. Cualquier `requirements.md` producido debe cumplir TODAS las reglas de aquí.
 
 ## 1. Propósito del requirements.md
 

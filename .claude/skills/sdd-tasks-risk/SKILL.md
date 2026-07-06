@@ -1,6 +1,6 @@
 ---
 name: sdd-tasks-risk
-description: Use this skill whenever generating, validating, or editing a tasks.md file for the SDD MAINTENANCE pipeline (adding a feature to a production system). Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS + invariant traceability footer), the canonical risk-ordered structure (Regression Shield FIRST → Data Delta → Backend Delta → Frontend Delta → Integration → E2E → No-Regression Validation), the five operational rules, useful patterns (spike, regression test creation, integration tasks, optional tasks), execution discipline (one task per agent session), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved delta design.md into a tasks.md for maintenance. NOT for greenfield or brownfield-rewrite — use sdd-tasks for those.
+description: Use this skill whenever generating, validating, or editing a tasks.md file for the SDD MAINTENANCE pipeline (adding a feature to a production system). Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS + invariant traceability footer), the canonical risk-ordered structure (Regression Shield FIRST → Data Delta → Backend Delta → API Delta → Frontend Delta → Integration → E2E → No-Regression Validation → Documentation), the five operational rules, useful patterns (spike, regression test creation, integration tasks, optional tasks), execution discipline (batched execution: one lote of contiguous same-section tasks per session, human review per lote; Regression Shield and No-Regression Validation always run alone), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved delta design.md into a tasks.md for maintenance. NOT for greenfield or brownfield-rewrite — use sdd-tasks for those.
 ---
 
 # SDD Tasks Risk — Constitución
@@ -82,9 +82,10 @@ Cada tarea en `tasks.md` SIEMPRE tiene esta estructura:
 
 ## 3. Las 5 reglas operacionales
 
-### Regla 1: Una tarea = una sesión del agente
+### Regla 1: Tareas atómicas (cada una cabe en una sesión del agente)
 
 - Heurística: 1-3 archivos tocados, 50-200 líneas. Idéntica a sdd-tasks.
+- (Regla de TAMAÑO, no de ejecución: la ejecución agrupa tareas contiguas en lotes — ver Sección 6.)
 
 ### Regla 2: Orden por RIESGO de regresión, NO por capa
 
@@ -323,13 +324,14 @@ Cada punto de coexistencia es una tarea propia, no se agrupan:
 
 ### Patrón correcto
 
-Idéntico a sdd-tasks: una tarea = una sesión = una revisión humana = un `[x]`.
+Idéntico a sdd-tasks §6: ejecución **por lotes** (grupos contiguos de tareas de la misma sección, tareas una por una en orden), revisión humana por lote, el humano marca los `[x]` (nunca el agente).
 
 Diferencias específicas de mantenimiento:
 
 1. **Antes de empezar la tarea 1**: confirmar que el repo está en estado limpio + suite completa de tests pasa. Si no, detener.
 2. **Después de cada tarea de Modificación**: ejecutar tests del módulo modificado **antes** de marcar `[x]`. Si rompió algo existente, no marcar.
 3. **No saltar la sección No-Regression Validation**: aunque "todo se ve bien", ejecutar la tarea final completa antes de cerrar.
+4. **Regression Shield y No-Regression Validation van SOLAS**, nunca loteadas con tareas de modificación: el blindaje va antes del código nuevo por diseño; la validación final es el gate más importante del feature.
 
 ### Anti-patrón fatal
 
@@ -353,7 +355,7 @@ Mismo que sdd-tasks: "ejecuta todo tasks.md" rompe garantizado. Además, en mant
 
 ### Estructura
 
-- [ ] El archivo está organizado por las 10 secciones canónicas (Regression Shield → ... → Documentation), en orden.
+- [ ] El archivo usa las secciones canónicas que apliquen, en el orden canónico (Regression Shield → Spike → Data Model Delta → Backend Delta → API Delta → Frontend Delta → Integration → Integration Tests → No-Regression Validation → Documentation). Spike, Data Model Delta y Frontend Delta son opcionales según el feature; Regression Shield y No-Regression Validation son obligatorias siempre.
 - [ ] Numeración secuencial sin huecos.
 - [ ] Sección "Regression Shield" existe y tiene al menos 1 tarea (mínimo: verificar que la suite existente pasa).
 - [ ] Sección "No-Regression Validation" existe y tiene la tarea final de verificación de invariantes.

@@ -78,7 +78,7 @@ inputs/ o analysis/
         ↓
 [descompositor-tareas] → docs/tasks.md  → [gate humano]
         ↓
-   tarea por sesión → código + tests
+   lote por sesión → código + tests
 ```
 
 **Opcionalidad**: la fase se ejecuta solo si el proyecto tiene UI relevante. Backend puro, CLIs y librerías la saltan sin culpa.
@@ -270,7 +270,7 @@ No es una regla dura — es un alerta que el humano evalúa.
 
 ## A7. Válvula de retorno al analista
 
-Cuando el feedback del cliente revela algo que **no es un cambio de UI sino un requisito faltante**, el flujo se detiene y vuelve al analista.
+Cuando el feedback del cliente revela algo que **no es un cambio de UI sino un requisito faltante**, el flujo se detiene y vuelve al analista. (El analista es el del pipeline en curso: `analista-entrevistas` en construcción, `analista-feature-mantenimiento` en mantenimiento — ver B-D6.)
 
 ### Señales de "esto es estructural, no cosmético"
 
@@ -401,15 +401,15 @@ stark tiene **tres pipelines paralelos**, todos viven en el mismo template y com
     │ tareas           │     │ tareas           │     │ riesgo-          │
     │       ↓          │     │       ↓          │     │ mantenimiento    │
     │ tasks.md         │     │ tasks.md         │     │       ↓          │
-    │ (capas)          │     │ (capas)          │     │ tasks.md (riesgo)│
+    │ (vertical)       │     │ (vertical)       │     │ tasks.md (riesgo)│
     └──────────────────┘     └──────────────────┘     └──────────────────┘
               │                        │                        │
               └────────────────────────┼────────────────────────┘
                                        ▼
-                         [tarea por sesión + código]
+                         [lote por sesión + código]
 ```
 
-**El template es el mismo.** Cuando clonas stark, traes los **8 agentes y 7 skills**. El pipeline correcto se identifica por:
+**El template es el mismo.** Cuando clonas stark, traes los **8 agentes y las 9 skills** (7 SDD + `onboarding` + `reglas-negocio`). El pipeline correcto se identifica por:
 
 1. Convención de carpetas distintas: `docs/inputs/` (nuevo), `docs/analysis/` (reingeniería), `docs/features/<X>/` (mantenimiento).
 2. Naming convention: agentes de mantenimiento llevan sufijo `-mantenimiento`.
@@ -508,7 +508,7 @@ Cada decisión en formato breve: **Decisión · Por qué · Consecuencias negati
 
 - **Decisión**: `prototipador-visual` PUEDE usarse en el pipeline de mantenimiento si el feature introduce UI nueva que el cliente quiere validar antes.
 - **Por qué**: la fase opcional de prototipo es transversal al framework — su input es un `requirements.md` aprobado, sea del pipeline que sea.
-- **Consecuencia aceptada**: para features de mantenimiento sin UI o triviales, conviene saltarla. El humano decide. El skill `sdd-prototype` no requiere cambios.
+- **Consecuencia aceptada**: para features de mantenimiento sin UI o triviales, conviene saltarla. El humano decide. El skill `sdd-prototype` solo parametriza la carpeta base y el analista de la válvula según el pipeline; el resto de sus reglas no cambia.
 - **Path**: si se usa, el prototipo vive en `docs/features/<feature>/prototype/`, no en `docs/prototype/` raíz (lo mantiene scoped al feature).
 
 ### B-D7. Sustrato recomendado pero no obligatorio
@@ -599,7 +599,7 @@ La última tarea del tasks.md es obligatoria: correr toda la suite + verificar c
 | Scope del `requirements.md` | Sistema completo | Sistema completo (reescrito) | **Solo el delta** |
 | Surface of Contact | N/A | N/A | **Obligatoria** |
 | Invariantes Preservadas | N/A | N/A (sí "Anomalies") | **Obligatorias** |
-| Orden de tasks | Por capa arquitectónica | Por capa arquitectónica | **Por riesgo de regresión** |
+| Orden de tasks | Vertical: walking skeleton + slices (`layered` solo justificado) | Vertical: walking skeleton + slices (`layered` solo justificado) | **Por riesgo de regresión** |
 | Tests de regresión | N/A | N/A | **Tareas de blindaje obligatorias** |
 | Validación final | Tests del feature | Tests del sistema reescrito | **Tests del feature + verificación de invariantes** |
 | Tamaño típico del design.md | 300-800 líneas | 300-800 líneas | **200-600 líneas** (es solo delta) |
@@ -629,7 +629,7 @@ La última tarea del tasks.md es obligatoria: correr toda la suite + verificar c
 
 ### De gobernanza
 
-- ❌ "Ejecuta todo `tasks.md`". Rompe garantizado, igual que en proyecto nuevo. Una tarea = una sesión = una revisión.
+- ❌ "Ejecuta todo `tasks.md`". Rompe garantizado, igual que en proyecto nuevo. Un lote = una revisión; el Regression Shield y la No-Regression Validation van solos.
 - ❌ Aprobar requirements sin haber leído Surface of Contact e Invariantes Preservadas. Esas dos secciones son **el contrato** del feature.
 - ❌ Aprobar design sin verificar que no rediseña arquitectura. La auto-validación del agente puede equivocarse — la revisión humana es la última línea.
 
@@ -639,7 +639,7 @@ La última tarea del tasks.md es obligatoria: correr toda la suite + verificar c
 
 Este caso de uso cierra el hueco más grande que tenía stark: aplicar la disciplina de specs-primero a **mantenimiento de sistemas en producción**, no solo a construcción.
 
-La filosofía: **lo que no se documenta como invariante, no se garantiza**. Si quieres no romper algo, anótalo, refencia el código, blíndalo con test. Lo demás es esperanza.
+La filosofía: **lo que no se documenta como invariante, no se garantiza**. Si quieres no romper algo, anótalo, referencia el código, blíndalo con test. Lo demás es esperanza.
 
 Para uso operativo paso a paso, ver [`REFERENCIA.md`](REFERENCIA.md) (Fase 2, variante mantenimiento).
 Para fundamentos generales del framework, ver el [README](../../README.md).

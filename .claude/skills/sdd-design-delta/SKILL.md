@@ -58,7 +58,6 @@ graph TB
     classDef new fill:#dcfce7,stroke:#16a34a,stroke-width:2px
     classDef existing fill:#f3f4f6,stroke:#6b7280,stroke-dasharray:5 5
 ```
-````
 
 ### Componentes del delta
 
@@ -211,8 +210,7 @@ y test que lo valida.]
 | I.1 | ReportController | ReportControllerTest.testJsonShapeUnchanged |
 | I.2 | ReportRenderer | ReportRendererTest.testHtmlRenderUnchanged |
 | I.3 | RoleGuard | RoleGuardTest.testReportAccessByRole (nuevo) |
-
-```
+````
 
 ## 3. Las dos reglas absolutas
 
@@ -321,7 +319,7 @@ Problemas:
 
 ### BIEN
 
-```markdown
+````markdown
 ## 2. Architecture
 
 ### 2.1 Arquitectura Heredada (inmutable)
@@ -357,7 +355,7 @@ graph TB
 
 - **ReportRenderer**: solo se invoca su método actual `render(report)`.
 - **RoleGuard**: misma regla de autorización aplica al endpoint extendido.
-```
+````
 
 ## 7. Checklist de auto-validación (OBLIGATORIO antes de cerrar)
 
