@@ -5,6 +5,8 @@ argument-hint: <slice o rango de tareas, ej. 'Slice 1' o '4-7'>
 
 Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones duras durante toda la ejecución.
 
+Si existe `CONSTITUTION.md` en la raíz, léelo también UNA vez al inicio: sus estándares de código (§4), umbrales de calidad (§5), seguridad (§6), patrones (§2) y vetos (§3) son restricciones duras al escribir código. Antes de entregar el lote, verifica los umbrales de §5 con los comandos que declara. Si una tarea exige contradecir la constitución, DETENTE y repórtalo como alerta crítica — nunca la violes en silencio.
+
 Vas a ejecutar UN lote. La unidad de ejecución es siempre un lote:
 - Modo vertical: un lote = UNA rebanada vertical (un Slice completo, demostrable de punta a punta).
 - Modo layered o mantenimiento por riesgo: un lote = un grupo contiguo de tareas de la misma capa/sección.

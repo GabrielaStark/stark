@@ -332,7 +332,7 @@ Distinto agente según caso. Asegúrate de invocar el correcto.
 
 ### (Opcional pero recomendado) Crea un `CONSTITUTION.md`
 
-Antes de invocar al diseñador, si tienes decisiones técnicas estándar del proyecto o del cliente (stack obligatorio, patrones, librerías vetadas), crea un `CONSTITUTION.md` en la raíz con esas decisiones inmutables. El agente lo va a leer y respetar. Estructura típica: `## Stack obligatorio` (lenguaje, frontend, backend, BD con versiones), `## Patrones obligatorios` (repository pattern, servicios sin estado, error handling tipado), `## Librerías vetadas` (con su alternativa). Sin `CONSTITUTION.md`, el agente te va a preguntar todas estas cosas en la Fase 2 de su workflow.
+Antes de invocar al diseñador, si tienes decisiones técnicas estándar del proyecto o del cliente (stack obligatorio, patrones, librerías vetadas, estándares de código, umbrales de calidad), copia `templates/CONSTITUTION.md` a la raíz como `CONSTITUTION.md` y llénalo. Los agentes lo tratan como restricciones duras en TODAS las fases: el diseñador usa sus decisiones sin preguntar, `/stark-build` aplica sus estándares al escribir código y verifica sus umbrales al cerrar cada lote, y `/stark-review` / `/stark-audit` cazan sus violaciones como severidad alta. La plantilla trae la regla clave de blindaje: si algo necesita contradecir la constitución, el agente se detiene con alerta crítica — la resuelve el humano editando la constitución o el artefacto, nunca el agente en silencio. Sin `CONSTITUTION.md`, el diseñador te va a preguntar el stack en la Fase 2 de su workflow y el codificador solo tendrá los Principios como guía.
 
 ### Invocación
 
@@ -753,7 +753,7 @@ Rompe siempre, sin excepción:
 - **Trazabilidad:** capacidad de rastrear cada línea de código → tarea → componente del design → criterio EARS → historia de usuario.
 - **Subagente:** instancia de Claude con system prompt propio, herramientas propias, identidad propia. Cada uno hace un trabajo específico.
 - **Skill:** archivo `SKILL.md` con reglas y procedimientos que un subagente consulta. Es la "constitución" compartida.
-- **CONSTITUTION.md:** archivo opcional con principios inmutables de un proyecto (stack obligatorio, patrones, vetos).
+- **CONSTITUTION.md:** archivo opcional en la raíz con decisiones inmutables de un proyecto (stack obligatorio, patrones, vetos, estándares de código, umbrales de calidad). Plantilla en `templates/CONSTITUTION.md`. Jerarquía: PRINCIPIOS > CONSTITUTION > artefactos > código. En mantenimiento NO duplica el stack heredado (eso vive en `docs/BIG_PICTURE.md`): aporta las reglas que ningún delta puede violar.
 - **Vibe-coding:** pedirle código a la IA conversacionalmente sin estructura. Funciona para prototipos, rompe para producción.
 
 ### Casos de uso (pipelines)

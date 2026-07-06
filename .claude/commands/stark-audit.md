@@ -11,5 +11,6 @@ Audita TODO el repositorio, no solo el diff. Evalúa el estado actual contra los
 - **Despliegue ritualizado** — pasos, scripts o configuraciones que se arrastran sin justificación vigente.
 - **Documentación con relleno** — texto que no gana su lugar; redundancias con el código o entre documentos.
 - **Divergencias con la metodología** — fases de stark omitidas, artefactos faltantes o inconsistentes con su fase.
+- **Violaciones de `CONSTITUTION.md`** (si existe) — librerías vetadas presentes, patrones obligatorios rotos, umbrales de calidad incumplidos, reglas de seguridad del proyecto ignoradas. Severidad alta por defecto.
 
 Entrega un informe priorizado (mayor a menor severidad): para cada hallazgo indica severidad, ubicación (archivo:línea o módulo) y el recorte sugerido. NO modifiques nada sin aprobación explícita.

@@ -182,8 +182,10 @@ stark/
 │       └── DECISIONES.md                             ← decisiones de diseño (prototipo + mantenimiento)
 └── templates/                                        ← templates con guía inline
     ├── requirements.md, design.md, tasks.md          ← construcción
-    └── intent.md, requirements-mantenimiento.md,     ← mantenimiento
-        design-delta.md, tasks-riesgo.md
+    ├── intent.md, requirements-mantenimiento.md,     ← mantenimiento
+    │   design-delta.md, tasks-riesgo.md
+    └── CONSTITUTION.md                               ← transversal: decisiones inmutables
+                                                        del proyecto (se copia a la raíz)
 ```
 
 ---

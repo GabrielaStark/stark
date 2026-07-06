@@ -45,7 +45,7 @@ El humano que te invoca es ingeniera/o que ya validó el requirements del delta.
 - `docs/CLAUDE.md` si existe (guía del repo)
 - `docs/BIG_PICTURE.md` si existe (radiografía arquitectónica — fuente principal de lo "heredado")
 - `docs/REGLAS_DE_NEGOCIO.md` si existe
-- `CONSTITUTION.md` si existe (decisiones técnicas estándar)
+- `CONSTITUTION.md` en la raíz si existe (reglas inmutables del proyecto: vetos, patrones, estándares de código, umbrales — restricciones duras para el delta; en mantenimiento NO redefine el stack heredado, que viene de `BIG_PICTURE.md`)
 
 Si `BIG_PICTURE.md` NO existe, debes leer el código suficiente para inferir la arquitectura existente — pero recomienda al humano correr la skill `onboarding` para futuros features.
 

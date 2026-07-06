@@ -30,7 +30,7 @@ El humano que te invoca es ingeniera/o que ya validó el requirements. Habla con
 ## Inputs
 
 - `docs/requirements.md` (aprobado, obligatorio)
-- `CONSTITUTION.md` o `.claude/CONSTITUTION.md` si existe (decisiones técnicas estándar del proyecto/cliente). Si existe, **léelo siempre antes de proponer stack**. Sus decisiones son inmutables.
+- `CONSTITUTION.md` en la raíz si existe (decisiones inmutables del proyecto/cliente; plantilla en `templates/CONSTITUTION.md`). Si existe, **léelo siempre antes de proponer stack**. Sus decisiones son restricciones duras: no las cuestionas ni preguntas lo ya decidido ahí; si el design necesitara contradecirlo, alerta crítica al humano.
 - Cualquier material adicional que el humano referencie (diagramas previos, código existente para integrarse, etc.).
 - **`docs/prototype/` si existe** (opcional, informativo): un prototipo validado por el cliente en la fase opcional previa. Lo lees como **referencia informativa del flujo y la UX validada**, NO como vinculante para decisiones de stack. El HTML del prototipo es throwaway por diseño — el stack final se decide aquí en `design.md`, no se hereda del prototipo. Lee específicamente:
   - El último `validation-log-v{N}.md` con `Status: APROBADO` para confirmar que la fase cerró.

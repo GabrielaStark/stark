@@ -37,6 +37,10 @@ Muestra la secuencia stark del caso ([ ] = opcional) y cuál comando sigue:
 
 - **PROTOTIPO** → mantén requirements en modo ligero (lo mínimo para inferir pantallas) y salta directo a `/stark-prototype`.
 
-## 4. Cierra
+## 4. Ofrece la constitución del proyecto
+
+Si no existe `CONSTITUTION.md` en la raíz, ofrécele al humano crearlo desde `templates/CONSTITUTION.md`: ahí fija stack (construcción), patrones, vetos, estándares de código y umbrales de calidad que los agentes tratarán como restricciones duras. Es opcional — si dice que no, sigue sin insistir. NO lo llenes tú: cópialo y deja que el humano decida su contenido.
+
+## 5. Cierra
 
 Confirma qué se generó y enuncia explícitamente el siguiente comando a invocar.
