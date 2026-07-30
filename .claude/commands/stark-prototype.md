@@ -7,7 +7,7 @@ Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones du
 
 El prototipo es transversal y opcional, pero ciudadano de primera (Fase 3). Detecta en cuál de los dos modos operas:
 
-- **STANDALONE** — el prototipo ES el encargo. Arranca de un requirements ligero (o lo que el cliente describa) y entrega un mockup desplegable para validar la idea.
+- **STANDALONE** — el prototipo ES el encargo. Arranca del requirements ligero aprobado (si no existe, primero `/stark-requirements` en modo ligero — el prototipador no arranca sin requirements) y entrega un mockup desplegable para validar la idea.
 - **FASE 3 DEL FLUJO** — vienes tras un requirements aprobado. Valida la UI con el cliente ANTES de pasar a diseño.
 
 Enruta al subagente: Use the prototipador-visual subagent to produce the deployable mockup.

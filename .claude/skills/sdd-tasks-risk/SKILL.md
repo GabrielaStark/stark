@@ -1,11 +1,13 @@
 ---
 name: sdd-tasks-risk
-description: Use this skill whenever generating, validating, or editing a tasks.md file for the SDD MAINTENANCE pipeline (adding a feature to a production system). Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS + invariant traceability footer), the canonical risk-ordered structure (Regression Shield FIRST → Data Delta → Backend Delta → API Delta → Frontend Delta → Integration → E2E → No-Regression Validation → Documentation), the five operational rules, useful patterns (spike, regression test creation, integration tasks, optional tasks), execution discipline (batched execution: one lote of contiguous same-section tasks per session, human review per lote; Regression Shield and No-Regression Validation always run alone), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved delta design.md into a tasks.md for maintenance. NOT for greenfield or brownfield-rewrite — use sdd-tasks for those.
+description: "Use this skill whenever generating, validating, or editing a tasks.md file for the SDD MAINTENANCE pipeline (adding a feature to a production system). Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS + invariant traceability footer), the canonical risk-ordered structure (Regression Shield FIRST → Data Model Delta → Backend Delta → API Delta → Frontend Delta → Integration → E2E → Documentation → No-Regression Validation LAST), the five operational rules, useful patterns (spike, regression test creation, integration tasks, optional tasks), execution discipline (batched execution: one lote of contiguous same-section tasks per session, human review per lote; Regression Shield and No-Regression Validation always run alone), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved delta design.md into a tasks.md for maintenance. NOT for greenfield or brownfield-rewrite — use sdd-tasks for those."
 ---
 
 # SDD Tasks Risk — Constitución
 
 Este skill es la fuente de verdad para producir `docs/features/<feature>/tasks.md` en el pipeline de **mantenimiento** del framework stark. El subagente `descompositor-riesgo-mantenimiento` consulta este archivo. Cualquier `tasks.md` producido en este pipeline debe cumplir TODAS las reglas de aquí.
+
+Las decisiones de diseño detrás de estas reglas viven en `docs/documentacion/DECISIONES.md` (Parte B — Mantenimiento). Si una regla aquí choca con ese doc, ese doc manda y este skill se actualiza.
 
 ## 1. Propósito del tasks.md de mantenimiento
 
@@ -56,7 +58,10 @@ Cada tarea en `tasks.md` SIEMPRE tiene esta estructura:
   - `Documentar` — escritura de docs
   - **`Blindar`** — escribir tests de regresión sobre código existente que se va a tocar (nuevo verbo, exclusivo de mantenimiento)
   - **`Verificar regresión`** — ejecutar suite completa y validar invariantes (nuevo verbo)
+  - `Integrar` — conectar el delta con un flujo existente (sección Integration)
+  - `Actualizar` — actualizar documentación o artefacto existente (sección Documentation)
 
+- El título `Tests ...` es válido para tareas de tests (forma corta de `Implementar tests ...`).
 - ❌ Prohibidos: "Trabajar en", "Hacer", "Investigar" (excepto en spikes formales).
 
 #### Sub-pasos
@@ -78,7 +83,7 @@ Cada tarea en `tasks.md` SIEMPRE tiene esta estructura:
 - Formato exacto: `_Requirements: X.Y, X.Z_ | _Invariants: I.A, I.B_`
 - `_Requirements:_` lista los criterios EARS del delta que la tarea cumple. Puede ser `-` si la tarea es de blindaje pura o de validación.
 - `_Invariants:_` lista las invariantes que la tarea afecta o blinda. Puede ser `-` si la tarea no toca código existente.
-- **Mínimo uno de los dos debe tener referencia.** Si ambos son `-`, la tarea no se justifica.
+- **Mínimo uno de los dos debe tener referencia** en tareas de implementación, modificación o blindaje. Excepción documentada: las tareas estructurales — el gate de suite del Regression Shield, los Spikes y las de Documentation — pueden llevar ambos `-`.
 
 ## 3. Las 5 reglas operacionales
 
@@ -102,8 +107,8 @@ Secuencia canónica:
 6. Frontend Delta (UI nueva o extensiones)
 7. Integration (puntos donde el delta se conecta con flujos existentes — tareas chicas y aisladas)
 8. E2E del feature (flujo completo del delta + coexistencia con lo existente)
-9. No-Regression Validation (suite completa + invariantes)
-10. Documentation (actualizar docs afectadas)
+9. Documentation (actualizar docs afectadas)
+10. No-Regression Validation (suite completa + invariantes) — SIEMPRE la última sección
 
 ### Regla 3: Tests existentes deben pasar ANTES de empezar a modificar
 
@@ -197,15 +202,18 @@ modificación al código de producción. Se derivan de la tabla
 
 - [ ] N+2. Tests de integración del endpoint
   - ...
+  - _Requirements: X.Y_ | _Invariants: I.A_
 
 ## Frontend Delta
 
 [Si aplica.]
 
 - [ ] N. Implementar [componente UI nuevo]
+  - _Requirements: X.Y_ | _Invariants: -_
 - [ ] N+1. Tests del componente
+  - _Requirements: X.Y_ | _Invariants: -_
 - [ ] N+2. Integrar [componente] en [vista existente] sin alterar resto de la vista
-  - _Invariants: I.B (resto de la vista renderiza igual)_
+  - _Requirements: -_ | _Invariants: I.B (resto de la vista renderiza igual)_
 
 ## Integration
 
@@ -227,19 +235,6 @@ de alto riesgo. NO mezclar varios puntos de integración en una sola tarea.]
   - Caso coexistencia: flujo existente sin tocar el feature sigue funcionando
   - _Requirements: X.Y, X.Z, ..._ | _Invariants: I.A, I.C_
 
-## No-Regression Validation
-
-[Tarea final obligatoria antes de cerrar el feature. Verifica que ninguna
-invariante se rompió.]
-
-- [ ] N. Verificar regresión: suite completa + invariantes
-  - Ejecutar TODA la suite de tests del repo
-  - Verificar manualmente cada invariante de `requirements.md`
-  - Para cada invariante: ¿el test sigue pasando? ¿el comportamiento es idéntico?
-  - Si hay alguna invariante violada, **detener cierre** y reportar
-  - Criterio de hecho: 100% de tests pasan + cada invariante verificada
-  - _Requirements: -_ | _Invariants: I.1, I.2, ..., I.N (todas)_
-
 ## Documentation
 
 - [ ] N. Actualizar `docs/BIG_PICTURE.md` si la arquitectura del sistema cambió
@@ -253,6 +248,19 @@ invariante se rompió.]
 
 - [ ] N+2. Actualizar README del módulo afectado
   - _Requirements: -_ | _Invariants: -_
+
+## No-Regression Validation
+
+[Tarea final obligatoria antes de cerrar el feature — SIEMPRE la última
+sección. Verifica que ninguna invariante se rompió.]
+
+- [ ] N. Verificar regresión: suite completa + invariantes
+  - Ejecutar TODA la suite de tests del repo
+  - Verificar manualmente cada invariante de `requirements.md`
+  - Para cada invariante: ¿el test sigue pasando? ¿el comportamiento es idéntico?
+  - Si hay alguna invariante violada, **detener cierre** y reportar
+  - Criterio de hecho: 100% de tests pasan + cada invariante verificada
+  - _Requirements: -_ | _Invariants: I.1, I.2, ..., I.N (todas)_
 ```
 
 Los headers de sección son **por riesgo de regresión y secuencia de seguridad**, no por capa arquitectónica. Esto es lo que distingue este pipeline.
@@ -301,15 +309,15 @@ Cada punto de coexistencia es una tarea propia, no se agrupan:
 ```markdown
 - [ ] N. Integrar [delta] con auth (rol-based access)
   - Garantía: I.3 (autorización por rol no cambia)
-  - _Invariants: I.3_
+  - _Requirements: -_ | _Invariants: I.3_
 
 - [ ] N+1. Integrar [delta] con notifications
   - Garantía: I.5 (notificaciones existentes no cambian)
-  - _Invariants: I.5_
+  - _Requirements: -_ | _Invariants: I.5_
 
 - [ ] N+2. Integrar [delta] con audit log
   - Garantía: I.7 (eventos auditados existentes no cambian)
-  - _Invariants: I.7_
+  - _Requirements: -_ | _Invariants: I.7_
 ```
 
 ### Tareas opcionales para MVP del feature
@@ -355,10 +363,10 @@ Mismo que sdd-tasks: "ejecuta todo tasks.md" rompe garantizado. Además, en mant
 
 ### Estructura
 
-- [ ] El archivo usa las secciones canónicas que apliquen, en el orden canónico (Regression Shield → Spike → Data Model Delta → Backend Delta → API Delta → Frontend Delta → Integration → Integration Tests → No-Regression Validation → Documentation). Spike, Data Model Delta y Frontend Delta son opcionales según el feature; Regression Shield y No-Regression Validation son obligatorias siempre.
+- [ ] El archivo usa las secciones canónicas que apliquen, en el orden canónico (Regression Shield → Spike → Data Model Delta → Backend Delta → API Delta → Frontend Delta → Integration → Integration Tests → Documentation → No-Regression Validation). Spike, Data Model Delta y Frontend Delta son opcionales según el feature; Regression Shield y No-Regression Validation son obligatorias siempre, y No-Regression Validation es la última sección del archivo.
 - [ ] Numeración secuencial sin huecos.
 - [ ] Sección "Regression Shield" existe y tiene al menos 1 tarea (mínimo: verificar que la suite existente pasa).
-- [ ] Sección "No-Regression Validation" existe y tiene la tarea final de verificación de invariantes.
+- [ ] Sección "No-Regression Validation" existe, es la última sección del archivo y tiene la tarea final de verificación de invariantes.
 
 ### Por cada tarea
 
@@ -367,7 +375,7 @@ Mismo que sdd-tasks: "ejecuta todo tasks.md" rompe garantizado. Además, en mant
 - [ ] Tiene al menos un sub-paso concreto.
 - [ ] Tiene línea explícita de "Criterio de hecho".
 - [ ] Tiene footer con `_Requirements:_` Y `_Invariants:_`.
-- [ ] Al menos uno de los dos del footer tiene referencia (no ambos `-`).
+- [ ] Al menos uno de los dos del footer tiene referencia (ambos `-` solo en tareas estructurales: gate de suite, Spike, Documentation).
 - [ ] Es completable en una sesión (1-3 archivos, 50-200 líneas).
 
 ### Cobertura

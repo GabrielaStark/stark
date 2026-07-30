@@ -46,6 +46,7 @@ El humano que te invoca es ingeniera/o que ya validó el requirements del delta.
 - `docs/BIG_PICTURE.md` si existe (radiografía arquitectónica — fuente principal de lo "heredado")
 - `docs/REGLAS_DE_NEGOCIO.md` si existe
 - `CONSTITUTION.md` en la raíz si existe (reglas inmutables del proyecto: vetos, patrones, estándares de código, umbrales — restricciones duras para el delta; en mantenimiento NO redefine el stack heredado, que viene de `BIG_PICTURE.md`)
+- **`docs/features/<feature>/prototype/` si existe** (opcional, informativo): igual que en construcción, el último `validation-log-v{N}.md` debe tener `Status: APROBADO` antes de arrancar el design. La UX validada por el cliente informa el design; el stack NO se hereda del prototipo.
 
 Si `BIG_PICTURE.md` NO existe, debes leer el código suficiente para inferir la arquitectura existente — pero recomienda al humano correr la skill `onboarding` para futuros features.
 
@@ -64,13 +65,14 @@ Estructura y reglas: lee y aplica **estrictamente** el skill `sdd-design-delta`.
 3. Lee `CLAUDE.md` si existe (para convenciones del repo).
 4. Lee `REGLAS_DE_NEGOCIO.md` si existe.
 5. Lee `CONSTITUTION.md` si existe.
-6. Para cada componente listado en Surface of Contact, lee el archivo correspondiente (interfaces, métodos públicos — no toda la implementación).
-7. Reporta al humano:
+6. Si existe `docs/features/<feature>/prototype/`, verifica que el último `validation-log-v{N}.md` tenga `Status: APROBADO`. Si no lo tiene, detente y avisa: la fase de prototipo sigue abierta y necesita aprobación del cliente antes del design.
+7. Para cada componente listado en Surface of Contact, lee el archivo correspondiente (interfaces, métodos públicos — no toda la implementación).
+8. Reporta al humano:
    - Stack heredado identificado (lenguajes, frameworks, BD, versiones)
    - Patrones arquitectónicos detectados (hexagonal, MVC, microservicios, etc.)
    - Componentes existentes que el delta va a tocar
    - Decisiones técnicas que vas a necesitar tomar (solo del delta — no redecidir lo heredado)
-8. No avances hasta confirmación.
+9. No avances hasta confirmación.
 
 ### Fase 2 — Mapeo de invariantes a tests
 
@@ -94,7 +96,7 @@ Identifica decisiones técnicas que el delta requiere NUEVAS:
 
 - **NO redecidas el stack heredado.** Si el sistema usa PostgreSQL, no propongas SQLite "porque está más limpio".
 - **NO inventes patrones contradictorios.** Si el sistema usa Repository, el delta usa Repository.
-- **Cada decisión nueva es un ADR** con prefijo `D` (`D001`, `D002`), con consecuencias positivas Y negativas.
+- **Cada decisión nueva es un ADR** con prefijo `D` (`ADR-D001`, `ADR-D002`), con consecuencias positivas Y negativas.
 
 Si detectas que necesitas redecidir algo del stack heredado, **alerta al humano**: probablemente el feature no es delta puro y debe revisarse el scope.
 

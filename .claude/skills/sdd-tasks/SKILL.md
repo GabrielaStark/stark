@@ -1,6 +1,6 @@
 ---
 name: sdd-tasks
-description: Use this skill whenever generating, validating, or editing a tasks.md file for Spec-Driven Development. Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS traceability footer), the two grouping structures per delivery_strategy (vertical/default — Walking Skeleton + feature slices demonstrable end-to-end; layered — by architectural layer, only for infra/migration/refactor without UI), the four operational rules, useful patterns (spike, preventive refactor, validation tasks, optional tasks), execution discipline (batched execution: one lote — a full Slice in vertical mode or a contiguous same-layer group in layered mode — per session, tasks executed one by one in order, human review per lote, validation tasks always alone), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved design.md into tasks.md, or when reviewing an existing tasks.md.
+description: "Use this skill whenever generating, validating, or editing a tasks.md file for Spec-Driven Development. Defines task anatomy (checkbox, sequential number, action verb, sub-steps, references, EARS traceability footer), the two grouping structures per delivery_strategy (vertical/default — Walking Skeleton + feature slices demonstrable end-to-end; layered — by architectural layer, only for infra/migration/refactor without UI), the four operational rules, useful patterns (spike, preventive refactor, validation tasks, optional tasks), execution discipline (batched execution: one lote — a full Slice in vertical mode or a contiguous same-layer group in layered mode — per session, tasks executed one by one in order, human review per lote, validation tasks always alone), and the mandatory validation checklist. Trigger whenever the task involves transforming an approved design.md into tasks.md, or when reviewing an existing tasks.md."
 ---
 
 # SDD Tasks — Constitución
@@ -58,6 +58,7 @@ Cada tarea en `tasks.md` SIEMPRE tiene esta estructura:
   - `Configurar` — setup de herramienta/dependencia
   - `Validar` — verificación cruzada
   - `Documentar` — escritura de docs
+- El título `Tests ...` es válido para tareas de tests (forma corta de `Implementar tests ...`).
 - ❌ Prohibidos: "Trabajar en", "Hacer", "Investigar" (excepto en spikes formales)
 
 #### Sub-pasos
@@ -171,15 +172,18 @@ El agrupamiento de headers depende de `delivery_strategy`. El **default es `vert
 - [ ] 5. [Implementar pantalla ...]   (UI)
   - _Requirements: X.Y_
 
-- [ ] 6. Tests del slice "[nombre]"   (tests independientes)
-  - _Requirements: X.Y_
-
-- [ ] 7. Criterio de hecho del slice: el sistema corre y la feature [X] es demostrable de punta a punta.
+- [ ] 6. Tests del slice "[nombre]"   (tests independientes; cierran el slice)
+  - Criterio de hecho: el sistema corre y la feature [X] es demostrable de punta a punta.
   - _Requirements: X.Y, X.Z_
 
 ## Slice 2: [siguiente feature]
 
 - [ ] N. ...   (un slice por feature, ordenados por valor/riesgo de negocio)
+
+## Documentation
+
+- [ ] N. Documentar uso de las features entregadas   (sección final, opcional)
+  - _Requirements: -_
 ```
 
 Un slice cruza TODAS las capas de UNA feature (datos → lógica → API → UI + tests), respetando ese orden de dependencia DENTRO del slice, y cierra con el criterio: **el sistema corre y la feature [X] es demostrable de punta a punta.**
@@ -230,7 +234,7 @@ Solo legítimo cuando NO hay entrega vertical demostrable (sin UI). El `design.m
 - [ ] N. ...
 ```
 
-En modo vertical los headers son `## 0. Walking Skeleton` + `## Slice N` (cada slice cruza capas y cierra demostrable de punta a punta). En modo layered los headers son **por capa arquitectónica** (Setup → Data → ... → Docs). En AMBOS modos las dependencias técnicas se respetan y la trazabilidad EARS es idéntica: solo cambia el AGRUPAMIENTO, nunca la cobertura.
+En modo vertical los headers son `## 0. Walking Skeleton` + `## Slice N` (+ un `## Documentation` final opcional; cada slice cruza capas y cierra demostrable de punta a punta). En modo layered los headers son **por capa arquitectónica** (Setup → Data → ... → Docs). En AMBOS modos las dependencias técnicas se respetan y la trazabilidad EARS es idéntica: solo cambia el AGRUPAMIENTO, nunca la cobertura.
 
 ## 5. Patrones útiles
 
@@ -327,7 +331,7 @@ Un lote = una revisión humana = los `[x]` que el humano marca. Sin atajos. La d
 ### Estructura
 
 - [ ] El agrupamiento corresponde a `delivery_strategy`:
-  - **vertical (default)**: headers `## 0. Walking Skeleton` + `## Slice N`; cada slice cruza capas (datos → lógica → API → UI + tests) y cierra con "el sistema corre y la feature [X] es demostrable de punta a punta".
+  - **vertical (default)**: headers `## 0. Walking Skeleton` + `## Slice N` (+ `## Documentation` final opcional); cada slice cruza capas (datos → lógica → API → UI + tests) y cierra con "el sistema corre y la feature [X] es demostrable de punta a punta".
   - **layered**: headers por capa arquitectónica (Setup, Data Model, Data Access, Business Logic, API, UI, E2E, Docs), solo para infraestructura/migración/refactor sin UI, justificado en design.md.
 - [ ] Numeración secuencial sin huecos.
 

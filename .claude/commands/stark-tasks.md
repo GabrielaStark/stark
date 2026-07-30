@@ -1,6 +1,6 @@
 ---
 description: Fase 5 · Descompone el design en tareas ejecutables. Vertical slices (construcción) o por riesgo (mantenimiento).
-argument-hint: [slug-feature en mantenimiento]
+argument-hint: "[slug-feature en mantenimiento]"
 ---
 
 Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones duras.

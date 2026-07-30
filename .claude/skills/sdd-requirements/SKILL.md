@@ -62,6 +62,8 @@ como lo que sí. Evita scope creep y suposiciones del LLM downstream.]
 [Solo si el dominio tiene términos no obvios. Definiciones breves.]
 ```
 
+**Modo arqueólogo (reingeniería):** al final del archivo se añaden además las secciones `## Detected Anomalies`, `## Open Questions` y `## Coverage Map` (las define el agente `arqueologo-codigo`; `templates/requirements.md` las anota).
+
 ### Reglas estructurales
 
 - **User Story SIEMPRE en español**, formato exacto: `Como X, quiero Y, para Z`. Nunca abreviar, nunca omitir el "para Z" (sin objetivo de negocio, el LLM optimiza para correctitud funcional pero pierde sentido).
@@ -246,7 +248,7 @@ Antes de declarar `requirements.md` terminado, ejecutar mentalmente cada uno de 
 - [ ] Todos los criterios usan exclusivamente `SHALL` (ningún `should`, `would`, `may`, `might`, `could`)
 - [ ] Todos los criterios empiezan con uno de: `THE SYSTEM SHALL`, `WHEN`, `WHILE`, `WHERE`, `IF`
 - [ ] Todos los criterios tienen sujeto `THE SYSTEM` (o subsistema nombrado)
-- [ ] Ningún criterio mezcla múltiples comportamientos (señal: aparece " and " conectando acciones)
+- [ ] Ningún criterio mezcla múltiples comportamientos (señal: " and " conectando acciones de dominio distintas; bloquear una acción y mostrar su error tipado cuenta como una sola respuesta)
 - [ ] Ningún criterio menciona implementación (REST, SQL, framework específico, librería específica)
 - [ ] Ningún criterio usa adjetivos vagos no testeables ("fast", "easy", "intuitive", "user-friendly")
 - [ ] Cantidades son específicas con unidad (no "rápido", sí "<200ms")
@@ -262,6 +264,8 @@ Antes de declarar `requirements.md` terminado, ejecutar mentalmente cada uno de 
 
 - [ ] Criterios derivados de código tienen anotación `<!-- confidence: high|medium|low; source: archivo:línea -->`
 - [ ] Huecos no resueltos están listados en sección final `## Open Questions`
+- [ ] Existe `## Detected Anomalies` (con contenido si se detectaron anomalías)
+- [ ] Existe `## Coverage Map` conectando módulo legacy ↔ Requirement(s)
 
 ## 7. Cuando el output NO está listo
 

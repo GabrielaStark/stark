@@ -13,7 +13,7 @@
   - Ejecutar `[comando de tests del repo, ej. mvn test, npm test, etc.]`
   - Si falla, detener y reportar al humano. El sistema está en estado roto independiente del feature.
   - Criterio de hecho: todos los tests existentes pasan en verde sin tocar nada
-  - _Requirements: -_ | _Invariants: -_
+  - _Requirements: -_ | _Invariants: -_ (tarea estructural de gate)
 
 - [ ] 2. Blindar I.1 — [descripción invariante]
   - Crear test en `[archivo_test]`
@@ -72,9 +72,11 @@
 [Si aplica.]
 
 - [ ] N. Implementar `[componente UI]`
+  - _Requirements: X.Y_ | _Invariants: -_
 - [ ] N+1. Tests del componente
+  - _Requirements: X.Y_ | _Invariants: -_
 - [ ] N+2. Integrar `[componente]` en `[vista existente]` sin alterar resto
-  - _Invariants: I.B (resto de la vista renderiza igual)_
+  - _Requirements: -_ | _Invariants: I.B (resto de la vista renderiza igual)_
 
 ## Integration
 
@@ -88,7 +90,7 @@
 
 - [ ] N+1. Integrar [delta] con [flujo existente 2]
   - ...
-  - _Invariants: I.D_
+  - _Requirements: -_ | _Invariants: I.D_
 
 ## Integration Tests (E2E del feature)
 
@@ -97,18 +99,6 @@
   - Caso error: payload inválido → 400 con error tipado
   - Caso coexistencia: flujo existente sin tocar el feature sigue funcionando
   - _Requirements: X.Y, X.Z, ..._ | _Invariants: I.A, I.C_
-
-## No-Regression Validation
-
-> Tarea final obligatoria antes de cerrar el feature.
-
-- [ ] N. Verificar regresión: suite completa + invariantes
-  - Ejecutar TODA la suite de tests del repo
-  - Verificar manualmente cada invariante de `requirements.md`
-  - Para cada invariante: ¿el test sigue pasando? ¿el comportamiento es idéntico?
-  - Si alguna invariante está violada, **detener cierre** y reportar
-  - Criterio de hecho: 100% de tests pasan + cada invariante verificada
-  - _Requirements: -_ | _Invariants: I.1, I.2, ..., I.N (todas)_
 
 ## Documentation
 
@@ -122,3 +112,15 @@
 
 - [ ] N+2. Actualizar README del módulo afectado
   - _Requirements: -_ | _Invariants: -_
+
+## No-Regression Validation
+
+> Tarea final obligatoria antes de cerrar el feature. SIEMPRE la última sección.
+
+- [ ] N. Verificar regresión: suite completa + invariantes
+  - Ejecutar TODA la suite de tests del repo
+  - Verificar manualmente cada invariante de `requirements.md`
+  - Para cada invariante: ¿el test sigue pasando? ¿el comportamiento es idéntico?
+  - Si alguna invariante está violada, **detener cierre** y reportar
+  - Criterio de hecho: 100% de tests pasan + cada invariante verificada
+  - _Requirements: -_ | _Invariants: I.1, I.2, ..., I.N (todas)_

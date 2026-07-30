@@ -1,10 +1,10 @@
 # Troubleshooting de stark
 
-Soluciones a los problemas más comunes durante el uso de stark, agrupadas en generales (los tres flujos de construcción) y específicas de mantenimiento. Para el camino feliz ve a [QUICKSTART.md](QUICKSTART.md); para el detalle exhaustivo, [REFERENCIA.md](REFERENCIA.md).
+Soluciones a los problemas más comunes durante el uso de stark, agrupadas en generales (aplican a cualquier caso de uso) y específicas de mantenimiento. Para el camino feliz ve a [QUICKSTART.md](QUICKSTART.md); para el detalle exhaustivo, [REFERENCIA.md](REFERENCIA.md).
 
 ---
 
-## General (los tres flujos de construcción)
+## General (todos los casos de uso)
 
 ### "Los subagentes no aparecen al ejecutar `/agents`"
 

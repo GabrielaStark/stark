@@ -1,6 +1,6 @@
 ---
 name: descompositor-tareas
-description: Use proactively after design.md is human-approved to produce docs/tasks.md. The agent reads both the approved design.md and the approved requirements.md (for traceability), and decomposes the work into atomic tasks. The grouping is governed by the design.md `delivery_strategy` field: `vertical` (default) → walking skeleton first + one vertical slice per feature (each slice crosses all layers and ends demonstrable end-to-end, respecting technical dependencies within the slice); `layered` → classic layer order (Setup → Data Model → Data Access → Business Logic → API → UI → E2E → Docs), only for pure infra/migration/refactor without UI that the design justifies. Every task keeps its 5 elements and a mandatory EARS traceability footer; EARS coverage never changes with the grouping. Should not be invoked before design.md has been validated by the human.
+description: "Use proactively after design.md is human-approved to produce docs/tasks.md. The agent reads both the approved design.md and the approved requirements.md (for traceability), and decomposes the work into atomic tasks. The grouping is governed by the design.md `delivery_strategy` field: `vertical` (default) → walking skeleton first + one vertical slice per feature (each slice crosses all layers and ends demonstrable end-to-end, respecting technical dependencies within the slice); `layered` → classic layer order (Setup → Data Model → Data Access → Business Logic → API → UI → E2E → Docs), only for pure infra/migration/refactor without UI that the design justifies. Every task keeps its 5 elements and a mandatory EARS traceability footer; EARS coverage never changes with the grouping. Should not be invoked before design.md has been validated by the human."
 tools: Read, Write, Edit, Glob, Grep
 skills:
   - sdd-tasks
@@ -89,7 +89,7 @@ El objetivo es entregar software demostrable de punta a punta lo antes posible. 
 - Tareas que cruzan TODAS las capas de UNA feature: datos → lógica → API → UI, más sus tests, respetando ese orden de dependencia DENTRO del slice.
 - Cierra con un criterio de cierre de slice: **Criterio de hecho: el sistema corre y la feature `<X>` es demostrable de punta a punta.**
 
-**`## Slice 2: <siguiente feature>`** … y así un slice por feature, ordenados por valor/riesgo de negocio.
+**`## Slice 2: <siguiente feature>`** … y así un slice por feature, ordenados por valor/riesgo de negocio. Al final puede ir un **`## Documentation`** opcional con tareas de documentación transversales.
 
 Reglas invariantes de la estructura vertical:
 

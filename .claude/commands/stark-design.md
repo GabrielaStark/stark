@@ -1,6 +1,6 @@
 ---
 description: Fase 4 · Diseño técnico. Enruta a arquitecto (nuevo/reingeniería) o delta (mantenimiento).
-argument-hint: [slug-feature en mantenimiento]
+argument-hint: "[slug-feature en mantenimiento]"
 ---
 
 Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones duras antes de actuar.

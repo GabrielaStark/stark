@@ -7,6 +7,8 @@ description: Use this skill whenever generating, validating, or editing a design
 
 Este skill es la fuente de verdad para producir `docs/features/<feature>/design.md` en el pipeline de **mantenimiento** del framework stark. El subagente `disenador-delta-mantenimiento` consulta este archivo. Cualquier `design.md` producido en este pipeline debe cumplir TODAS las reglas de aquí.
 
+Las decisiones de diseño detrás de estas reglas viven en `docs/documentacion/DECISIONES.md` (Parte B — Mantenimiento). Si una regla aquí choca con ese doc, ese doc manda y este skill se actualiza.
+
 ## 1. Propósito del design.md delta
 
 Responde **"¿cómo se implementa el feature del requirements.md sobre la arquitectura existente, sin tocar lo que ya funciona?"**.
@@ -53,9 +55,10 @@ relevantes para el feature. NO redibujar el sistema completo.]
 graph TB
     NewFeature[FeatureService NEW]:::new --> ExistingSvc[UserService<br/>EXISTING]:::existing
     NewFeature --> NewRepo[FeatureRepository NEW]:::new
-    NewRepo --> ExistingDb[(users table<br/>EXISTING + col delta)]:::existing
+    NewRepo --> ExistingDb[(users table<br/>+ col delta)]:::modified
 
     classDef new fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    classDef modified fill:#fef3c7,stroke:#d97706,stroke-width:2px
     classDef existing fill:#f3f4f6,stroke:#6b7280,stroke-dasharray:5 5
 ```
 
@@ -258,7 +261,7 @@ Un humano debe poder leer, entender y aprobar el design completo en 20-30 minuto
 - Solo para decisiones nuevas. NO redecidir stack, patrones globales, etc.
 - Si una decisión nueva contradice una decisión existente del sistema, **alerta crítica al humano** — eso no es mantenimiento, es modernización parcial.
 - Cada ADR con consecuencias negativas obligatorias.
-- ADRs van numerados `D001`, `D002` (prefijo `D` por "delta") para diferenciar de ADRs históricos del sistema (que pueden estar como `ADR-001` en otra documentación).
+- ADRs van numerados `ADR-D001`, `ADR-D002` (prefijo `D` por "delta") para diferenciar de ADRs históricos del sistema (que pueden estar como `ADR-001` en otra documentación).
 
 ### Critical Flows
 - Solo flujos del feature que tocan componentes existentes.

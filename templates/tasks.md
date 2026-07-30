@@ -76,7 +76,7 @@ esqueleto que camina.
   - _Requirements: -_
 
 - [ ] 4. Configurar pipeline de despliegue mínimo
-  - Definir build y artefacto desplegable (Docker / plataforma según design §8)
+  - Definir build y artefacto desplegable (Docker / plataforma según design §1 Overview y sus ADRs)
   - Desplegar el hilo pasante a un entorno accesible
   - Criterio de hecho: el sistema arranca y responde `/health` en el entorno desplegado
   - _Requirements: -_
@@ -239,7 +239,7 @@ Orden clásico por capa (reemplaza al cuerpo vertical de arriba):
 
 ## Setup            -> scaffolding, deps, linter, testing
 ## Data Model       -> schema y migraciones por entidad (design §3)
-## Data Access      -> repositorios + tests de integración (design §4)
+## Data Access Layer -> repositorios + tests de integración (design §4)
 ## Business Logic   -> servicios + tests unitarios (design §2, §4)
 ## API / Interface  -> endpoints/handlers + tests de integración (design §4)
 ## UI / Client      -> pantallas/componentes (si aplica)

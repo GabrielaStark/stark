@@ -29,7 +29,7 @@ Todas las reglas de este skill aplican igual en ambos casos; solo cambia la carp
 ## 2. Estructura obligatoria de la carpeta
 
 ```
-docs/prototype/
+<prototype>/                      ← carpeta base según pipeline (§1)
 ├── index.html                    ← OUTPUT pantalla principal
 ├── pantallas/                    ← OUTPUT pantallas adicionales (si aplica)
 │   ├── <nombre>.html
@@ -149,7 +149,7 @@ Y `package.json`:
 ### Reglas del server
 
 - Credenciales SIEMPRE por env vars (`AUTH_USER`, `AUTH_PASS`). Defaults solo para no romper en local.
-- Sirve la carpeta donde reside `server.js` (es decir, `docs/prototype/`).
+- Sirve la carpeta donde reside `server.js` (es decir, `<prototype>/`).
 - Sin lógica adicional. NO endpoints, NO API, NO base de datos.
 - Sin variables sensibles hardcodeadas en código. Si aparece una, FALLO.
 
@@ -177,14 +177,8 @@ la clave `prototype_deploy: <nombre>` o avísale al agente en la próxima invoca
 
 ## Alternativas soportadas
 
-| Plataforma | Auth privado | Setup | Notas |
-|---|---|---|---|
-| Railway (default) | Basic auth via server.js | Dashboard one-time | Recomendado para sensible |
-| Netlify | Drag & drop o git connect | Cuenta gratis | Basic auth solo en plan pago |
-| Vercel | Git connect | Cuenta gratis | Password protection en Pro |
-| Cloudflare Pages | Cloudflare Access | Dashboard | Free tier generoso |
-| GitHub Pages | Público por defecto | Settings → Pages | NO para info sensible |
-| Manual | Lo que el dev decida | — | Agente entrega solo los archivos |
+Railway (default), Netlify, Vercel, Cloudflare Pages, GitHub Pages o manual.
+Trade-offs de auth y setup por plataforma: `docs/documentacion/DECISIONES.md` §A5.
 
 ## Credenciales para el cliente
 
@@ -242,7 +236,7 @@ Reglas:
 
 - **El dev llena este archivo**, no el cliente. Transcripción honesta.
 - **NUNCA** se sobrescribe entre iteraciones. La v2 lee la v1 como historia.
-- **Aprobación final**: la última línea del último validation-log debe decir `Status: APROBADO` con fecha. Sin esa línea, el diseñador de la fase 4 (`disenador-arquitecto`, o `disenador-delta-mantenimiento` en mantenimiento) no debe arrancar.
+- **Aprobación final**: el campo **Status** del header del último validation-log debe decir `APROBADO por cliente el YYYY-MM-DD`. Sin esa señal, el diseñador de la fase 4 (`disenador-arquitecto`, o `disenador-delta-mantenimiento` en mantenimiento) no debe arrancar.
 - Cambios estructurales detectados disparan la **válvula de retorno al analista** — ver §8.
 
 ## 7. Política de iteración
@@ -303,7 +297,7 @@ Cualquiera de estas señales en el feedback del cliente:
 
 El agente NO ejecuta `git push` ni `railway up` por su cuenta. Genera los archivos y deja `DEPLOY.md` para que el humano despliegue manualmente.
 
-**Excepción**: si el humano en una sesión específica dice *"haz push"* o equivalente explícito, el agente puede ejecutar `git add docs/prototype/ && git commit && git push` en esa invocación. NO asume permiso para futuras iteraciones.
+**Excepción**: si el humano en una sesión específica dice *"haz push"* o equivalente explícito, el agente puede ejecutar `git add <prototype>/ && git commit && git push` en esa invocación. NO asume permiso para futuras iteraciones.
 
 Bajo ninguna circunstancia el agente:
 
@@ -396,11 +390,11 @@ Antes de declarar una iteración del prototipo lista para mostrar al cliente, ej
 
 ### Estructura de carpeta
 
-- [ ] Existe `docs/prototype/index.html`
-- [ ] Existe `docs/prototype/context/` (aunque alguna subcarpeta esté vacía)
-- [ ] Existe `docs/prototype/DEPLOY.md` con plataforma declarada
+- [ ] Existe `<prototype>/index.html`
+- [ ] Existe `<prototype>/context/` (aunque alguna subcarpeta esté vacía)
+- [ ] Existe `<prototype>/DEPLOY.md` con plataforma declarada
 - [ ] Si plataforma requiere server, existen `server.js` y `package.json`
-- [ ] Existe `docs/prototype/validation-log-v{N}.md` para esta iteración (vacío excepto header)
+- [ ] Existe `<prototype>/validation-log-v{N}.md` para esta iteración (vacío excepto header)
 
 ### HTML / Visual
 
@@ -429,7 +423,7 @@ Antes de declarar una iteración del prototipo lista para mostrar al cliente, ej
 
 - [ ] Sección "Setup (una sola vez)" presente y adaptada a la plataforma
 - [ ] Sección "Redeploy (cada iteración)" ejecutable sin investigación extra
-- [ ] Tabla de alternativas presente
+- [ ] Sección de alternativas presente (referencia a DECISIONES §A5)
 - [ ] NO contiene credenciales reales, solo placeholders
 
 ### validation-log

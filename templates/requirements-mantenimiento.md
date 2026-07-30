@@ -66,6 +66,11 @@ Cada invariante con referencia al código que la implementa hoy.]
 
 [Solo si el feature introduce restricciones nuevas. EARS estándar.]
 
+## Behavior Replaced
+
+[Solo si algún Requirement modifica comportamiento existente: el comportamiento
+anterior, con referencia a código y motivación del reemplazo. Si no aplica, omitir.]
+
 ## Tests Existentes a Preservar
 
 [Lista de tests que ya cubren los módulos tocados. Si un módulo de riesgo

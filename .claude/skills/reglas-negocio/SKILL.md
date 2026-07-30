@@ -1,7 +1,7 @@
 ---
 name: reglas-negocio
 description: "Extrae y documenta las reglas de negocio de un proyecto existente: roles, permisos, flujos de estados, validaciones y mapa funcional. Genera docs/REGLAS_DE_NEGOCIO.md."
-allowed-tools: Read, Grep, Glob, Bash(find:*), Bash(wc:*), Bash(ls:*), Task, Write
+allowed-tools: Read, Grep, Glob, Bash(find:*), Bash(wc:*), Bash(ls:*), Write
 ---
 
 # Reglas de Negocio — Protocolo de Extracción
@@ -125,7 +125,7 @@ Crea el archivo `docs/REGLAS_DE_NEGOCIO.md` (o la carpeta de docs que ya exista 
 - **Lee el código, no asumas.** Los nombres de archivo mienten a veces. Un `authGuard` podría solo verificar token sin validar rol.
 - **Documenta la implementación real, no la intención.** Si el código dice que un endpoint es público aunque "debería" estar protegido, documenta lo que ES, no lo que debería ser. Marca la discrepancia como hallazgo.
 - **Busca en ambas capas.** Una regla puede estar en el backend (use case), en el frontend (computed signal), o en ambos. Documenta dónde se implementa realmente.
-- **Sé específico con archivos.** No digas "en el módulo de reportes" — di `reports/pages/amsyd/amsyd.ts` línea tal.
+- **Sé específico con archivos.** No digas "en el módulo de reportes" — di `src/reports/report-detail.ts:142`.
 - **Prioriza lo que rompe.** Si cambias una validación de estado y no sabías que había cambio en cascada, rompiste 5 entidades. Esas dependencias ocultas son las más importantes de documentar.
 - **Si algo falta, dilo.** Si no hay validación de rol en el backend, si no hay guards por rol en el frontend, si no hay tests para las transiciones de estado — eso es un hallazgo crítico.
 - **Los diagramas en Mermaid son preferidos** sobre ASCII cuando sea posible.

@@ -28,6 +28,12 @@ El archivo SIEMPRE tiene esta estructura, en este orden:
 microservicios, modular monolith, etc.), naturaleza del despliegue
 (web, desktop, móvil, híbrido). Da el "marco mental" antes de detalles.]
 
+```yaml
+delivery_strategy: vertical   # vertical (default) | layered — layered SOLO para
+                              # infraestructura pura, migración o refactor sin UI,
+                              # justificado aquí. Lo lee descompositor-tareas en Fase 5.
+```
+
 ## 2. Architecture
 
 [Diagrama Mermaid de componentes. Cada componente con su responsabilidad
@@ -133,6 +139,7 @@ Un humano (cliente técnico, revisor, tú misma) debe poder leer, entender y apr
 ### Overview
 - Máximo 1 párrafo (5-8 líneas).
 - Stack concreto con versiones cuando importa: "SQLite 3.45+", no "una base de datos".
+- Declara `delivery_strategy` (`vertical` default | `layered` con justificación): gobierna el agrupamiento del tasks.md en la Fase 5.
 
 ### Architecture
 - Cada componente tiene UNA responsabilidad principal.
@@ -234,6 +241,7 @@ Antes de declarar `design.md` terminado, ejecutar mentalmente cada chequeo. Si C
 ### Overview
 - [ ] Stack concreto con versiones donde importan.
 - [ ] Paradigma arquitectónico declarado.
+- [ ] `delivery_strategy` declarado (`vertical`, o `layered` con justificación).
 
 ### Architecture
 - [ ] Hay un diagrama Mermaid de componentes.
@@ -289,4 +297,3 @@ Si después de la auto-validación queda CUALQUIER ítem sin marcar:
 3. Itera hasta que el checklist completo esté satisfecho.
 
 Mejor entregar un design.md más corto con secciones marcadas como `TBD: pendiente de decisión sobre X` que un design.md que parece completo pero tiene huecos disfrazados.
-```

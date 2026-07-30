@@ -1,6 +1,6 @@
 ---
 description: Fase 1 · Arranca un proyecto stark - detecta el caso de uso y enruta el flujo. Genera el sustrato en reingeniería y mantenimiento.
-argument-hint: [nuevo|reingenieria|mantenimiento|prototipo]
+argument-hint: "[nuevo|reingenieria|mantenimiento|prototipo]"
 ---
 
 Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones duras durante toda la fase.
@@ -35,7 +35,7 @@ Muestra la secuencia stark del caso ([ ] = opcional) y cuál comando sigue:
 
 - **MANTENIMIENTO** → genera el sustrato (skills `onboarding` + `reglas-negocio`). Pregunta al humano el **slug del feature** (kebab-case, ej. `exportar-reportes-pdf` — `$ARGUMENTS` es el caso de uso, NO el slug) y crea `docs/features/<slug>/intent.md` desde `templates/intent.md` para capturar la intención de la feature. Siguiente: el humano llena el `intent.md` y luego invoca `/stark-requirements <slug>`.
 
-- **PROTOTIPO** → mantén requirements en modo ligero (lo mínimo para inferir pantallas) y salta directo a `/stark-prototype`.
+- **PROTOTIPO** → indícale al humano que el siguiente paso es `/stark-requirements` en modo ligero (lo mínimo para inferir pantallas y flujos); con ese requirements aprobado, sigue `/stark-prototype`.
 
 ## 4. Ofrece la constitución del proyecto
 

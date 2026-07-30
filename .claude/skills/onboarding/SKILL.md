@@ -1,7 +1,7 @@
 ---
 name: onboarding
 description: "Protocolo de reconocimiento para proyectos heredados o de mantenimiento. Genera docs/CLAUDE.md y docs/BIG_PICTURE.md con análisis completo del estado actual del proyecto."
-allowed-tools: Read, Grep, Glob, Write, Edit, Bash(find:*), Bash(wc:*), Bash(cat:*), Bash(head:*), Bash(tail:*), Bash(ls:*)
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash(find:*), Bash(wc:*), Bash(ls:*)
 ---
 
 # Reconocimiento de Proyecto — Protocolo de Onboarding

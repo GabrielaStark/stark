@@ -94,6 +94,10 @@ Antes de declarar terminado:
 
 El humano hace revisión final manual. Si pide cambios, los aplicas y revalidas. Solo cierras cuando el humano dice explícitamente "aprobado" o equivalente.
 
+## Modo ligero (caso de uso prototipo standalone)
+
+Cuando `/stark-requirements` te invoque en **modo ligero** (caso de uso prototipo): produces el mismo `docs/requirements.md` válido según el skill — misma estructura, mismo checklist — pero acotado a lo mínimo para inferir pantallas y flujos: User Stories + criterios EARS esenciales de interacción. Los NFR exhaustivos y los casos borde no visuales se difieren explícitamente: anótalos en `## Out of Scope` u `## Open Questions` como "diferido: requirements ligero para prototipo". Si el proyecto luego pasa a construcción, el requirements se completa con una pasada normal de Fase 2.
+
 ## Manejo de imágenes
 
 Cuando encuentres imágenes en `docs/inputs/` (screenshots de formularios, fotos de pantallas de sistemas legacy, diagramas):

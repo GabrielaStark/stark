@@ -7,6 +7,8 @@ description: Use this skill whenever generating, validating, or editing a requir
 
 Este skill es la fuente de verdad para producir `docs/features/<feature>/requirements.md` en el pipeline de **mantenimiento** del framework stark. El subagente `analista-feature-mantenimiento` consulta este archivo. Cualquier `requirements.md` producido en este pipeline debe cumplir TODAS las reglas de aquí.
 
+Las decisiones de diseño detrás de estas reglas viven en `docs/documentacion/DECISIONES.md` (Parte B — Mantenimiento). Si una regla aquí choca con ese doc, ese doc manda y este skill se actualiza.
+
 ## 1. Propósito del requirements.md de mantenimiento
 
 Es el contrato formal entre el levantamiento del **feature nuevo** y el resto del pipeline de mantenimiento (`design.md` delta → `tasks.md` por riesgo → código). Su lector primario es un LLM downstream que producirá el `design.md` delta. Su lector secundario es el humano que valida.
@@ -55,7 +57,8 @@ de design no sabe dónde aterriza el feature.]
 Niveles de riesgo:
 - **alto**: punto de coexistencia con flujo crítico, alta probabilidad de regresión
 - **medio**: modificación localizada con tests existentes que cubren
-- **bajo**: lectura o consumo sin modificar
+- **bajo**: lectura, consumo o creación aislada sin modificar lo existente
+- **—**: explícitamente NO se toca (se lista para descartarlo)
 
 ## Invariantes Preservadas
 
@@ -97,6 +100,11 @@ las garantías de "no romper nada".]
 
 [Solo si el feature introduce restricciones nuevas: performance, seguridad,
 accesibilidad, compatibilidad. EARS estándar.]
+
+## Behavior Replaced
+
+[Solo si algún Requirement modifica comportamiento existente (ver §4.3): el
+comportamiento anterior, con referencia a código y motivación del reemplazo.]
 
 ## Tests Existentes a Preservar
 
@@ -254,6 +262,7 @@ Antes de declarar el `requirements.md` de mantenimiento terminado, ejecutar ment
 - [ ] Existe sección `## Tests Existentes a Preservar` con tabla rellena.
 - [ ] Existe sección `## Requirements (del delta)` con al menos un `### Requirement N`.
 - [ ] Existe sección `## Out of Scope (del feature)`.
+- [ ] Si algún Requirement modifica comportamiento existente, existe `## Behavior Replaced` con referencia a código y motivación (§4.3).
 
 ### Reglas EARS (mismas que sdd-requirements)
 
@@ -304,8 +313,8 @@ Si en el repo existen los artefactos:
 El agente DEBE leerlos como sustrato antes de inferir Surface of Contact e Invariantes. Estos archivos no se duplican en el requirements.md — se **referencian** cuando aplique:
 
 ```markdown
-1. **I.4** — Las reglas de validación de RFC documentadas en `docs/REGLAS_DE_NEGOCIO.md` §3.2 se preservan sin cambios.
-   <!-- source: src/validators/RfcValidator.java; ver REGLAS_DE_NEGOCIO.md §3.2 -->
+1. **I.4** — Las reglas de validación de RFC documentadas en `docs/REGLAS_DE_NEGOCIO.md` §5 se preservan sin cambios.
+   <!-- source: src/validators/RfcValidator.java; ver REGLAS_DE_NEGOCIO.md §5 -->
 ```
 
 Si esos archivos NO existen, el agente debe avisar al humano y recomendar correrlos antes — pero puede continuar sin ellos, asumiendo el riesgo y documentándolo en Open Questions.

@@ -68,6 +68,7 @@ Antes de escribir el design, identifica explícitamente las decisiones técnicas
 - **Autenticación/autorización** si aplica
 - **Integración con sistemas externos** si requirements los menciona
 - **Restricciones**: latencia, concurrencia, offline-first, compatibilidad
+- **Estrategia de entrega**: `delivery_strategy` en el Overview — `vertical` (default) o `layered` (solo infraestructura pura, migración o refactor sin UI, con justificación). La lee `descompositor-tareas` en la Fase 5.
 
 Presenta esto al humano como **preguntas concretas numeradas**. Espera respuestas.
 
@@ -111,6 +112,7 @@ Antes de auto-validar:
    - Cero funciones completas de código.
    - Cada ADR con sus 4 campos incluyendo consecuencias negativas.
    - Tabla de trazabilidad completa.
+   - `delivery_strategy` declarado en el Overview (`vertical` default | `layered` justificado).
 4. Si CUALQUIER ítem está ❌, corrige y revalida.
 
 ### Fase 6 — Cierre

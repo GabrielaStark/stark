@@ -24,6 +24,7 @@ Vocabulario de casos de uso: **nuevo** (greenfield), **reingeniería** (brownfie
 |-------|--------|
 | Setup inicial del repo | 5–10 minutos |
 | Requirements | 30–90 minutos |
+| Prototipo (opcional) | 30–60 minutos por iteración + validación del cliente |
 | Design | 45–90 minutos |
 | Tasks | 20–45 minutos |
 | Build (código) | Depende del feature; una tarea = 15–45 min en sesión |
@@ -154,7 +155,7 @@ Los tres archivos viven en `docs/` raíz (no dentro de `features/`) porque aplic
 
 #### Preparar el feature
 
-Define un slug (kebab-case: `exportar-reportes-pdf`, `auth-mfa`), crea `docs/features/<slug>/`, copia `templates/intent.md` dentro y rellénalo. Secciones del template: **Qué queremos**, **Por qué**, **Quién pidió**, **En qué área del sistema vive** (intuición inicial), **Out of scope explícito**, **Pistas técnicas conocidas** (opcional), **Stakeholder técnico**, **Fecha / urgencia**. Escríbelo en prosa libre — es un input para el agente, no un documento formal; él lo refina y formaliza después. Invocación:
+Define un slug (kebab-case: `exportar-reportes-pdf`, `auth-mfa`), crea `docs/features/<slug>/`, copia `templates/intent.md` dentro y rellénalo. Secciones del template: **Qué queremos**, **Por qué**, **Quién pidió**, **En qué área del sistema vive** (intuición inicial), **Out of scope explícito**, **Pistas técnicas conocidas** (opcional), **Stakeholder técnico**, **Fecha de pedido / urgencia** y **Notas adicionales**. Escríbelo en prosa libre — es un input para el agente, no un documento formal; él lo refina y formaliza después. Invocación:
 
 ```
 Use the analista-feature-mantenimiento subagent to produce
@@ -184,10 +185,10 @@ El `requirements.md` de mantenimiento es distinto del de nuevo. Verifica:
 - [ ] Existe sección `## Surface of Contact` con tabla rellena. Cada fila lista un módulo/archivo/endpoint/tabla que el feature toca, lee, o explícitamente NO toca, con su nivel de riesgo.
 - [ ] Existe sección `## Invariantes Preservadas` con mínimo una invariante numerada **I.N**, cada una con comentario `<!-- source: archivo:líneas -->`.
 - [ ] Existe sección `## Tests Existentes a Preservar` con tabla que indica qué tests cubren cada invariante (y cuáles son gaps sin test).
-- [ ] Existe sección `## Requirements` (del delta) con al menos un `### Requirement N` que describe solo el feature nuevo, no el sistema.
+- [ ] Existe sección `## Requirements (del delta)` con al menos un `### Requirement N` que describe solo el feature nuevo, no el sistema.
 - [ ] Cada Requirement con **User Story:** "Como X, quiero Y, para Z". en español.
 - [ ] Acceptance Criteria en inglés con `SHALL` únicamente.
-- [ ] Existe sección `## Out of Scope` (del feature) explícita.
+- [ ] Existe sección `## Out of Scope (del feature)` explícita.
 - [ ] El requirements **NO** documenta el sistema completo — solo el delta.
 - [ ] El requirements **NO** propone reescribir arquitectura existente. Si lo hace, pausa: probablemente el caso correcto es reingeniería, no mantenimiento.
 
@@ -280,8 +281,8 @@ Se repite hasta que el cliente apruebe:
 
 Si el cliente pide algo que no está en requirements (un actor nuevo, una entidad nueva, un flujo completo nuevo, una integración externa), el agente se detiene. No intenta resolverlo en HTML — eso rompería la trazabilidad EARS. El flujo es:
 
-1. El agente te avisa: "Esto es un cambio estructural, necesita pasar por analista-entrevistas."
-2. Tú invocas al `analista-entrevistas` para actualizar `requirements.md`.
+1. El agente te avisa: "Esto es un cambio estructural, necesita pasar por el analista del pipeline."
+2. Tú invocas al analista del pipeline (`analista-entrevistas`; en mantenimiento, `analista-feature-mantenimiento`) para actualizar el `requirements.md` correspondiente.
 3. Apruebas el requirements actualizado (gate humano normal).
 4. Vuelves a invocar al `prototipador-visual` con el contexto enriquecido.
 
@@ -289,7 +290,7 @@ Si el cliente pide algo que no está en requirements (un actor nuevo, una entida
 
 Cuando el cliente aprueba explícitamente:
 
-- En el último `validation-log-v{N}.md`, marca `Status: APROBADO` con fecha.
+- En el header del último `validation-log-v{N}.md`, marca `Status: APROBADO por cliente el YYYY-MM-DD`.
 - Commit final con tag `prototype-approved-v{N}`.
 
 Sin esa aprobación explícita, **no avances a Fase 4 (design).**
@@ -300,7 +301,7 @@ Antes de cada despliegue, verifica:
 
 - [ ] Todas las pantallas tienen el banner fijo amarillo "MOCKUP NO FUNCIONAL" (no removible).
 - [ ] Los datos visibles son obviamente falsos ("Cliente Demo", "$1,234.56", "usuario@ejemplo.com").
-- [ ] El HTML usa solo Tailwind CDN + JS vanilla — no hay React, Vue ni nada con build.
+- [ ] El HTML usa solo Tailwind CDN + JS vanilla o Alpine.js por CDN — no hay React, Vue ni nada con build.
 - [ ] `DEPLOY.md` tiene instrucciones claras y NO contiene credenciales reales.
 - [ ] Los clicks navegan entre pantallas pero no ejecutan lógica de negocio real.
 - [ ] Si hubo cambios estructurales, se canalizaron al analista-entrevistas antes de iterar.
@@ -308,7 +309,7 @@ Antes de cada despliegue, verifica:
 ### Heurísticas importantes
 
 - **Iteración 1 no necesita branding.** Valida estructura y flujo, no pulido visual.
-- **Si llegas a la iteración 4–5** y el cliente sigue pidiendo cambios estructurales, el problema está en `requirements.md`. Vuelve al analista para una pasada completa.
+- **Si llegas a la iteración 3 o superior acumulando 3+ cambios estructurales**, el problema está en `requirements.md`. Vuelve al analista para una pasada completa.
 - **El prototipo NO decide el stack.** Que esté en HTML+Tailwind no significa que el sistema final lo será. Eso lo decide `design.md`.
 - **El prototipo es throwaway.** No se reutiliza como código de producción.
 
@@ -394,7 +395,7 @@ El agente `disenador-delta-mantenimiento` ejecuta 7 fases internas (similares pe
 2. Architecture (2.1 Arquitectura Heredada inmutable + 2.2 Delta Architecture con Mermaid diferenciando nuevo/modificado/existente)
 3. Data Model Delta (solo entidades nuevas o modificaciones, `ALTER` explícito si modifica)
 4. Interface Contracts Delta (endpoints nuevos + extensiones a existentes con qué preservan)
-5. Technical Decisions (ADRs del delta, prefijo D001) + sección "Decisiones heredadas que se mantienen"
+5. Technical Decisions (ADRs del delta, prefijo ADR-D001) + sección "Decisiones heredadas que se mantienen"
 6. Critical Flows Afectados + sección "Coexistencia con flujos existentes"
 7. Error & Edge Case Strategy del Delta
 8. Testing Strategy (delta + tabla obligatoria invariantes → tests de regresión)
@@ -418,7 +419,7 @@ El agente `disenador-delta-mantenimiento` ejecuta 7 fases internas (similares pe
 - [ ] El diagrama Mermaid de 2.2 distingue visualmente componentes nuevos / modificados / existentes (colores o estilos distintos).
 - [ ] Ningún componente del design queda fuera de la Surface of Contact del requirements (no se invade territorio no autorizado).
 - [ ] La sección 6 tiene "Coexistencia con flujos existentes" si Surface of Contact tiene filas riesgo medio/alto.
-- [ ] ADRs solo para decisiones **NUEVAS** del delta (prefijo D001). Decisiones heredadas se citan, no se redeciden.
+- [ ] ADRs solo para decisiones **NUEVAS** del delta (prefijo ADR-D001). Decisiones heredadas se citan, no se redeciden.
 - [ ] Sección 8 tiene tabla Invariante → Test que la valida → ¿Existe hoy?. Cualquier invariante sin test existente lleva tarea de blindaje en `tasks.md`.
 - [ ] Sección 9 Traceability tiene doble tabla: criterios EARS del delta + invariantes preservadas.
 - [ ] Cambios en data model son compatibles hacia atrás (`NOT NULL` con `DEFAULT`, etc.).
@@ -484,8 +485,8 @@ El agente `descompositor-riesgo-mantenimiento`:
    - **Frontend Delta** (si aplica)
    - **Integration** (una tarea aislada por punto de coexistencia)
    - **Integration Tests** (E2E del feature)
-   - **No-Regression Validation** (ÚLTIMO): suite completa + verificar todas las invariantes
    - **Documentation**
+   - **No-Regression Validation** (ÚLTIMO): suite completa + verificar todas las invariantes
 5. Cada tarea con footer doble: _Requirements: X.Y_ | _Invariants: I.A_.
 6. Hace pasada de podado y auto-valida.
 
@@ -494,7 +495,7 @@ El agente `descompositor-riesgo-mantenimiento`:
 **Nuevo / reingeniería:**
 
 - [ ] El archivo está organizado por rebanadas verticales (walking skeleton + slices end-to-end); por capas solo si el design declaró `delivery_strategy: layered`.
-- [ ] Cada tarea tiene los 5 elementos: checkbox + número + verbo + sub-pasos + criterio de hecho + footer.
+- [ ] Cada tarea tiene los 5 elementos (checkbox + número + verbo + sub-pasos + criterio de hecho) más el footer.
 - [ ] Tareas son chiquitas (1–3 archivos, 50–200 líneas estimadas).
 - [ ] Tests están como tareas independientes, no como sub-pasos.
 - [ ] Cada criterio EARS del `requirements.md` aparece referenciado en al menos una tarea.
@@ -504,7 +505,7 @@ El agente `descompositor-riesgo-mantenimiento`:
 
 - [ ] La primera sección es `## Regression Shield`. Tiene al menos: tarea 1 = ejecutar suite existente + una tarea Blindar por cada invariante sin test.
 - [ ] Las tareas con verbo Blindar van **ANTES** de las tareas que modifican el módulo correspondiente.
-- [ ] Cada tarea tiene footer doble: _Requirements: X.Y_ | _Invariants: I.A_ (al menos uno con referencia, no ambos `-`).
+- [ ] Cada tarea tiene footer doble: _Requirements: X.Y_ | _Invariants: I.A_ (al menos uno con referencia; ambos `-` solo en tareas estructurales: gate de suite, Spike, Documentation).
 - [ ] Las tareas de Modificar declaran explícitamente **QUÉ preservar** (referencia a la invariante correspondiente).
 - [ ] Sección `## Integration` tiene una tarea aislada por cada punto de coexistencia (cada fila de Surface of Contact con riesgo medio/alto). NO se agrupan.
 - [ ] La última sección es `## No-Regression Validation` con una tarea final de verbo Verificar regresión que cubre **TODAS** las invariantes.
@@ -544,7 +545,7 @@ La unidad de trabajo es el **lote:** un grupo de tareas contiguas — en modo ve
 **¿Por qué es a la vez lo más correcto y lo más barato?**
 
 - **Correcto:** el agente tiene `requirements.md` y `design.md` **ÍNTEGROS** en contexto durante todo el lote. Cada decisión se toma con la spec completa a la vista — sin fragmentos, sin inferencias.
-- **Barato:** esos documentos se pagan una vez por lote, no una vez por tarea. Abrir una conversación nueva por cada tarea obliga al agente a releer todo desde cero (~56k tokens de spec por tarea, multiplicado por 48 tareas).
+- **Barato:** esos documentos se pagan una vez por lote, no una vez por tarea. Abrir una conversación nueva por cada tarea obliga al agente a releer todo desde cero (la spec completa, multiplicada por decenas de tareas).
 
 ### El procedimiento
 
@@ -559,7 +560,6 @@ Después ejecuta las tareas 3, 4 y 5 (capa Data Model) en orden, una por una.
 Reglas:
 - Implementa cada tarea ÚNICAMENTE desde lo que dicen los documentos leídos.
   Si algo no está especificado o es ambiguo, DETENTE y pregúntame; no lo infieras.
-- Respeta las erratas y resoluciones de la sección "Erratas" de tasks.md.
 - No releas los documentos entre tareas: ya los tienes en contexto.
 
 Al terminar cada tarea, repórtame: qué archivos creó, si cumple su
@@ -605,7 +605,7 @@ Al terminar cada tarea repórtame archivos, criterio de hecho y tests.
 
 ### Por qué el lote no gasta más por leer completo
 
-"Leer los documentos completos gasta mucho" es cierto solo si lo haces en cada tarea. En un lote, el costo de lectura se paga una vez y se divide entre las tareas: spec completa para 6 tareas = ~9k tokens por tarea, contra ~56k por tarea si abres conversación por cada una. Además el prompt caching mantiene el contexto barato — Claude cachea lo ya leído y reutilizarlo cuesta ~10% del precio normal; el temporizador de la caché (~5 min) se reinicia con cada interacción, así que trabajando de corrido se mantiene activa horas. Si expira por inactividad, el costo es una recarga puntual, sin perder contexto ni calidad.
+"Leer los documentos completos gasta mucho" es cierto solo si lo haces en cada tarea. En un lote, el costo de lectura se paga una vez y se divide entre las tareas: la spec completa repartida entre todas las tareas del lote, contra pagarla entera en cada tarea suelta. Además el prompt caching mantiene el contexto barato — Claude cachea lo ya leído y reutilizarlo cuesta ~10% del precio normal; el temporizador de la caché (~5 min) se reinicia con cada interacción, así que trabajando de corrido se mantiene activa horas. Si expira por inactividad, el costo es una recarga puntual, sin perder contexto ni calidad.
 
 **En una frase:** contexto completo, pagado una vez por lote. Nunca "contexto recortado para ahorrar" — eso es lo que genera código inferido e incorrecto.
 
@@ -617,7 +617,7 @@ En modo vertical (el default), tu `tasks.md` viene en **rebanadas verticales**: 
 |--|--|--|
 | Setup | Andamiaje (monorepo, tsconfig, lint, test runners) | Cero lógica de negocio, cero riesgo |
 | Data Model | Tipos / esquemas / constantes | Se construyen unos sobre otros, sin efectos externos |
-| Data Access | Repositorios / capa de sesión + sus tests | Tests se auto-validan dentro del lote |
+| Data Access Layer | Repositorios / capa de sesión + sus tests | Tests se auto-validan dentro del lote |
 | Business Logic | Servicios, clientes, validadores | El más grande — pártelo por tamaño (clientes / validadores / servicios), no por riesgo |
 | API / Routes | Endpoints + tests de integración | Comparten el mismo contrato de §4 |
 | UI | Componentes / vistas | Comparten el shell y la capa de transporte |
@@ -630,7 +630,7 @@ En modo vertical (el default), tu `tasks.md` viene en **rebanadas verticales**: 
 ### Qué tareas NUNCA van en lote (van solas)
 
 - Tareas de validación de integración (las que dicen "Validar integración tareas X–Y", "Verificar regresión"). Son puntos de control donde **TÚ** decides si el bloque anterior quedó bien antes de seguir.
-- Tareas con decisión humana pendiente (una errata abierta, un ADR que aún no apruebas, un campo cuya forma se fijó "por decisión humana").
+- Tareas con decisión humana pendiente (un ADR que aún no apruebas, un campo cuya forma se fijó "por decisión humana").
 - **(Mantenimiento)** Las tareas de Regression Shield (blindaje) y la No-Regression Validation final. El blindaje va antes del código nuevo por diseño; la validación final es el gate más importante del feature. Ninguna se lotea con tareas de modificación.
 
 ### Si solo necesitas UNA tarea suelta
@@ -646,7 +646,6 @@ Lectura acotada (no leas los tres documentos completos):
   los criterios del footer "_Requirements:_" (el requirement entero con su
   User Story, no solo la línea del criterio).
 - De docs/design.md: lee completas las secciones que la tarea cite con §.
-- Lee las erratas que la tarea mencione (sección "Erratas" de tasks.md).
 
 Regla de corrección: si con eso algo queda ambiguo o sin especificar,
 NO lo infieras — amplía la lectura al documento completo o pregúntame.
@@ -660,27 +659,25 @@ Es razonable para **UNA tarea.** Pero si vas a hacer varias, **el lote siempre g
 
 Esta tabla es solo para que entiendas qué significan los símbolos que verás dentro de una tarea. No tienes que escribir nada de esto en tu prompt — el agente lo interpreta solo. Léela una vez y olvídala.
 
-Cada tarea del `tasks.md` está construida siempre con las mismas piezas. Esta es una tarea real del proyecto, anotada pieza por pieza:
+Cada tarea del `tasks.md` está construida siempre con las mismas piezas. Ejemplo anotado pieza por pieza:
 
 ```
 - [ ] 3. Definir tipos de dominio y enums en backend/src/types        ← el NÚMERO va en tu prompt
-  - Crear ActorInput... según §3 del design.                         ← § = sección del design a leer
-  - ...consumidos por los contratos internos de §4...                ← otra sección del design
-  - ...derivada de DashboardArtifact + ActorInput — ver errata 4.    ← errata: léela al final del archivo
-  - Crear los tipos auxiliares... (tareas 3, 4)                       ← depende de esas tareas (ya hechas)
-  - Criterio de hecho: tipos compilan; el enum SectionId tiene...    ← cómo sabes que terminó bien
-  - _Requirements: 1.1, 1.2, 1.3, 1.4, 3.1, 3.2_                     ← criterios EARS: el agente los busca SOLO
+  - Crear los tipos de entrada según §3 del design.                   ← § = sección del design a leer
+  - ...consumidos por los contratos internos de §4...                 ← otra sección del design
+  - Crear los tipos auxiliares... (tareas 1, 2)                       ← depende de esas tareas (ya hechas)
+  - Criterio de hecho: los tipos compilan y el enum cubre sus casos.  ← cómo sabes que terminó bien
+  - _Requirements: 1.1, 1.2, 3.1_                                     ← criterios EARS: el agente los busca SOLO
 ```
 
-Las 6 piezas y qué hace cada una:
+Las 5 piezas y qué hace cada una:
 
 | Pieza | Aspecto | Para qué sirve |
 |--|--|--|
 | Número (3) | `- [ ] 3.` | Lo **ÚNICO** que tú escribes en el prompt. |
 | Sub-pasos | viñetas con archivos a crear | Lo que el agente ejecuta. Tú no haces nada. |
 | §N | "según §3", "§4", "§6.1" | Apunta a una sección del `design.md`. El agente lee solo esa. |
-| "errata N" | "ver errata 4", "NOTA DE ERRATA" | Hay decisiones ya tomadas en la sección ## Erratas detectadas en artefactos upstream (al final del `tasks.md`). El agente debe respetarlas. |
-| "(tareas X, Y)" | "(tareas 3, 4)" | Dependencias: esas tareas deben estar hechas antes. Por eso se ejecutan en orden. |
+| "(tareas X, Y)" | "(tareas 1, 2)" | Dependencias: esas tareas deben estar hechas antes. Por eso se ejecutan en orden. |
 | _Requirements:_ | el footer | Los criterios EARS que el agente busca solo en `requirements.md`. Tú no los copias. |
 
 Dos detalles del footer que verás y son normales:
@@ -731,7 +728,7 @@ Rompe siempre, sin excepción:
 
 - **Después de cada tarea de Modificar:** corre los tests del módulo modificado (no toda la suite todavía, solo los del módulo) y verifica que los tests de blindaje correspondientes siguen pasando. Solo entonces marca `[x]`.
 
-- **Las tareas de Integration son aisladas.** Una por sesión, como cualquier otra. NO las agrupes en "voy a hacer todas las integraciones de un jalón".
+- **Las tareas de Integration son una por punto de coexistencia.** NO agrupes varios puntos en una sola tarea (pueden ejecutarse en el mismo lote de la sección Integration); "todas las integraciones en una sola tarea" es el anti-patrón.
 
 - **La tarea final Verificar regresión** es la más importante de todo el feature. Tómate el tiempo:
   - Corre **TODA** la suite del repo (ej. `mvn test`, `npm test`, `pytest`, según el stack).
@@ -765,7 +762,7 @@ Rompe siempre, sin excepción:
 ### Conceptos específicos de mantenimiento
 
 - **Delta:** el conjunto de cambios que un feature de mantenimiento introduce. Los artefactos del pipeline de mantenimiento describen solo el delta, no el sistema completo.
-- **Surface of Contact:** tabla en el `requirements.md` de mantenimiento que lista exhaustivamente los módulos, archivos, endpoints, tablas que el feature toca, lee, modifica o explícitamente NO toca. Cada fila con nivel de riesgo (alto / medio / bajo).
+- **Surface of Contact:** tabla en el `requirements.md` de mantenimiento que lista exhaustivamente los módulos, archivos, endpoints, tablas que el feature toca, lee, modifica o explícitamente NO toca. Cada fila con nivel de riesgo (alto / medio / bajo / — no se toca).
 - **Invariantes Preservadas:** lista numerada (I.1, I.2, ...) de comportamientos del sistema existente que **NO deben cambiar** tras el feature. Cada una con referencia al código fuente (`<!-- source: archivo:líneas -->`) y un test (existente o de blindaje) que la valida.
 - **Sustrato** (de mantenimiento): los tres archivos `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md` que documentan el sistema existente. Generados por las skills auxiliares `onboarding` y `reglas-negocio` (incluidas en `.claude/skills/`). Recomendados pero no obligatorios.
 - **Intent.md:** archivo de entrada del pipeline de mantenimiento. Lo escribe el humano describiendo el feature en lenguaje de negocio. Vive en `docs/features/<slug>/intent.md`.
@@ -774,7 +771,7 @@ Rompe siempre, sin excepción:
 - **Trazabilidad doble:** cada tarea del `tasks.md` de mantenimiento lleva footer `_Requirements: X.Y_ | _Invariants: I.A_`, conectando tanto criterios EARS del delta como invariantes preservadas.
 - **Blindar:** verbo nuevo de tareas en pipeline de mantenimiento. Significa "escribir un test de regresión sobre código existente para asegurar que su comportamiento actual se preserve durante el feature".
 - **Coexistencia:** estrategia de cómo el delta convive con flujos existentes sin alterarlos. Documentada en sección 6 del `design.md` delta cuando hay puntos de Surface of Contact con riesgo medio/alto.
-- **Válvula de retorno** (mantenimiento): cuando el design propone tocar algo fuera de Surface of Contact, volver al analista para actualizar el requirements antes de seguir.
+- **Válvula de retorno:** volver al analista del pipeline para actualizar el requirements antes de seguir. Dos disparadores: feedback estructural del cliente durante el prototipo (Fase 3), y un design delta que propone tocar componentes fuera de Surface of Contact (mantenimiento, Fase 4).
 
 ### Skills auxiliares del framework (usadas como sustrato del pipeline de mantenimiento)
 

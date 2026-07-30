@@ -1,6 +1,6 @@
 ---
 name: descompositor-riesgo-mantenimiento
-description: Use proactively after the maintenance-pipeline design.md is human-approved to produce docs/features/<feature>/tasks.md. Reads both the approved delta design.md and the approved delta requirements.md (for traceability of EARS criteria AND invariants), inspects existing tests to understand the regression shield needs, and decomposes the work into atomic tasks ORDERED BY REGRESSION RISK (Regression Shield FIRST → Data Delta → Backend Delta → API Delta → Frontend Delta → Integration → E2E → No-Regression Validation → Documentation), with mandatory dual-traceability footer (EARS + Invariants) in each task. Should not be invoked before design.md has been validated by the human. NOT for greenfield or brownfield-rewrite — use descompositor-tareas for those.
+description: Use proactively after the maintenance-pipeline design.md is human-approved to produce docs/features/<feature>/tasks.md. Reads both the approved delta design.md and the approved delta requirements.md (for traceability of EARS criteria AND invariants), inspects existing tests to understand the regression shield needs, and decomposes the work into atomic tasks ORDERED BY REGRESSION RISK (Regression Shield FIRST → Data Model Delta → Backend Delta → API Delta → Frontend Delta → Integration → E2E → Documentation → No-Regression Validation LAST), with mandatory dual-traceability footer (EARS + Invariants) in each task. Should not be invoked before design.md has been validated by the human. NOT for greenfield or brownfield-rewrite — use descompositor-tareas for those.
 tools: Read, Write, Edit, Glob, Grep
 skills:
   - sdd-tasks-risk
@@ -93,16 +93,16 @@ Genera el tasks.md siguiendo la estructura obligatoria del skill `sdd-tasks-risk
 6. **Frontend Delta** (si aplica).
 7. **Integration** — una tarea **aislada** por cada punto de coexistencia con riesgo medio/alto.
 8. **Integration Tests (E2E)** — flujo completo del feature + verificación de coexistencia.
-9. **No-Regression Validation** — tarea final con verbo `Verificar regresión`, cubre TODAS las invariantes.
-10. **Documentation** — actualizar `BIG_PICTURE.md` / `REGLAS_DE_NEGOCIO.md` / READMEs si el delta los cambió.
+9. **Documentation** — actualizar `BIG_PICTURE.md` / `REGLAS_DE_NEGOCIO.md` / READMEs si el delta los cambió.
+10. **No-Regression Validation** — SIEMPRE la última sección: tarea final con verbo `Verificar regresión`, cubre TODAS las invariantes.
 
 Reglas durante la descomposición:
 
 - **Granularidad**: 1-3 archivos / 50-200 líneas / una sesión de agente.
 - **Tests del delta como tareas independientes** (no sub-pasos).
 - **Tests de blindaje en Regression Shield**, con verbo `Blindar`.
-- **Verbos del skill**: `Implementar`, `Crear`, `Modificar`, `Agregar`, `Refactorizar`, `Configurar`, `Validar`, `Documentar`, `Blindar`, `Verificar regresión`.
-- **Cada tarea con footer doble**: `_Requirements: X.Y_ | _Invariants: I.A_` (al menos uno con referencia, ambos no pueden ser `-`).
+- **Verbos del skill**: `Implementar`, `Crear`, `Modificar`, `Agregar`, `Refactorizar`, `Configurar`, `Validar`, `Documentar`, `Blindar`, `Verificar regresión`, `Integrar`, `Actualizar` (el título `Tests ...` es válido para tareas de tests).
+- **Cada tarea con footer doble**: `_Requirements: X.Y_ | _Invariants: I.A_` (al menos uno con referencia; ambos `-` solo en tareas estructurales: gate de suite, Spike, Documentation).
 - **Tareas de `Modificar` declaran QUÉ preservar**: "preservar comportamiento sin el parámetro nuevo (I.A)".
 
 ### Fase 4 — Validación de cobertura
@@ -157,7 +157,7 @@ Recuerda al humano los siguientes pasos:
 - ❌ Omitir No-Regression Validation final. Es la garantía de no romper nada.
 - ❌ Tareas de integración agrupadas. Una por punto de coexistencia.
 - ❌ Modificar código sin blindar antes (las tareas `Blindar` van ANTES en numeración).
-- ❌ Footer de trazabilidad con ambos `-`. Al menos uno con referencia.
+- ❌ Footer de trazabilidad con ambos `-` (salvo tareas estructurales: gate de suite, Spike, Documentation). Al menos uno con referencia en tareas de implementación, modificación o blindaje.
 - ❌ Tareas demasiado grandes o con verbos vagos.
 - ❌ Dejar invariantes sin cobertura (huérfanas) o criterios EARS sin tarea.
 - ❌ Romper reglas del skill `sdd-tasks-risk`. Absoluto.

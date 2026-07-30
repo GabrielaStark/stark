@@ -1,6 +1,6 @@
 ---
 description: Fase 2 · Levanta los requirements (specs). Enruta al analista correcto según el caso de uso.
-argument-hint: [slug-feature en mantenimiento]
+argument-hint: "[slug-feature en mantenimiento]"
 ---
 
 Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones duras antes de actuar.

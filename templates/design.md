@@ -8,7 +8,7 @@ Reglas absolutas:
 - Errores tipados como enum, nunca strings libres
 - ADRs SIEMPRE con consecuencias negativas
 - Tabla de Traceability es obligatoria, no opcional
-- Total entre 300-800 líneas; si excede 800, partir el feature
+- Target 300-700 líneas, hard limit 800; si excede 800, partir el feature
 
 Antes de cerrar este archivo, ejecutar el checklist de auto-validación
 definido en .claude/skills/sdd-design/SKILL.md
@@ -46,8 +46,6 @@ Estrategia de entrega que `descompositor-tareas` lee para ordenar el tasks.md:
 
 ## 2. Architecture
 
-### Diagrama de componentes
-
 ```mermaid
 graph TB
     UI[UI Layer<br/>React + Tailwind] --> API[API Layer<br/>IPC handlers]
@@ -56,7 +54,7 @@ graph TB
     REPO --> DB[(SQLite)]
 ```
 
-### Responsabilidades
+### Componentes
 
 <!--
 Cada componente: responsabilidad principal Y qué NO hace.
@@ -159,11 +157,11 @@ NO todos los flujos del sistema.
 
 ```mermaid
 sequenceDiagram
-    Actor as Usuario
-    UI as UI Layer
-    API as API Layer
-    SVC as Service Layer
-    DB as DB
+    participant Actor as Usuario
+    participant UI as UI Layer
+    participant API as API Layer
+    participant SVC as Service Layer
+    participant DB as DB
 
     Actor->>UI: acción
     UI->>API: invocar

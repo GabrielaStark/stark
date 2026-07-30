@@ -256,13 +256,13 @@ docs/prototype/
 El loop se cierra cuando el cliente aprueba explícitamente. El humano marca la aprobación así:
 
 - Commit final con tag tipo `prototype-approved-v{N}`
-- Última línea en el `validation-log-v{N}.md`: `Status: APROBADO por cliente el YYYY-MM-DD`
+- En el header del `validation-log-v{N}.md`: `Status: APROBADO por cliente el YYYY-MM-DD`
 
 Sin esa señal explícita, `disenador-arquitecto` no debe arrancar.
 
 ### Sanity check informal
 
-Si en la iteración **3 o 4** el cliente sigue pidiendo cambios estructurales (no cosméticos), eso es señal de que `requirements.md` estaba incompleto o mal levantado. El agente debe sugerir explícitamente al humano: *"Iteración N detectó M cambios estructurales acumulados. Recomendación: volver al analista-entrevistas antes de continuar el loop."*
+Si en la iteración **3 o superior** el cliente acumula **3 o más cambios estructurales** (no cosméticos), eso es señal de que `requirements.md` estaba incompleto o mal levantado. El agente debe sugerir explícitamente al humano: *"Iteración N detectó M cambios estructurales acumulados. Recomendación: volver al analista del pipeline antes de continuar el loop."*
 
 No es una regla dura — es un alerta que el humano evalúa.
 
@@ -283,12 +283,12 @@ Cuando el feedback del cliente revela algo que **no es un cambio de UI sino un r
 ### Qué hace el agente en estos casos
 
 1. Se detiene. NO intenta resolverlo en HTML.
-2. Reporta al humano: *"Detecté un cambio estructural en el feedback: [descripción]. Esto no se resuelve en el prototipo, requiere actualizar `requirements.md`. Recomiendo invocar `analista-entrevistas` para añadir el Requirement correspondiente antes de continuar la iteración."*
-3. Espera instrucción explícita del humano: (a) volver al analista, o (b) ignorar ese feedback en esta iteración y continuar con el resto.
+2. Reporta al humano: *"Detecté un cambio estructural en el feedback: [descripción]. Esto no se resuelve en el prototipo, requiere actualizar `requirements.md`. Recomiendo invocar al analista del pipeline para añadir el Requirement correspondiente antes de continuar la iteración."*
+3. Espera instrucción explícita del humano: (a) volver al analista, (b) ignorar ese feedback en esta iteración y continuar con el resto, o (c) detenerse hasta nueva orden.
 
-### Qué hace el `analista-entrevistas` cuando recibe la válvula
+### Qué hace el analista del pipeline cuando recibe la válvula
 
-El analista debe contemplar este caso de uso secundario: recibir feedback estructural desde el prototipador y actualizar `requirements.md` añadiendo el Requirement nuevo (con su User Story y EARS). Ver actualización en `.claude/agents/analista-entrevistas.md`.
+El analista debe contemplar este caso de uso secundario: recibir feedback estructural desde el prototipador y actualizar el `requirements.md` añadiendo el Requirement nuevo (con su User Story y EARS). Ver el caso de uso secundario en `.claude/agents/analista-entrevistas.md` (construcción) y `.claude/agents/analista-feature-mantenimiento.md` (mantenimiento).
 
 Después de actualizar `requirements.md`, el humano vuelve a invocar al prototipador para la siguiente iteración con el contexto enriquecido.
 
@@ -354,7 +354,7 @@ Este caso de uso introduce **tres agentes nuevos + tres skills nuevos** que vive
 
 - No es una alternativa a `arqueologo-codigo` para reescritura — sigue habiendo reingeniería (brownfield-rewrite) cuando el plan es rehacer el sistema.
 - No es un atajo "metan el feature como puedan" — mantiene rigor de specs, EARS y gates humanos.
-- No es excusa para ignorar el sistema existente — exige documentarlo antes (skills `onboarding` y `reglas-negocio`).
+- No es excusa para ignorar el sistema existente — pide documentarlo antes con las skills `onboarding` y `reglas-negocio` (recomendado, no bloqueante — ver B-D7).
 
 **Lo que el caso de uso SÍ es:**
 
@@ -390,7 +390,7 @@ stark tiene **tres pipelines paralelos**, todos viven en el mismo template y com
     │       ↓          │     │       ↓          │     │       ↓          │
     │ (prototipo       │     │ (prototipo       │     │ (prototipo       │
     │  opcional)       │     │  opcional)       │     │  opcional —      │
-    │       ↓          │     │       ↓          │     │  ver B4.D6)      │
+    │       ↓          │     │       ↓          │     │  ver B-D6)       │
     │ disenador-       │     │ disenador-       │     │       ↓          │
     │ arquitecto       │     │ arquitecto       │     │ disenador-delta- │
     │       ↓          │     │       ↓          │     │ mantenimiento    │
@@ -413,7 +413,7 @@ stark tiene **tres pipelines paralelos**, todos viven en el mismo template y com
 
 1. Convención de carpetas distintas: `docs/inputs/` (nuevo), `docs/analysis/` (reingeniería), `docs/features/<X>/` (mantenimiento).
 2. Naming convention: agentes de mantenimiento llevan sufijo `-mantenimiento`.
-3. Árbol de decisión en `REFERENCIA.md` § Fase 0.
+3. Árbol de decisión en `REFERENCIA.md` §1 (Fase 1: Init).
 
 **Los porteros estrictos en cada agente** son lo que evita confusión cruzada: si invocas el agente equivocado en el repo equivocado, no encuentra sus pre-condiciones y se detiene avisando.
 
@@ -572,7 +572,7 @@ Si no existen, el agente puede continuar pero recomienda al humano correrlas pri
 
 El pipeline está construido sobre tres garantías que se refuerzan mutuamente:
 
-### Garantía 1: Fases 1-3 son read-only sobre el código de producción
+### Garantía 1: Análisis y diseño (Fases 2 y 4) son read-only sobre el código de producción
 
 `analista-feature-mantenimiento` y `disenador-delta-mantenimiento` solo leen código. Sus outputs son `.md`. Es **matemáticamente imposible romper producción durante análisis y diseño**.
 
@@ -624,7 +624,7 @@ La última tarea del tasks.md es obligatoria: correr toda la suite + verificar c
 - ❌ Modificar código existente sin escribir antes el test de blindaje.
 - ❌ Marcar tarea de modificación como `[x]` sin haber corrido los tests del módulo modificado.
 - ❌ Tareas de integración agrupadas (varias coexistencias en una tarea).
-- ❌ Trazabilidad doble con ambos `-` en el footer (`_Requirements: -_ | _Invariants: -_`) — al menos uno debe tener referencia.
+- ❌ Trazabilidad doble con ambos `-` en el footer (`_Requirements: -_ | _Invariants: -_`) — al menos uno debe tener referencia (salvo tareas estructurales: gate de suite, Spike, Documentation).
 - ❌ Verbos vagos en tasks ("Trabajar en X", "Hacer Y"). Sigue siendo prohibido como en sdd-tasks.
 
 ### De gobernanza
