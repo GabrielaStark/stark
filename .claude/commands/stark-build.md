@@ -13,6 +13,8 @@ Vas a ejecutar UN lote. La unidad de ejecución es siempre un lote:
 
 `$ARGUMENTS` indica el slice o rango de tareas a ejecutar. Si está vacío, identifica el siguiente lote no completado en `tasks.md` y confírmalo antes de proceder.
 
+SEGURIDAD (dura, Principio 2): valida entradas en el servidor, parametriza queries/comandos (nunca concatenar input), autorización por rol en cada endpoint nuevo, secretos solo por env vars, datos sensibles fuera de logs y de mensajes de error, ningún `catch` vacío.
+
 PRINCIPIO DE CORRECCIÓN (duro):
 - Lee la spec COMPLETA del lote (requirements + design) UNA vez al inicio, con el contexto íntegro a la vista. No fragmentes la lectura.
 - No infieras lo que no está escrito. Si falta información, detente y pregunta.
