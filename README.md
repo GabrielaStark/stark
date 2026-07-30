@@ -240,7 +240,7 @@ entrevistas               codigo                       mantenimiento
 ### Líneas que stark no cruza
 
 - **No spec-as-source puro.** stark versiona las specs como artefacto primario, pero el código sigue siendo código mantenible — no la spec como única fuente de verdad sin código. Eso último es experimental, no producción.
-- **No "es lo que hacen los grandes".** SDD está en "Assess", no en "Adopt". Es práctica emergente bien fundamentada, no estándar consolidado. Véndelo como lo que es.
+- **No "es lo que hacen los grandes".** SDD está en "Assess", no en "Adopt". Es práctica emergente bien fundamentada, no estándar consolidado.
 
 ---
 
