@@ -4,6 +4,10 @@
 
 Por [@iamgabstark_](https://github.com/GabrielaStark) · [Principios](docs/documentacion/PRINCIPIOS.md)
 
+**stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras**: subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase y trazabilidad de cada línea de código hasta su requirement. Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
+
+Clonas, corres `/stark-init`, y el framework te lleva fase por fase: [empieza aquí →](docs/documentacion/QUICKSTART.md)
+
 ---
 
 ## Propiedad: SDD, MARK, stark
