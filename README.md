@@ -157,6 +157,9 @@ stark/
 │       ├── REFERENCIA.md                             ← referencia detallada por fase
 │       ├── TROUBLESHOOTING.md                        ← problemas comunes
 │       └── DECISIONES.md                             ← decisiones de diseño (prototipo + mantenimiento)
+├── scripts/
+│   └── verificar.py                                  ← auto-verificación del framework (CI la
+│                                                       corre en cada push)
 └── templates/
     ├── intent.md                                     ← se copia y llena (input de mantenimiento)
     ├── CONSTITUTION.md                               ← se copia a la raíz y llena (decisiones
@@ -258,6 +261,8 @@ entrevistas               codigo                       mantenimiento
   - Reingeniería: código legacy + arqueología previa
   - Mantenimiento: código en producción + descripción del feature
 - (Mantenimiento recomendado) Skills auxiliares `onboarding` y `reglas-negocio` (ya incluidas en `.claude/skills/`) para generar el sustrato (`CLAUDE.md`, `BIG_PICTURE.md`, `REGLAS_DE_NEGOCIO.md`)
+
+El repo se auto-verifica: `python3 scripts/verificar.py` valida frontmatters, fences, links y nombres citados; el CI lo corre en cada push.
 
 ---
 
