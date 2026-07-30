@@ -257,7 +257,7 @@ Use the prototipador-visual subagent to produce docs/prototype/
 
 ### Despliegue (tú lo haces)
 
-Sigue las instrucciones de `docs/prototype/DEPLOY.md`. Flujo típico con Railway: **setup (una vez)** — crear proyecto, conectar repo, root directory `docs/prototype/`, env vars `AUTH_USER` y `AUTH_PASS`; **redeploy (cada iteración)** — `git add docs/prototype/ && git commit && git push`, Railway redespliega solo.
+Sigue las instrucciones del `DEPLOY.md` del prototipo. El setup detallado por plataforma vive en [`DECISIONES.md`](DECISIONES.md) §A5.
 
 ### El loop iterativo con el cliente
 

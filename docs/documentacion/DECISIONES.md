@@ -174,32 +174,7 @@ Cada decisión en formato breve: **Decisión · Por qué · Consecuencias negati
 
 ## A4. Estructura del artefacto `docs/prototype/`
 
-```
-docs/prototype/
-├── index.html                    # mockup principal, banner permanente
-├── pantallas/                    # otras pantallas si el flujo lo requiere
-│   ├── login.html
-│   ├── dashboard.html
-│   └── ...
-├── assets/                       # imágenes, logos (placeholders si no hay branding)
-│   └── ...
-├── context/                      # INPUT: brief de branding, notas del cliente
-│   ├── branding.md               # colores, tipografía, tono (puede estar vacío)
-│   ├── logos/                    # archivos de marca si existen
-│   └── referencias/              # screenshots inspiracionales si existen
-├── server.js                     # express + basic auth (default: Railway)
-├── package.json                  # "start": "node server.js"
-├── validation-log-v1.md          # observaciones del cliente sobre v1
-├── validation-log-v2.md          # observaciones sobre v2 (si existe)
-├── ...
-└── DEPLOY.md                     # instrucciones de despliegue (default Railway + alternativas)
-```
-
-**Reglas**:
-
-- `context/` es **input**: lo llena el dev antes de invocar al agente con material que tenga.
-- `validation-log-vN.md` es **input al agente para la iteración N+1**: lo llena el dev tras mostrar la versión N al cliente.
-- Todo lo demás es **output** del agente.
+La estructura canónica de la carpeta vive en el skill `sdd-prototype` §2 (fuente única). La decisión congelada aquí: `context/` y los `validation-log-vN.md` son **INPUT del dev** (material de branding y transcripción del feedback del cliente); todo lo demás es **OUTPUT del agente**.
 
 ---
 
@@ -272,25 +247,7 @@ No es una regla dura — es un alerta que el humano evalúa.
 
 Cuando el feedback del cliente revela algo que **no es un cambio de UI sino un requisito faltante**, el flujo se detiene y vuelve al analista. (El analista es el del pipeline en curso: `analista-entrevistas` en construcción, `analista-feature-mantenimiento` en mantenimiento — ver B-D6.)
 
-### Señales de "esto es estructural, no cosmético"
-
-- Cliente menciona una **entidad nueva** ("ah, y necesito que cada cliente tenga proyectos asociados") — entidad no estaba en `requirements.md`.
-- Cliente menciona un **actor nuevo** ("y debería poder loguearse el supervisor también") — actor no estaba contemplado.
-- Cliente menciona un **flujo completo nuevo** ("y antes de calcular debe pasar por aprobación de jefe") — flujo no estaba.
-- Cliente menciona una **integración con sistema externo** ("y esto debe mandar correos automáticamente"/"...sincronizar con CRM").
-- Cliente menciona un **requisito no funcional duro nuevo** ("y debe funcionar offline").
-
-### Qué hace el agente en estos casos
-
-1. Se detiene. NO intenta resolverlo en HTML.
-2. Reporta al humano: *"Detecté un cambio estructural en el feedback: [descripción]. Esto no se resuelve en el prototipo, requiere actualizar `requirements.md`. Recomiendo invocar al analista del pipeline para añadir el Requirement correspondiente antes de continuar la iteración."*
-3. Espera instrucción explícita del humano: (a) volver al analista, (b) ignorar ese feedback en esta iteración y continuar con el resto, o (c) detenerse hasta nueva orden.
-
-### Qué hace el analista del pipeline cuando recibe la válvula
-
-El analista debe contemplar este caso de uso secundario: recibir feedback estructural desde el prototipador y actualizar el `requirements.md` añadiendo el Requirement nuevo (con su User Story y EARS). Ver el caso de uso secundario en `.claude/agents/analista-entrevistas.md` (construcción) y `.claude/agents/analista-feature-mantenimiento.md` (mantenimiento).
-
-Después de actualizar `requirements.md`, el humano vuelve a invocar al prototipador para la siguiente iteración con el contexto enriquecido.
+Las señales de cambio estructural, el protocolo del agente y el del analista viven en el skill `sdd-prototype` §8 (fuente única) y en el caso de uso secundario de cada analista (`analista-entrevistas` y `analista-feature-mantenimiento`). La decisión congelada: el feedback estructural NUNCA se absorbe en HTML — vuelve al analista del pipeline, se re-aprueba el requirements (gate humano), y solo entonces el prototipador itera con el contexto enriquecido.
 
 ---
 

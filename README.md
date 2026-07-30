@@ -97,30 +97,7 @@ Cada fase termina en un **gate humano**: revisión y aprobación explícita ante
 
 #### Alternativa manual: invocar subagentes directamente
 
-Los comandos `/stark-*` orquestan subagentes. Si prefieres control fino, invócalos a mano:
-
-```
-/agents   # deberías ver 8 subagentes
-
-# Fase 2 — Requirements (uno según caso de uso)
-Use the analista-entrevistas subagent to produce docs/requirements.md                              # nuevo
-Use the arqueologo-codigo subagent to produce docs/requirements.md                                 # reingeniería
-Use the analista-feature-mantenimiento subagent to produce docs/features/<slug>/requirements.md    # mantenimiento
-
-# Fase 3 — Prototipo (transversal, si hay UI relevante)
-Use the prototipador-visual subagent to produce docs/prototype/                  # construcción
-Use the prototipador-visual subagent to produce docs/features/<slug>/prototype/  # mantenimiento
-
-# Fase 4 — Design
-Use the disenador-arquitecto subagent to produce docs/design.md                            # construcción
-Use the disenador-delta-mantenimiento subagent to produce docs/features/<slug>/design.md   # mantenimiento
-
-# Fase 5 — Tasks
-Use the descompositor-tareas subagent to produce docs/tasks.md                                   # construcción
-Use the descompositor-riesgo-mantenimiento subagent to produce docs/features/<slug>/tasks.md     # mantenimiento
-
-# Fase 6 — Build: un lote (Slice) por sesión — patrón encapsulado en /stark-build
-```
+Los comandos `/stark-*` orquestan subagentes (con `/agents` deberías ver 8). Si prefieres control fino, cada fase se puede invocar subagente por subagente — las invocaciones exactas están en [`REFERENCIA.md`](docs/documentacion/REFERENCIA.md), en la sección de cada fase.
 
 ### Documentación completa
 
@@ -155,7 +132,7 @@ stark/
 │   │   ├── analista-feature-mantenimiento.md         ← mantenimiento: intent + código prod → requirements (delta)
 │   │   ├── disenador-delta-mantenimiento.md          ← mantenimiento: requirements (delta) → design (delta)
 │   │   └── descompositor-riesgo-mantenimiento.md     ← mantenimiento: design (delta) → tasks (por riesgo)
-│   └── skills/                                       ← 9 constituciones compartidas
+│   └── skills/                                       ← 9 skills (7 constituciones SDD + 2 auxiliares)
 │       ├── sdd-requirements/SKILL.md                 ← construcción
 │       ├── sdd-prototype/SKILL.md                    ← transversal
 │       ├── sdd-design/SKILL.md                       ← construcción
@@ -180,12 +157,12 @@ stark/
 │       ├── REFERENCIA.md                             ← referencia detallada por fase
 │       ├── TROUBLESHOOTING.md                        ← problemas comunes
 │       └── DECISIONES.md                             ← decisiones de diseño (prototipo + mantenimiento)
-└── templates/                                        ← templates con guía inline
-    ├── requirements.md, design.md, tasks.md          ← construcción
-    ├── intent.md, requirements-mantenimiento.md,     ← mantenimiento
-    │   design-delta.md, tasks-riesgo.md
-    └── CONSTITUTION.md                               ← transversal: decisiones inmutables
-                                                        del proyecto (se copia a la raíz)
+└── templates/
+    ├── intent.md                                     ← se copia y llena (input de mantenimiento)
+    ├── CONSTITUTION.md                               ← se copia a la raíz y llena (decisiones
+    │                                                   inmutables del proyecto)
+    └── (resto)                                       ← esqueletos de referencia de los artefactos;
+                                                        la fuente única de estructura son los skills
 ```
 
 ---
