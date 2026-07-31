@@ -11,7 +11,7 @@ Valida todo lo verificable por máquina en el repo:
 
 Uso: python3 scripts/verificar.py   →   exit 0 = verde.
 """
-import py_compile
+import ast
 import re
 import sys
 from pathlib import Path
@@ -136,9 +136,9 @@ def verifica_nombres():
 def verifica_scripts():
     for p in list((RAIZ / ".claude/scripts").glob("*.py")) + list((RAIZ / "scripts").glob("*.py")):
         try:
-            py_compile.compile(str(p), doraise=True)
-        except py_compile.PyCompileError as e:
-            error(f"{p.relative_to(RAIZ)}: no compila — {str(e).splitlines()[0]}")
+            ast.parse(p.read_text(encoding="utf-8"), filename=str(p))
+        except SyntaxError as e:
+            error(f"{p.relative_to(RAIZ)}: no compila — línea {e.lineno}: {e.msg}")
 
 
 def main():
