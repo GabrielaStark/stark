@@ -8,6 +8,8 @@ El camino feliz, de principio a fin. Elige tu caso de uso **una vez** y sigue su
 
 ## Arranca
 
+Instala stark según tu caso (comandos exactos en el [README](../../README.md#quick-start)) y grábate **la regla de oro**: `.claude/` y `templates/` son la herramienta — van en `.gitignore`, viven en tu disco y los agentes funcionan igual; `docs/` y tus specs son el producto — esos sí se commitean. Tu repo nunca carga la herramienta, y actualizar stark es recopiar dos carpetas.
+
 Un solo riel: los comandos `/stark-*`. No hay prompt que copiar ni nada que memorizar.
 
 ```
