@@ -15,13 +15,15 @@ Clonas, corres `/stark-init`, y el framework te lleva fase por fase: [empieza aq
 
 ---
 
-## Propiedad: SDD, MARK, stark
+## Las piezas: qué es cada cosa y de quién es
 
-Tres cosas distintas. No se confunden:
+La primera línea de este README usa cinco nombres. Uno por uno:
 
-- **SDD** (Spec-Driven Development — Desarrollo Guiado por Especificaciones): la metodología de la industria. Tomada y adaptada.
-- **MARK**: la metodología propia de la autora — su adaptación de SDD. El **método**.
-- **stark**: este framework. La herramienta que implementa MARK. El **con qué**.
+- **SDD** (Spec-Driven Development — Desarrollo Guiado por Especificaciones): la disciplina de **especificar** — specs formales primero; el código se genera a partir de ellas. De la industria. Tomada y adaptada.
+- **YAGNI** (You Aren't Gonna Need It — "no lo vas a necesitar"): la disciplina de **limitar** — solo se construye lo que la spec exige; lo especulativo no gana su lugar. Clásica de Extreme Programming; la escalera de decisión de stark está adaptada de Ponytail → [Principios](docs/documentacion/PRINCIPIOS.md).
+- **RDD** (Receipt-Driven Development — desarrollo guiado por comprobantes): la disciplina de **demostrar** — ninguna aprobación sin evidencia escrita en el repo. Emergente, de la era de agentes.
+- **MARK**: el **método** — la metodología propia de la autora, que integra las tres disciplinas.
+- **stark**: la **herramienta** — este framework: MARK vuelto workflow ejecutable sobre Claude Code. El **con qué**.
 
 > **MARK es el método, stark es la herramienta. stark es un framework Spec-Driven.**
 
@@ -131,7 +133,7 @@ Vía principal: los comandos slash `/stark-*`. Las fases están numeradas; el pr
    /stark-audit    ← transversal: audita el repo completo contra los Principios
 ```
 
-Cada fase termina en un **gate humano**: revisión y aprobación explícita antes de pasar a la siguiente.
+Cada fase termina en un **gate humano**: revisión y aprobación explícita antes de pasar a la siguiente — y la aprobación queda **sellada** en el header del artefacto (`> Aprobado por [nombre] — fecha`), no solo dicha en el chat.
 
 #### Alternativa manual: invocar subagentes directamente
 
@@ -139,7 +141,7 @@ Los comandos `/stark-*` orquestan subagentes (con `/agents` deberías ver 8). Si
 
 ### Documentación completa
 
-- 📖 [`docs/documentacion/PRINCIPIOS.md`](docs/documentacion/PRINCIPIOS.md) — filosofía: el sello especifica todo, construye lo mínimo
+- 📖 [`docs/documentacion/PRINCIPIOS.md`](docs/documentacion/PRINCIPIOS.md) — filosofía: el lema especifica todo, construye lo mínimo
 - 🚀 [`docs/documentacion/QUICKSTART.md`](docs/documentacion/QUICKSTART.md) — **empieza aquí**: el camino feliz, una pista lineal por caso de uso
 - 📋 [`docs/documentacion/REFERENCIA.md`](docs/documentacion/REFERENCIA.md) — referencia detallada por fase (anatomía completa de cada artefacto y agente)
 - 🛟 [`docs/documentacion/TROUBLESHOOTING.md`](docs/documentacion/TROUBLESHOOTING.md) — problemas comunes y soluciones
@@ -190,7 +192,7 @@ stark/
 │   ├── design.md                                     ← OUTPUT construcción
 │   ├── tasks.md                                      ← OUTPUT construcción
 │   └── documentacion/
-│       ├── PRINCIPIOS.md                             ← filosofía (sello stark)
+│       ├── PRINCIPIOS.md                             ← filosofía (lema stark)
 │       ├── QUICKSTART.md                             ← empieza aquí (camino feliz)
 │       ├── REFERENCIA.md                             ← referencia detallada por fase
 │       ├── TROUBLESHOOTING.md                        ← problemas comunes
@@ -267,7 +269,7 @@ entrevistas               codigo                       mantenimiento
 ## Reglas no negociables
 
 1. **La unidad de ejecución es el lote** (un Slice vertical, o un grupo contiguo de la misma capa/sección), con revisión humana al cerrar cada lote. Nunca "ejecuta todo tasks.md". Las tareas de validación — y en mantenimiento el Regression Shield y la No-Regression Validation — van solas.
-2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente (en la ruta corta de mantenimiento los gates se fusionan en uno; la aprobación humana se conserva — ver `DECISIONES.md` B-D13).
+2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente, y toda aprobación deja sello en el artefacto — de documento o de lote (en la ruta corta de mantenimiento los gates se fusionan en uno; la aprobación humana y su sello se conservan — ver `DECISIONES.md` B-D13).
 3. **Los SKILLs son absolutos.** Si una regla no encaja en un caso, el caso no es para stark — no inventes excepciones.
 4. **Trazabilidad bidireccional.** Cada línea de código se justifica en una tarea → decisión de design → criterio EARS → historia de usuario.
 5. **Nada gana su lugar por defecto.** Lo especulativo no se construye; lo que no aporta se recorta (escalera YAGNI, ver Principios).

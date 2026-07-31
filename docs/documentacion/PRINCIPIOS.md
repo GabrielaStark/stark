@@ -6,7 +6,7 @@ Guiado por Especificaciones).
 
 Une dos mundos: especificación exhaustiva (specs primero, EARS, trazabilidad,
 gates humanos) e implementación mínima (no escribir una línea que no gane su
-lugar). El sello: especifica todo, construye lo mínimo.
+lugar). El lema: especifica todo, construye lo mínimo.
 
 Todo agente lee este archivo antes de actuar y respeta estos principios como
 reglas duras.
