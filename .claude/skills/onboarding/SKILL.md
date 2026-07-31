@@ -73,7 +73,9 @@ Crea el archivo `docs/BIG_PICTURE.md` (misma regla: en `docs/`, no en la raíz) 
 <!-- Dependencias desactualizadas, código duplicado, patrones inconsistentes, vulnerabilidades potenciales, TODOs/FIXMEs encontrados, archivos sin tests -->
 
 ## Observaciones del Ingeniero
-<!-- Tu criterio profesional: qué te preocupa, qué está bien hecho, por dónde empezarías a mejorar -->
+<!-- Tu criterio profesional: qué te preocupa, qué está bien hecho, por dónde empezarías a mejorar.
+     Lista explícitamente las zonas técnicas no comprendidas (código cuyo propósito no pudiste
+     determinar): son insumo para la sección 11 de REGLAS_DE_NEGOCIO.md -->
 ```
 
 ## Reglas

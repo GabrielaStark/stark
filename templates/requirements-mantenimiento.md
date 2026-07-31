@@ -7,6 +7,7 @@ Este artefacto lo GENERA el agente analista-feature-mantenimiento desde el skill
 # Requirements: [Nombre del feature]
 
 > Feature de mantenimiento sobre `<nombre-sistema>`. Describe **el delta**, no el sistema completo.
+> Ruta: [corta|completa] — justificación: [superficie tocada, criterios de DECISIONES.md B-D13]
 
 ## Contexto
 
@@ -17,7 +18,13 @@ Este artefacto lo GENERA el agente analista-feature-mantenimiento desde el skill
 
 ## Invariantes Preservadas
 
-1. **I.1** — [comportamiento en lenguaje testeable]. <!-- source: archivo:líneas -->
+1. **I.1** (`estado`) — [comportamiento en lenguaje testeable]. <!-- source: archivo:líneas -->
+
+## Decisiones sobre hallazgos en-duda
+
+| Hallazgo | Decisión | Quién decidió | Fecha |
+|---|---|---|---|
+<!-- Decisión ∈ {preservar por alcance, corregir dentro del cambio, diferir} -->
 
 ## Requirements (del delta)
 
@@ -32,3 +39,6 @@ Este artefacto lo GENERA el agente analista-feature-mantenimiento desde el skill
 ## Open Questions
 
 ## Glossary
+
+<!-- RUTA CORTA: este mismo archivo incorpora "## Encaje de diseño" y "## Tasks por riesgo".
+     Ver skill sdd-requirements-mantenimiento §4.6 y DECISIONES.md B-D13 -->

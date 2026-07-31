@@ -224,18 +224,18 @@ entrevistas               codigo                       mantenimiento
 
 **Construcción (nuevo / reingeniería)**: las tasks se ordenan como **walking skeleton + rebanadas verticales** — primero un esqueleto end-to-end que camina, luego rebanadas verticales que atraviesan todas las capas, no capa por capa.
 
-**Mantenimiento**: la arquitectura/stack son **heredados e inmutables**, los artefactos describen solo el **delta**, las tasks van ordenadas por **riesgo de regresión** (Regression Shield primero, No-Regression Validation al final), y se documentan explícitamente las **Invariantes Preservadas** del sistema existente.
+**Mantenimiento**: la arquitectura/stack son **heredados e inmutables**, los artefactos describen solo el **delta**, las tasks van ordenadas por **riesgo de regresión** (Regression Shield primero, No-Regression Validation al final), y se documentan explícitamente las **Invariantes Preservadas** del sistema existente. Los cambios internos de bajo riesgo pueden ir por **ruta corta** (un solo documento, un solo gate; Shield y No-Regression intactos) — el criterio es la superficie tocada, no el tamaño: ver `DECISIONES.md` B-D13.
 
 ---
 
 ## Reglas no negociables
 
 1. **La unidad de ejecución es el lote** (un Slice vertical, o un grupo contiguo de la misma capa/sección), con revisión humana al cerrar cada lote. Nunca "ejecuta todo tasks.md". Las tareas de validación — y en mantenimiento el Regression Shield y la No-Regression Validation — van solas.
-2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente.
-3. **Los SKILLs son absolutos.** Si una regla no encaja en un caso, el caso probablemente no es para stark — no inventes excepciones.
+2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente (en la ruta corta de mantenimiento los gates se fusionan en uno; la aprobación humana se conserva — ver `DECISIONES.md` B-D13).
+3. **Los SKILLs son absolutos.** Si una regla no encaja en un caso, el caso no es para stark — no inventes excepciones.
 4. **Trazabilidad bidireccional.** Cada línea de código se justifica en una tarea → decisión de design → criterio EARS → historia de usuario.
 5. **Nada gana su lugar por defecto.** Lo especulativo no se construye; lo que no aporta se recorta (escalera YAGNI, ver Principios).
-6. **(Mantenimiento)** El Regression Shield va primero, la No-Regression Validation va última. Ambas son obligatorias.
+6. **(Mantenimiento)** El Regression Shield va primero, la No-Regression Validation va última. Ambas son obligatorias. El Shield blinda solo invariantes `confirmada` e `inferida`; lo `en-duda` exige decisión explícita, nunca blindaje silencioso.
 
 ### Líneas que stark no cruza
 
@@ -246,7 +246,7 @@ entrevistas               codigo                       mantenimiento
 
 ## Preguntas que casi siempre salen
 
-**¿Y si el feature es enorme?** Lo partes. Una feature = un trío `requirements/design/tasks`. Si el `design.md` pasa de ~800 líneas o el `tasks.md` de ~50 tareas, partir. El anti-patrón confirmado por Thoughtworks es la spec gigante upfront + big-bang release.
+**¿Y si el feature es enorme?** Lo partes. Una feature = un trío `requirements/design/tasks`. Si el `design.md` pasa de ~800 líneas o el `tasks.md` de ~50 tareas, partir. El anti-patrón confirmado por Thoughtworks es la spec gigante upfront + big-bang release. Partir divide el papeleo, no el riesgo: los pedazos de una misma feature se evalúan juntos para decidir ruta corta o completa. Partir para calificar a la ruta corta es el anti-patrón, no el atajo.
 
 **¿Por qué EARS en inglés si trabajamos en español?** Porque los LLMs procesan EARS mucho mejor en inglés — así fueron entrenados. La User Story va en español (preserva el contexto humano de negocio); los criterios EARS van en inglés (preservan precisión técnica). Es el patrón más común en repos reales.
 

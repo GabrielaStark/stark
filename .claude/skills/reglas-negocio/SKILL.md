@@ -74,6 +74,11 @@ Crea el archivo `docs/REGLAS_DE_NEGOCIO.md` (o la carpeta de docs que ya exista 
 > Documento de referencia para mantenimiento. Describe roles, funcionalidades,
 > flujos de estados, validaciones y ubicación de cada pieza en el código.
 >
+> Procedencia: toda regla lleva estado — `confirmada` (una persona con nombre
+> respondió por ella), `inferida` (solo el código la respalda) o `en-duda`
+> (contradictoria, sin explicación, o posible defecto). En tablas: columna
+> "Estado"; en listas: etiqueta al inicio de la regla. Ver DECISIONES.md B-D11.
+>
 > Última actualización: [fecha]
 
 ## 1. Roles del Sistema
@@ -116,14 +121,30 @@ Crea el archivo `docs/REGLAS_DE_NEGOCIO.md` (o la carpeta de docs que ya exista 
 
 ## 10. Endpoints API — Referencia Rápida
 <!-- Tabla con método, ruta, controller, rol requerido -->
+
+## 11. Descubrimiento — lo que este análisis NO pudo determinar
+
+### Contradicciones encontradas
+<!-- Comportamientos que chocan entre sí o con la documentación -->
+
+### Zonas no comprendidas
+<!-- Módulos o flujos cuyo propósito no se pudo inferir del código -->
+
+### Preguntas abiertas para el Stakeholder técnico
+<!-- Redactadas en comportamiento observable, contestables por alguien
+     que no lee código. Patrón: "Cuando pasa X, el sistema hace Y —
+     ¿es a propósito o siempre ha estado así?"
+     Cada respuesta con nombre promueve la regla correspondiente a `confirmada`. -->
 ```
 
-**Nota:** Las secciones son una guía. Si el proyecto no tiene estados, ni roles, ni auditoría — no inventes secciones vacías. Documenta solo lo que existe. Si una sección no aplica, omítela.
+**Nota:** Las secciones son una guía. Si el proyecto no tiene estados, ni roles, ni auditoría — no inventes secciones vacías. Documenta solo lo que existe. Si una sección no aplica, omítela (excepción: la sección 11 nunca se omite — ver Reglas).
 
 ## Reglas
 
 - **Lee el código, no asumas.** Los nombres de archivo mienten a veces. Un `authGuard` podría solo verificar token sin validar rol.
-- **Documenta la implementación real, no la intención.** Si el código dice que un endpoint es público aunque "debería" estar protegido, documenta lo que ES, no lo que debería ser. Marca la discrepancia como hallazgo.
+- **Todo nace `inferida`.** Al arrancar el análisis, cada regla se marca `inferida`. Solo se marca `confirmada` si hay evidencia documentada de confirmación humana previa (no lo asumas). Lo contradictorio, lo inexplicable o el posible defecto se marca `en-duda`.
+- **Documenta la implementación real, no la intención.** Si el código dice que un endpoint es público aunque "debería" estar protegido, documenta lo que ES, no lo que debería ser. Marca la discrepancia formalmente como `en-duda`.
+- **La sección 11 no puede quedar vacía por omisión.** Si de verdad no hubo nada indeterminado, escribe explícitamente "Sin hallazgos" en cada subsección — el silencio no es un resultado válido.
 - **Busca en ambas capas.** Una regla puede estar en el backend (use case), en el frontend (computed signal), o en ambos. Documenta dónde se implementa realmente.
 - **Sé específico con archivos.** No digas "en el módulo de reportes" — di `src/reports/report-detail.ts:142`.
 - **Prioriza lo que rompe.** Si cambias una validación de estado y no sabías que había cambio en cascada, rompiste 5 entidades. Esas dependencias ocultas son las más importantes de documentar.

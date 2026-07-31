@@ -492,6 +492,31 @@ Cada decisión en formato breve: **Decisión · Por qué · Consecuencias negati
 - **Por qué**: cuando integras un feature con un flujo existente, el riesgo es local. Agrupar varios puntos en una tarea grande mezcla riesgos y vuelve la revisión más difícil.
 - **Consecuencia aceptada**: el tasks.md tiene más tareas. Cada una es chica y revisable.
 
+> Premisa de las tres decisiones siguientes (B-D11 a B-D13): *el mantenimiento seguro no consiste en preservar código. Consiste en preservar las invariantes correctas del sistema, distinguiéndolas de accidentes históricos.*
+
+### B-D11. Procedencia de invariantes (3 estados)
+
+- **Decisión**: toda regla en `REGLAS_DE_NEGOCIO.md` lleva estado: `confirmada` (una persona con nombre respondió por ella), `inferida` (solo el código la respalda) o `en-duda` (contradictoria, sin explicación, o posible defecto). El Regression Shield blinda `confirmada` e `inferida`; lo `en-duda` NO entra al Shield: genera una decisión explícita en el requirements del feature — preservar por alcance, corregir dentro del cambio, o diferir a mantenimiento o reingeniería. Regla de promoción: un estado solo sube a `confirmada` cuando una persona identificada por nombre responde una pregunta abierta del descubrimiento; aprobar un lote o un gate NO promueve estados.
+- **Por qué**: en legacy (especialmente de gobierno) el sistema puede llevar años operando "mal" y otros procesos pueden depender de ese comportamiento. El usuario autoriza un cambio específico, no la corrección de todo lo encontrado. Sin procedencia, un bug histórico entra al escudo con el mismo peso que una regla de verdad. No corregir ahora ≠ declararlo regla válida.
+- **Consecuencia aceptada**: el sustrato y el requirements cargan un campo más por regla, y algunos features abren decisiones que antes pasaban en silencio. Es fricción deliberada, exactamente donde el silencio costaba producción.
+
+### B-D12. Gate de descubrimiento (revisar lo encontrado + completar lo que falta)
+
+- **Decisión**: el sustrato (skills `onboarding` + `reglas-negocio`) debe listar explícitamente lo que NO pudo determinar, no solo lo que infirió: contradicciones, zonas no comprendidas y preguntas abiertas. Las preguntas se redactan en comportamiento observable de negocio, nunca en términos de código. Patrón: "Cuando pasa X, el sistema hace Y — ¿es a propósito o siempre ha estado así?". Anti-patrón: "¿Por qué la función Z redondea así?". Destinatario: el Stakeholder técnico que ya captura `templates/intent.md`.
+- **Por qué**: revisar una lista te vuelve bueno detectando lo que está mal y ciego a lo que falta — si el análisis infirió cuarenta reglas y omitió una, quien valida ve cuarenta correctas y aprueba. Y quien tiene el conocimiento tácito de por qué el sistema hace algo raro casi nunca es quien lee código: una pregunta técnica a la persona equivocada produce silencio, y el silencio se lee como aprobación.
+- **Consecuencia aceptada**: el sustrato es más largo y el gate exige respuestas de una persona, no solo palomear una lista. La alternativa era un gate ciego a lo tácito.
+
+### B-D13. Ruta corta de mantenimiento (fusión de gates, no eliminación)
+
+- **Decisión**: para cambios internos de bajo riesgo existe una **ruta corta** que fusiona los tres gates del circuito de mantenimiento en uno. Conserva la aprobación humana explícita (regla no negociable #2): las fases se fusionan, la aprobación no se elimina — esta entrada es la que legitima esa fusión frente a la constitución. El criterio es la **superficie tocada**, no el tamaño del cambio.
+  - Va **COMPLETO** si toca aunque sea una línea de: lo que ve el usuario final; dinero (cobros, montos, descuentos, cálculos); permisos, autenticación o datos personales; integraciones con otros sistemas; esquema de datos / migraciones; una zona con reglas `en-duda`.
+  - Va **CORTO** solo si cumple las cuatro: (1) no toca nada de la lista anterior; (2) es interno y aislado, sin consumidores externos; (3) ya existe Regression Shield de esa zona — si no existe, no hay corto: primero se construye; (4) es un cambio completo en sí mismo, no un pedazo de algo mayor.
+  - Regla de agregación (anti-trampa): si el cambio es parte de una feature mayor, el riesgo se evalúa sobre la feature completa, no sobre el pedazo. Partir divide el papeleo, no el riesgo.
+  - Quién decide: el agente propone la ruta con justificación de superficie tocada; el humano confirma o la sube a completa. El humano puede subir la ruta, nunca bajarla.
+  - Qué recorta el corto: un solo documento con el delta (requirements + encaje de diseño + tasks por riesgo en el mismo archivo) y un solo gate. Qué NO recorta jamás: Regression Shield primero, No-Regression Validation al final.
+- **Por qué**: una línea tocando el cobro es más peligrosa que doscientas en un script interno. Si el atajo se ganara por tamaño, la salida fácil sería partir un cambio grande en cinco chicos y saltear todo. Y el circuito completo para todo cambio castiga los de bajo riesgo con papeleo que no compra protección.
+- **Consecuencia aceptada**: hay dos rutas que aprender y una decisión más por feature (la propuesta de ruta). El criterio de superficie la vuelve auditable.
+
 ---
 
 ## B5. Estructura del artefacto `docs/features/<feature>/`

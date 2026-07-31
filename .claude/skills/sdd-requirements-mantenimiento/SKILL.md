@@ -30,6 +30,7 @@ El archivo SIEMPRE tiene esta estructura, en este orden:
 # Requirements: [Nombre del feature]
 
 > Feature de mantenimiento sobre el sistema `<nombre-sistema>`. Este documento describe **el delta**, no el sistema completo.
+> Ruta: [corta|completa] — justificación: [superficie tocada, criterios de DECISIONES.md B-D13]
 
 ## Contexto
 
@@ -63,17 +64,30 @@ Niveles de riesgo:
 ## Invariantes Preservadas
 
 [Lista numerada de comportamientos existentes que el feature NO debe cambiar.
-Cada invariante con referencia al código que la implementa hoy. Estas son
-las garantías de "no romper nada".]
+Cada invariante con referencia al código que la implementa hoy y con su estado
+de procedencia heredado de REGLAS_DE_NEGOCIO.md: `confirmada` o `inferida`.
+Si el sustrato no tiene la regla, la invariante nace `inferida`. Una regla
+`en-duda` NO puede listarse aquí — va a "Decisiones sobre hallazgos en-duda".]
 
-1. **I.1** — Los usuarios con rol `ADMIN` mantienen acceso a todos los endpoints actuales sin modificación.
+1. **I.1** (`confirmada`) — Los usuarios con rol `ADMIN` mantienen acceso a todos los endpoints actuales sin modificación.
    <!-- source: src/auth/RoleGuard.java:42-58 -->
-2. **I.2** — El cálculo de ISR existente no cambia sus resultados para entradas idénticas.
+2. **I.2** (`confirmada`) — El cálculo de ISR existente no cambia sus resultados para entradas idénticas.
    <!-- source: src/tax/IsrCalculator.java:120-180; tests: TaxCalculatorTest.testIsrStandardCases -->
-3. **I.3** — El endpoint `POST /api/users` sigue retornando 201 con el mismo payload que hoy.
+3. **I.3** (`inferida`) — El endpoint `POST /api/users` sigue retornando 201 con el mismo payload que hoy.
    <!-- source: src/users/UserController.java:34-67 -->
 
 [...]
+
+## Decisiones sobre hallazgos en-duda
+
+[Hallazgos `en-duda` del sustrato que caen dentro de la superficie del feature.
+Cada uno con decisión explícita; la tabla no puede tener filas sin decisión al
+aprobar el gate. Si no hay, la sección dice "Sin hallazgos en-duda en la
+superficie de este feature" — no se omite.]
+
+| Hallazgo | Decisión | Quién decidió | Fecha |
+|---|---|---|---|
+<!-- Decisión ∈ {preservar por alcance, corregir dentro del cambio, diferir} -->
 
 ## Requirements (del delta)
 
@@ -139,7 +153,9 @@ como lo que sí. Evita scope creep dentro del mantenimiento.]
 - **Acceptance Criteria SIEMPRE en inglés**, formato EARS estricto (ver sección 3).
 - **Surface of Contact es obligatoria.** Sin esta tabla, el design no puede acotar el delta. Si vacía, el feature no tiene justificación para estar en mantenimiento (¿es realmente un delta?).
 - **Invariantes Preservadas es obligatoria.** Mínimo 1 invariante. Si no hay invariantes que preservar, probablemente es greenfield o brownfield-rewrite, no mantenimiento.
-- **Cada invariante lleva referencia al código** con comentario HTML `<!-- source: archivo:líneas -->`. Sin la fuente, la invariante no es auditable.
+- **Cada invariante lleva referencia al código** con comentario HTML `<!-- source: archivo:líneas -->` y su estado de procedencia (`confirmada` | `inferida`). Sin la fuente, la invariante no es auditable.
+- **La línea `> Ruta:` es obligatoria**, con justificación explícita de superficie tocada (criterios de DECISIONES.md B-D13).
+- **`## Decisiones sobre hallazgos en-duda` es obligatoria** — con tabla resuelta, o con la línea "Sin hallazgos en-duda en la superficie de este feature". Nunca se omite.
 - **Numeración**: Requirements `### Requirement N`, invariantes `**I.N**`, criterios `1., 2., 3.`.
 - **Mínimo 1 criterio EARS por Requirement del delta.**
 
@@ -183,6 +199,20 @@ Ver `.claude/skills/sdd-requirements/SKILL.md` §3-4 para los detalles, ejemplos
 
 - **No hay sección de stack en este documento.** El stack está fijado por el sistema existente. Si el feature requiere una librería nueva, va al ADR del design.md, no aquí.
 - Si el feature requiere una decisión de stack genuinamente nueva (ej. agregar Redis donde no había), eso es un riesgo del feature y debe documentarse en Surface of Contact con riesgo alto + nota.
+
+### 4.5 Procedencia de invariantes y hallazgos en-duda
+
+- Cada invariante hereda su estado desde `REGLAS_DE_NEGOCIO.md` y lo muestra: `**I.N** (`confirmada`)` o `**I.N** (`inferida`)`. Si el sustrato no contiene la regla, la invariante nace `inferida`.
+- Una regla `en-duda` NUNCA se lista como Invariante Preservada. Va a `## Decisiones sobre hallazgos en-duda` con decisión explícita: preservar por alcance, corregir dentro del cambio, o diferir (a mantenimiento o reingeniería). La tabla no puede tener filas sin decisión al aprobar el gate.
+- El Regression Shield se deriva de las Invariantes Preservadas; al excluir lo `en-duda` de esa lista, un posible defecto jamás llega al Shield ni se blinda en silencio.
+- La promoción a `confirmada` solo ocurre cuando una persona identificada por nombre responde una pregunta abierta del descubrimiento (sección 11 del sustrato). Aprobar un lote o un gate NO promueve estados.
+
+### 4.6 Ruta corta vs completa (propuesta del agente, decisión del humano)
+
+- Al inicio del análisis, el agente evalúa los criterios de DECISIONES.md B-D13 y propone `ruta: corta` o `ruta: completa` en la línea `> Ruta:`, con justificación explícita de superficie tocada (qué toca de la lista COMPLETO, o por qué no toca nada).
+- El humano confirma la ruta en el gate. Puede subirla a completa; nunca bajarla a corta.
+- En **ruta corta**, este MISMO `requirements.md` incorpora dos secciones adicionales al final — `## Encaje de diseño` (cómo entra el delta respetando la arquitectura existente como inmutable: componentes tocados, contratos, errores; versión reducida del design delta) y `## Tasks por riesgo` (Regression Shield primero → delta → No-Regression Validation al final, con la misma anatomía de tarea de `sdd-tasks-risk`) — y el gate único aprueba el documento completo. No existe template separado: la variante se documenta aquí y en un comentario de `templates/requirements-mantenimiento.md`.
+- Lo que la ruta corta jamás recorta: Regression Shield primero y No-Regression Validation al final.
 
 ## 5. Ejemplos comparados
 
@@ -263,6 +293,9 @@ Antes de declarar el `requirements.md` de mantenimiento terminado, ejecutar ment
 - [ ] Existe sección `## Requirements (del delta)` con al menos un `### Requirement N`.
 - [ ] Existe sección `## Out of Scope (del feature)`.
 - [ ] Si algún Requirement modifica comportamiento existente, existe `## Behavior Replaced` con referencia a código y motivación (§4.3).
+- [ ] Existe la línea `> Ruta: [corta|completa]` con justificación de superficie tocada; si es corta, cumple los cuatro criterios de B-D13 y el documento incorpora `## Encaje de diseño` y `## Tasks por riesgo`.
+- [ ] Cada invariante muestra su estado (`confirmada` | `inferida`); ninguna regla `en-duda` aparece como Invariante Preservada.
+- [ ] Existe `## Decisiones sobre hallazgos en-duda` sin filas sin decisión (o con "Sin hallazgos en-duda en la superficie de este feature").
 
 ### Reglas EARS (mismas que sdd-requirements)
 
@@ -310,7 +343,7 @@ Si en el repo existen los artefactos:
 - `docs/BIG_PICTURE.md` (generado por skill `onboarding`)
 - `docs/REGLAS_DE_NEGOCIO.md` (generado por skill `reglas-negocio`)
 
-El agente DEBE leerlos como sustrato antes de inferir Surface of Contact e Invariantes. Estos archivos no se duplican en el requirements.md — se **referencian** cuando aplique:
+El agente DEBE leerlos como sustrato antes de inferir Surface of Contact e Invariantes. De `REGLAS_DE_NEGOCIO.md` hereda además el estado de procedencia de cada regla (`confirmada` / `inferida` / `en-duda`) — ver §4.5. Estos archivos no se duplican en el requirements.md — se **referencian** cuando aplique:
 
 ```markdown
 1. **I.4** — Las reglas de validación de RFC documentadas en `docs/REGLAS_DE_NEGOCIO.md` §5 se preservan sin cambios.
