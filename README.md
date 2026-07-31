@@ -7,7 +7,9 @@
 >  · [MARK — la metodología](https://iamgabstark.com/mark.html) · [stark — el framework](https://iamgabstark.com/stark.html) · [Principios](docs/documentacion/PRINCIPIOS.md)
 
 
-**stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras**: subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase y trazabilidad de cada línea de código hasta su requirement. Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
+**MARK integra SDD para especificar, YAGNI para limitar y RDD para demostrar que lo validado es exactamente lo entregado. stark convierte ese método en un workflow ejecutable para agentes.**
+
+En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada línea de código hasta su requirement, y sellos de aprobación (quién, cuándo, qué commit) en cada artefacto. Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
 
 Clonas, corres `/stark-init`, y el framework te lleva fase por fase: [empieza aquí →](docs/documentacion/QUICKSTART.md)
 
@@ -32,6 +34,19 @@ Resuelve el problema del vibe-coding: prototipos rápidos pero código frágil. 
 Está en fase "Assess" del Tech Radar de Thoughtworks (2025-2026). Práctica emergente bien fundamentada que probablemente sea estándar en 2027. MARK es la adaptación de la autora dentro de ese género; stark la implementa.
 
 > stark te da el **formato** (la gramática de requirements/design/tasks) y el **workflow**. Lo que hace que entregue código que funciona — no solo documentación preciosa — son los **gates humanos** y el rigor de tu revisión. Esos los pones tú.
+
+### ¿Qué es RDD?
+
+**Receipt-Driven Development** (desarrollo guiado por comprobantes): ninguna validación sin evidencia verificable. No basta con que el agente diga "ya quedó" — cada aprobación deja huella escrita en el repo.
+
+En stark son **dos sellos**:
+
+1. **Sello de documento** — al aprobar requirements, design o tasks en su gate, el header queda estampado: `> Aprobado por [nombre] — YYYY-MM-DD`.
+2. **Sello de lote** — al cerrar cada lote de build con tests en verde: `> Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD`. Antes del push se recompara el hash: si difiere, el código cambió después de la validación — se revalida, no se entrega.
+
+Con eso, cualquiera que abra un proyecto hecho con stark puede verificar **quién aprobó qué, cuándo, y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
+
+Honestidad de posicionamiento: RDD es una disciplina emergente de la era de agentes de IA, sin autor canónico ni estándar consagrado (a diferencia de SDD). stark no la presume: la implementa.
 
 ---
 

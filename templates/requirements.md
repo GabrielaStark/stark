@@ -7,6 +7,8 @@ este archivo solo muestra la forma del artefacto de un vistazo.
 
 # Requirements: [Nombre del feature o sistema]
 
+> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+
 ## Introduction
 
 ## Requirements

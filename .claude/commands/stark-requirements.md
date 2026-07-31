@@ -12,4 +12,4 @@ Determina el caso de uso y enruta:
 - MANTENIMIENTO → Use the analista-feature-mantenimiento subagent to produce `docs/features/$ARGUMENTS/requirements.md`, con delta, Surface of Contact e Invariantes Preservadas.
 - PROTOTIPO (standalone) → Use the analista-entrevistas subagent to produce `docs/requirements.md` en modo LIGERO: solo lo mínimo para inferir pantallas y flujos (User Stories + criterios EARS esenciales), sin exhaustividad de NFRs ni casos borde. Si después se decide construir, el requirements se completa con una pasada normal.
 
-Gate humano: nada avanza a la siguiente fase sin aprobación explícita del requirements producido.
+Gate humano: nada avanza a la siguiente fase sin aprobación explícita del requirements producido. Al recibirla, estampa el sello bajo el título del documento: `> Aprobado por [nombre] — YYYY-MM-DD` (pregunta el nombre si no lo tienes). Sin sello, el documento no cuenta como aprobado.

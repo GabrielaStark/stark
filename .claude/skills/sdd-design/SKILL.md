@@ -19,6 +19,8 @@ Regla de oro: **si dos personas técnicas leyendo el mismo design.md llegarían 
 
 El archivo SIEMPRE tiene esta estructura, en este orden:
 
+> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-design` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+
 ````markdown
 # Design: [Nombre del feature o sistema]
 

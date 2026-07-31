@@ -127,6 +127,8 @@ Secuencia canónica:
 
 ## 4. Estructura del archivo
 
+> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-tasks` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+
 ```markdown
 # Tasks: [Nombre del feature]
 
@@ -332,7 +334,7 @@ Cada punto de coexistencia es una tarea propia, no se agrupan:
 
 ### Patrón correcto
 
-Idéntico a sdd-tasks §6: ejecución **por lotes** (grupos contiguos de tareas de la misma sección, tareas una por una en orden), revisión humana por lote, el humano marca los `[x]` (nunca el agente).
+Idéntico a sdd-tasks §6: ejecución **por lotes** (grupos contiguos de tareas de la misma sección, tareas una por una en orden), revisión humana por lote, el humano marca los `[x]` (nunca el agente). `/stark-build` estampa el **sello del lote** bajo el header del lote — en mantenimiento incluye las invariantes: `> Lote validado: commit <hash> — Tests: PASS — Invariantes: PASS — aprobado por [nombre] el YYYY-MM-DD`. Antes de push, el hash se recompara — si difiere, se revalida, no se entrega.
 
 Diferencias específicas de mantenimiento:
 

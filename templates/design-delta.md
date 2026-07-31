@@ -8,6 +8,8 @@ Este artefacto lo GENERA el agente disenador-delta-mantenimiento desde el skill.
 
 > La arquitectura existente es inmutable: se referencia, no se rediseña.
 
+> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+
 ## 1. Overview del Delta
 
 ## 2. Architecture

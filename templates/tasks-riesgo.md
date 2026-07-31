@@ -7,7 +7,11 @@ Orden por riesgo de regresión; footer doble _Requirements: X.Y_ | _Invariants: 
 
 # Tasks: [Nombre del feature]
 
+> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+
 ## Regression Shield
+<!-- Al cerrar cada lote aprobado, /stark-build estampa bajo su header:
+     > Lote validado: commit <hash> — Tests: PASS — Invariantes: PASS — aprobado por [nombre] el YYYY-MM-DD -->
 
 - [ ] 1. Verificar que la suite existente pasa contra los módulos afectados
 - [ ] 2. Blindar I.1 — [invariante sin test]

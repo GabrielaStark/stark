@@ -17,6 +17,8 @@ Regla de oro: **si otro desarrollador (humano o agente) que no estuvo en el leva
 
 El archivo SIEMPRE tiene esta estructura, en este orden:
 
+> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-requirements` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+
 ```markdown
 # Requirements: [Nombre del feature o sistema]
 

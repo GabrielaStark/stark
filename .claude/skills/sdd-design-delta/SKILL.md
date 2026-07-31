@@ -23,6 +23,8 @@ Regla de oro: **si el design propone cambios en componentes NO listados en la Su
 
 El archivo SIEMPRE tiene esta estructura, en este orden. Es **paralela** a `sdd-design` para mantener la curva de aprendizaje, pero el contenido de cada sección está acotado al delta.
 
+> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-design` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+
 ````markdown
 # Design Delta: [Nombre del feature]
 

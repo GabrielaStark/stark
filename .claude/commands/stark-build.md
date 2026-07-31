@@ -13,6 +13,8 @@ Vas a ejecutar UN lote. La unidad de ejecución es siempre un lote:
 
 `$ARGUMENTS` indica el slice o rango de tareas a ejecutar. Si está vacío, identifica el siguiente lote no completado en `tasks.md` y confírmalo antes de proceder.
 
+Pre-condición: `tasks.md` debe traer el sello `> Aprobado por ...` en su header. Si no lo trae, detente y pídelo.
+
 SEGURIDAD (dura, Principio 2): valida entradas en el servidor, parametriza queries/comandos (nunca concatenar input), autorización por rol en cada endpoint nuevo, secretos solo por env vars, datos sensibles fuera de logs y de mensajes de error, ningún `catch` vacío.
 
 PRINCIPIO DE CORRECCIÓN (duro):
@@ -23,3 +25,7 @@ PRINCIPIO DE CORRECCIÓN (duro):
 Aísla las tareas de validación: van solas, nunca loteadas. En mantenimiento, Regression Shield y No-Regression Validation también van solas.
 
 GATE HUMANO por lote: valida SOFTWARE FUNCIONANDO. El sistema corre y la feature del lote es demostrable de punta a punta — no basta con código que compila. Entrega al humano cómo verificarlo y espera su revisión antes de cerrar el lote.
+
+SELLO DEL LOTE (cadena de evidencia): cuando el humano aprueba el lote, registra bajo el header del lote en `tasks.md`:
+`> Lote validado: commit <hash> — Tests: PASS — Invariantes: PASS — aprobado por [nombre] el YYYY-MM-DD`
+donde `<hash>` sale de `git rev-parse --short HEAD` tras el último commit del lote (`Invariantes` solo aplica en mantenimiento; omítelo en construcción). Antes de cualquier push del lote, vuelve a correr `git rev-parse --short HEAD` y compáralo con el sellado: si difieren, el código cambió después de la validación — se revalida con el humano, no se entrega.

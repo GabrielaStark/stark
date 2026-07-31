@@ -7,7 +7,11 @@ delivery_strategy vertical (default): Walking Skeleton + Slices; layered: por ca
 
 # Tasks: [Nombre del feature o sistema]
 
+> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+
 ## 0. Walking Skeleton
+<!-- Al cerrar cada lote aprobado, /stark-build estampa bajo su header:
+     > Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD -->
 
 - [ ] 1. [Verbo] [objeto concreto]
   - [Sub-pasos: archivos a tocar / patrón a aplicar]
