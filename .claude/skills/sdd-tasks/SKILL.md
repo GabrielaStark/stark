@@ -146,7 +146,7 @@ Tests como sub-paso son lo primero que el agente recorta cuando va apurado. Como
 
 El agrupamiento de headers depende de `delivery_strategy`. El **default es `vertical`**.
 
-> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-tasks` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+> Sello de aprobación: el documento nace con `> Estado: PENDIENTE` bajo el título (este agente lo escribe así). Al aprobar, el gate (`/stark-tasks`) corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` y genera el receipt (sha256 del contenido aprobado) en `docs/.stark/receipts/`. La autoridad es el receipt, no la línea: si el documento cambia después, la fase siguiente lo detecta (`verificar-doc`) y se bloquea. Este agente nunca sella.
 
 ### Modo vertical (default): headers por slice de feature
 
@@ -300,7 +300,7 @@ La unidad de ejecución es el **lote**: en modo vertical (default), un lote = UN
 1. **Conversación nueva**. El agente lee COMPLETOS `tasks.md`, `requirements.md` y `design.md`, UNA sola vez.
 2. El agente ejecuta las tareas del lote **una por una, en orden numérico**, únicamente desde lo especificado. Si algo es ambiguo, se detiene y pregunta — no infiere.
 3. Al terminar cada tarea reporta: archivos tocados, criterio de hecho, resultado de tests. **NO marca `[x]`**.
-4. **El humano revisa el lote completo** (corre tests, verifica cada criterio de hecho) y marca `[x]` solo lo que pasa. `/stark-build` estampa entonces el **sello del lote** bajo el header del lote: `> Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD`. Antes de push, el hash se recompara — si difiere, se revalida, no se entrega.
+4. **El humano revisa el lote completo** (corre tests, verifica cada criterio de hecho) y marca `[x]` solo lo que pasa. `/stark-build` sella entonces el commit validado con un **annotated tag** (`sello.py sellar-lote`) — la autoridad del sello es el tag, no una línea en este archivo. El hook pre-push bloquea el push si el árbol cambió después de la validación (dirty, untracked o commits sin sellar): se revalida, no se entrega.
 5. Siguiente lote: en la misma conversación si sigue sana (contexto ya cargado), o conversación nueva.
 
 Las tareas de **validación intermedia** van SOLAS, nunca loteadas: son puntos de control donde el humano decide si el bloque anterior quedó bien.

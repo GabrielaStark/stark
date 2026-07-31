@@ -127,7 +127,7 @@ Secuencia canónica:
 
 ## 4. Estructura del archivo
 
-> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-tasks` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+> Sello de aprobación: el documento nace con `> Estado: PENDIENTE` bajo el título (este agente lo escribe así). Al aprobar, el gate (`/stark-tasks`) corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` y genera el receipt (sha256 del contenido aprobado) en `docs/.stark/receipts/`. La autoridad es el receipt, no la línea: si el documento cambia después, la fase siguiente lo detecta (`verificar-doc`) y se bloquea. Este agente nunca sella.
 
 ```markdown
 # Tasks: [Nombre del feature]
@@ -334,7 +334,7 @@ Cada punto de coexistencia es una tarea propia, no se agrupan:
 
 ### Patrón correcto
 
-Idéntico a sdd-tasks §6: ejecución **por lotes** (grupos contiguos de tareas de la misma sección, tareas una por una en orden), revisión humana por lote, el humano marca los `[x]` (nunca el agente). `/stark-build` estampa el **sello del lote** bajo el header del lote — en mantenimiento incluye las invariantes: `> Lote validado: commit <hash> — Tests: PASS — Invariantes: PASS — aprobado por [nombre] el YYYY-MM-DD`. Antes de push, el hash se recompara — si difiere, se revalida, no se entrega.
+Idéntico a sdd-tasks §6: ejecución **por lotes** (grupos contiguos de tareas de la misma sección, tareas una por una en orden), revisión humana por lote, el humano marca los `[x]` (nunca el agente). `/stark-build` sella el commit validado con un **annotated tag** (`sello.py sellar-lote --invariantes`, que registra `Invariantes: PASS`) — la autoridad es el tag, no una línea en este archivo. El hook pre-push bloquea el push si el árbol cambió después de la validación: se revalida, no se entrega.
 
 Diferencias específicas de mantenimiento:
 

@@ -41,10 +41,12 @@ Está en fase "Assess" del Tech Radar de Thoughtworks (2025-2026). Práctica eme
 
 **Receipt-Driven Development** (desarrollo guiado por comprobantes): ninguna validación sin evidencia verificable. No basta con que el agente diga "ya quedó" — cada aprobación deja huella escrita en el repo.
 
-En stark son **dos sellos**:
+En stark son **dos sellos**, con una autoridad ejecutable (`.claude/scripts/sello.py`) — no líneas de Markdown que cualquiera edita:
 
-1. **Sello de documento** — al aprobar requirements, design o tasks en su gate, el header queda estampado: `> Aprobado por [nombre] — YYYY-MM-DD`.
-2. **Sello de lote** — al cerrar cada lote de build con tests en verde: `> Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD`. Antes del push se recompara el hash: si difiere, el código cambió después de la validación — se revalida, no se entrega.
+1. **Sello de documento** — al aprobar requirements, design o tasks, el gate corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` en el header y genera un **receipt** con el hash sha256 del contenido aprobado (en `docs/.stark/receipts/`, se commitea). La fase siguiente recalcula el hash: si cambió una coma después de la aprobación, se bloquea y se re-aprueba.
+2. **Sello de lote** — al cerrar cada lote de build con tests en verde, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<n>`, registrando `Tests: PASS`, aprobador y fecha — el tag no modifica el árbol validado). Un **hook pre-push** corre la comprobación determinista: árbol limpio, sin untracked, HEAD sellado — si algo cambió después de validar, **git bloquea el push**, no la buena voluntad del agente.
+
+Las seis pruebas que sostienen el claim (verificadas en repo real): editar el documento tras aprobarlo bloquea la fase siguiente; modificar código sin commit, dejar un archivo untracked o commitear después de validar bloquean el push; los placeholders se rechazan; y el push sin sellar lo bloquea git solo.
 
 Con eso, cualquiera que abra un proyecto hecho con stark puede verificar **quién aprobó qué, cuándo, y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
 
@@ -133,7 +135,7 @@ Vía principal: los comandos slash `/stark-*`. Las fases están numeradas; el pr
    /stark-audit    ← transversal: audita el repo completo contra los Principios
 ```
 
-Cada fase termina en un **gate humano**: revisión y aprobación explícita antes de pasar a la siguiente — y la aprobación queda **sellada** en el header del artefacto (`> Aprobado por [nombre] — fecha`), no solo dicha en el chat.
+Cada fase termina en un **gate humano**: revisión y aprobación explícita antes de pasar a la siguiente — y la aprobación queda **sellada** (header estampado + receipt sha256 en `docs/.stark/receipts/`); la fase siguiente verifica el receipt antes de arrancar y se bloquea si el documento cambió después de aprobarse.
 
 #### Alternativa manual: invocar subagentes directamente
 
@@ -172,7 +174,7 @@ stark/
 │   │   ├── analista-feature-mantenimiento.md         ← mantenimiento: intent + código prod → requirements (delta)
 │   │   ├── disenador-delta-mantenimiento.md          ← mantenimiento: requirements (delta) → design (delta)
 │   │   └── descompositor-riesgo-mantenimiento.md     ← mantenimiento: design (delta) → tasks (por riesgo)
-│   └── skills/                                       ← 9 skills (7 constituciones SDD + 2 auxiliares)
+│   ├── skills/                                       ← 9 skills (7 constituciones SDD + 2 auxiliares)
 │       ├── sdd-requirements/SKILL.md                 ← construcción
 │       ├── sdd-prototype/SKILL.md                    ← transversal
 │       ├── sdd-design/SKILL.md                       ← construcción
@@ -182,6 +184,9 @@ stark/
 │       ├── sdd-tasks-risk/SKILL.md                   ← mantenimiento
 │       ├── onboarding/SKILL.md                       ← auxiliar: genera CLAUDE.md + BIG_PICTURE.md
 │       └── reglas-negocio/SKILL.md                   ← auxiliar: genera REGLAS_DE_NEGOCIO.md
+│   └── scripts/
+│       └── sello.py                                  ← autoridad RDD: receipts sha256, tags de
+│                                                       lote, hook pre-push
 ├── docs/
 │   ├── inputs/                                       ← material crudo (nuevo)
 │   ├── analysis/                                     ← análisis previo (reingeniería)
@@ -191,6 +196,8 @@ stark/
 │   ├── prototype/                                    ← OUTPUT prototipo
 │   ├── design.md                                     ← OUTPUT construcción
 │   ├── tasks.md                                      ← OUTPUT construcción
+│   ├── .stark/receipts/                              ← OUTPUT: receipts de aprobación (sha256) —
+│   │                                                   evidencia RDD, se commitea
 │   └── documentacion/
 │       ├── PRINCIPIOS.md                             ← filosofía (lema stark)
 │       ├── QUICKSTART.md                             ← empieza aquí (camino feliz)
@@ -304,7 +311,7 @@ entrevistas               codigo                       mantenimiento
   - Mantenimiento: código en producción + descripción del feature
 - (Mantenimiento recomendado) Skills auxiliares `onboarding` y `reglas-negocio` (ya incluidas en `.claude/skills/`) para generar el sustrato (`CLAUDE.md`, `BIG_PICTURE.md`, `REGLAS_DE_NEGOCIO.md`)
 
-El repo se auto-verifica: `python3 scripts/verificar.py` valida frontmatters, fences, links y nombres citados; el CI lo corre en cada push.
+El repo se auto-verifica: `python3 scripts/verificar.py` valida frontmatters, fences, links y nombres citados; el CI lo corre en cada push. En tus proyectos, los sellos RDD los verifica `python3 .claude/scripts/sello.py` (receipts sha256, tags de lote, hook pre-push).
 
 ---
 

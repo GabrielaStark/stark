@@ -105,7 +105,7 @@ Las fases 1–6 son la columna vertebral; `/stark-review` y `/stark-audit` son t
 - En **prototipo**: aprueba el **cliente**, no tú.
 - En **build**: revisas **cada lote** — corres los tests, verificas el criterio de hecho, y **solo tú** marcas `[x]`. El agente nunca se auto-aprueba.
 - El gate de build valida **software funcionando** (el sistema corre y el Slice es demostrable de punta a punta), no solo código que compila.
-- **Toda aprobación deja sello** (RDD): el gate estampa `> Aprobado por [nombre] — fecha` en el header del documento aprobado; en build, el sello del lote registra el commit validado y el hash se recompara antes del push — si difiere, se revalida. Sin sello no hay aprobación: es el recibo que tu repo puede demostrar sin el chat.
+- **Toda aprobación deja sello** (RDD): al aprobar, el gate corre `sello.py` — estampa `> Aprobado por [nombre] — fecha` en el documento y genera un receipt con el hash sha256 del contenido aprobado; si el documento cambia después, la fase siguiente se bloquea. En build, el lote validado se sella con un tag de git sobre el commit exacto, y el hook pre-push bloquea el push de cualquier cosa que cambiara tras la validación. Sin sello no hay aprobación: es el recibo que tu repo demuestra sin el chat.
 
 Los checklists de validación de cada fase (qué revisar antes de aprobar) están completos en la referencia: [requirements](REFERENCIA.md#2-fase-2-requirements-levantamiento) · [prototipo](REFERENCIA.md#3-fase-3-prototipo-visual-opcional) · [design](REFERENCIA.md#4-fase-4-design-diseño-técnico) · [tasks](REFERENCIA.md#5-fase-5-tasks-descomposición) · [build](REFERENCIA.md#6-fase-6-build--ejecución-del-código).
 

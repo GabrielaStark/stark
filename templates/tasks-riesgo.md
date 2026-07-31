@@ -7,11 +7,12 @@ Orden por riesgo de regresión; footer doble _Requirements: X.Y_ | _Invariants: 
 
 # Tasks: [Nombre del feature]
 
-> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+> Estado: PENDIENTE  <!-- al aprobar, el gate corre sello.py: estampa "Aprobado por..." aquí y genera el receipt (sha256) en docs/.stark/receipts/ -->
 
 ## Regression Shield
-<!-- Al cerrar cada lote aprobado, /stark-build estampa bajo su header:
-     > Lote validado: commit <hash> — Tests: PASS — Invariantes: PASS — aprobado por [nombre] el YYYY-MM-DD -->
+<!-- Al cerrar cada lote aprobado, /stark-build lo sella con un annotated tag
+     (sello.py sellar-lote --invariantes): la autoridad es el tag sobre el commit
+     validado, no una línea aquí. El hook pre-push bloquea commits sin sellar. -->
 
 - [ ] 1. Verificar que la suite existente pasa contra los módulos afectados
 - [ ] 2. Blindar I.1 — [invariante sin test]

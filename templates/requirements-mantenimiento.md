@@ -9,7 +9,7 @@ Este artefacto lo GENERA el agente analista-feature-mantenimiento desde el skill
 > Feature de mantenimiento sobre `<nombre-sistema>`. Describe **el delta**, no el sistema completo.
 > Ruta: [corta|completa] — justificación: [superficie tocada, criterios de DECISIONES.md B-D13]
 
-> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+> Estado: PENDIENTE  <!-- al aprobar, el gate corre sello.py: estampa "Aprobado por..." aquí y genera el receipt (sha256) en docs/.stark/receipts/ -->
 
 ## Contexto
 

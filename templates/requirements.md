@@ -7,7 +7,7 @@ este archivo solo muestra la forma del artefacto de un vistazo.
 
 # Requirements: [Nombre del feature o sistema]
 
-> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+> Estado: PENDIENTE  <!-- al aprobar, el gate corre sello.py: estampa "Aprobado por..." aquí y genera el receipt (sha256) en docs/.stark/receipts/ -->
 
 ## Introduction
 

@@ -5,7 +5,7 @@ argument-hint: "[slug-feature en mantenimiento]"
 
 Lee `docs/documentacion/PRINCIPIOS.md` y aplica sus reglas como restricciones duras antes de actuar.
 
-Pre-condición: el requirements de esta fase debe estar aprobado por el humano — su header debe traer el sello `> Aprobado por ...`. Si no lo trae, detente y pídelo.
+Pre-condición: el requirements de esta fase debe estar aprobado. Verifícalo: `python3 .claude/scripts/sello.py verificar-doc <ruta-del-requirements>` — comprueba que el contenido actual coincide (sha256) con la versión aprobada. Si falla (receipt ausente, o el documento cambió después de aprobarse), detente: se re-aprueba y re-sella antes de seguir.
 
 Enruta según el caso de uso:
 
@@ -14,4 +14,4 @@ Enruta según el caso de uso:
 
 El campo `delivery_strategy` del Overview del design (`vertical` por defecto | `layered`) gobierna cómo se descompondrá en la Fase 5; déjalo explícito.
 
-Gate humano: nada avanza a la Fase 5 sin aprobación explícita del design producido. Al recibirla, estampa el sello bajo el título del documento: `> Aprobado por [nombre] — YYYY-MM-DD`. Sin sello, el documento no cuenta como aprobado.
+Gate humano: nada avanza a la Fase 5 sin aprobación explícita del design producido. Al recibirla, sella el documento: `python3 .claude/scripts/sello.py sellar-doc <ruta-del-design> --por "<nombre>"` — estampa el header y genera el receipt (sha256) en `docs/.stark/receipts/`; commitea ambos. Sin receipt válido, el documento no cuenta como aprobado.

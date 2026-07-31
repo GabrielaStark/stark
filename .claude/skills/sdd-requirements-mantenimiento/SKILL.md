@@ -26,7 +26,7 @@ Regla de oro: **si un desarrollador que nunca tocó este código pudiera impleme
 
 El archivo SIEMPRE tiene esta estructura, en este orden:
 
-> Sello de aprobación: tras el gate humano, el header lleva `> Aprobado por [nombre] — YYYY-MM-DD` bajo el título. Lo estampa `/stark-requirements` al recibir la aprobación — no este agente. Sin sello, el documento no cuenta como aprobado.
+> Sello de aprobación: el documento nace con `> Estado: PENDIENTE` bajo el título (este agente lo escribe así). Al aprobar, el gate (`/stark-requirements`) corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` y genera el receipt (sha256 del contenido aprobado) en `docs/.stark/receipts/`. La autoridad es el receipt, no la línea: si el documento cambia después, la fase siguiente lo detecta (`verificar-doc`) y se bloquea. Este agente nunca sella.
 
 ```markdown
 # Requirements: [Nombre del feature]

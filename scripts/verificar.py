@@ -7,9 +7,11 @@ Valida todo lo verificable por máquina en el repo:
   2. Fences de código balanceados en todos los .md.
   3. Links internos de markdown resuelven (archivo y ancla).
   4. Nombres de agentes/skills/comandos citados en prosa existen en disco.
+  5. Los scripts Python del framework (sello.py incluido) compilan.
 
 Uso: python3 scripts/verificar.py   →   exit 0 = verde.
 """
+import py_compile
 import re
 import sys
 from pathlib import Path
@@ -114,6 +116,7 @@ def verifica_nombres():
         {p.stem for p in (RAIZ / ".claude/agents").glob("*.md")}
         | {p.parent.name for p in (RAIZ / ".claude/skills").glob("*/SKILL.md")}
         | {p.stem for p in (RAIZ / ".claude/commands").glob("*.md")}
+        | {"stark-lote"}  # prefijo de los tags RDD (sello.py), no es comando
     )
     patron = re.compile(
         r"\b((?:analista|arqueologo|disenador|descompositor|prototipador|sdd|stark)-[a-z-]+)"
@@ -130,17 +133,26 @@ def verifica_nombres():
             error(f"{p.relative_to(RAIZ)}: nombre citado inexistente → '{token}'")
 
 
+def verifica_scripts():
+    for p in list((RAIZ / ".claude/scripts").glob("*.py")) + list((RAIZ / "scripts").glob("*.py")):
+        try:
+            py_compile.compile(str(p), doraise=True)
+        except py_compile.PyCompileError as e:
+            error(f"{p.relative_to(RAIZ)}: no compila — {str(e).splitlines()[0]}")
+
+
 def main():
     verifica_frontmatter()
     verifica_fences()
     verifica_links()
     verifica_nombres()
+    verifica_scripts()
     if ERRORES:
         print(f"❌ verificar.py: {len(ERRORES)} problema(s)")
         for e in ERRORES:
             print(f"  - {e}")
         sys.exit(1)
-    print("✅ stark verificado: frontmatters, fences, links y nombres en orden.")
+    print("✅ stark verificado: frontmatters, fences, links, nombres y scripts en orden.")
 
 
 if __name__ == "__main__":

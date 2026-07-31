@@ -584,7 +584,7 @@ Al terminar cada tarea, repórtame: qué archivos creó, si cumple su
 
 4. Tú revisas el resultado de cada tarea del lote: corres los tests, lees el código, verificas el criterio de hecho.
 
-5. Marcas `[x]` solo las que pasen, y el gate estampa el **sello del lote** bajo su header en `tasks.md`: `> Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD` (en mantenimiento incluye `Invariantes: PASS`). Antes del push se recompara el hash: si difiere, el código cambió tras la validación — se revalida, no se entrega. Cierras la conversación. Abres otra para el siguiente lote.
+5. Marcas `[x]` solo las que pasen, y el gate sella el commit validado: `python3 .claude/scripts/sello.py sellar-lote <n> --por "<nombre>"` (con `--invariantes` en mantenimiento) — un **annotated tag** `stark-lote-<n>` sobre el commit exacto, con working tree limpio como requisito. El hook pre-push (lo instala `/stark-init` o el primer `/stark-build`) corre `verificar-push` y bloquea el push si algo cambió tras la validación — dirty, untracked o commits sin sellar: se revalida, no se entrega. Cierras la conversación. Abres otra para el siguiente lote.
 
 ### Encadenar el siguiente lote en la MISMA conversación (aún más barato)
 
@@ -755,8 +755,8 @@ Rompe siempre, sin excepción:
 - **Acceptance Criteria** (Criterios de Aceptación): condiciones testeables que definen "está hecho". En SDD se escriben en EARS.
 - **ADR** (Architecture Decision Record): registro corto de una decisión técnica con su contexto, consecuencias positivas y negativas.
 - **Quality Gate:** punto de revisión humana obligatoria entre fases. No es opcional.
-- **RDD** (Receipt-Driven Development): ninguna validación sin evidencia verificable — el agente no dice "ya quedó", lo demuestra el repo. stark lo implementa con los sellos de aprobación.
-- **Sello de aprobación:** la huella escrita que deja cada gate. De documento: `> Aprobado por [nombre] — YYYY-MM-DD` en el header de requirements/design/tasks al aprobarse. De lote: `> Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD` en `tasks.md` al cerrar cada lote de build (el hash se recompara antes del push; si difiere, se revalida). Sin sello, no hay aprobación.
+- **RDD** (Receipt-Driven Development): ninguna validación sin evidencia verificable — el agente no dice "ya quedó", lo demuestra el repo. stark lo implementa con los sellos de aprobación y su autoridad ejecutable: `.claude/scripts/sello.py`.
+- **Sello de aprobación:** la evidencia que deja cada gate, con autoridad ejecutable (`sello.py`), no solo una línea de Markdown. De documento: `> Aprobado por [nombre] — fecha` en el header **+ receipt JSON con sha256 del contenido aprobado** en `docs/.stark/receipts/` — la fase siguiente recalcula el hash (`verificar-doc`) y se bloquea si el documento cambió tras aprobarse. De lote: **annotated tag** `stark-lote-<n>` sobre el commit validado (exige working tree limpio); el hook pre-push (`verificar-push`) bloquea el push si hay dirty, untracked o HEAD sin sellar. Sin receipt/tag válido, no hay aprobación.
 - **Trazabilidad:** capacidad de rastrear cada línea de código → tarea → componente del design → criterio EARS → historia de usuario.
 - **Subagente:** instancia de Claude con system prompt propio, herramientas propias, identidad propia. Cada uno hace un trabajo específico.
 - **Skill:** archivo `SKILL.md` con reglas y procedimientos que un subagente consulta. Es la "constitución" compartida.

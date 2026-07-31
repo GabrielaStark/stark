@@ -7,11 +7,12 @@ delivery_strategy vertical (default): Walking Skeleton + Slices; layered: por ca
 
 # Tasks: [Nombre del feature o sistema]
 
-> Aprobado por [nombre] — YYYY-MM-DD  <!-- sello: lo estampa el gate al aprobar; sin sello no está aprobado -->
+> Estado: PENDIENTE  <!-- al aprobar, el gate corre sello.py: estampa "Aprobado por..." aquí y genera el receipt (sha256) en docs/.stark/receipts/ -->
 
 ## 0. Walking Skeleton
-<!-- Al cerrar cada lote aprobado, /stark-build estampa bajo su header:
-     > Lote validado: commit <hash> — Tests: PASS — aprobado por [nombre] el YYYY-MM-DD -->
+<!-- Al cerrar cada lote aprobado, /stark-build lo sella con un annotated tag
+     (sello.py sellar-lote): la autoridad es el tag sobre el commit validado,
+     no una línea aquí. El hook pre-push bloquea el push de commits sin sellar. -->
 
 - [ ] 1. [Verbo] [objeto concreto]
   - [Sub-pasos: archivos a tocar / patrón a aplicar]

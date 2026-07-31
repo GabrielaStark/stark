@@ -37,6 +37,8 @@ Muestra la secuencia stark del caso ([ ] = opcional) y cuál comando sigue:
 
 - **PROTOTIPO** → indícale al humano que el siguiente paso es `/stark-requirements` en modo ligero (lo mínimo para inferir pantallas y flujos); con ese requirements aprobado, sigue `/stark-prototype`.
 
+En cualquier caso: si el repo git ya existe, instala el candado RDD — `python3 .claude/scripts/sello.py instalar-hook` (hook pre-push que bloquea el push de código no sellado). Si aún no hay repo git (caso nuevo antes de `git init`), indícale al humano que lo corra después del primer `git init`.
+
 ## 4. Ofrece la constitución del proyecto
 
 Si no existe `CONSTITUTION.md` en la raíz, ofrécele al humano crearlo desde `templates/CONSTITUTION.md`: ahí fija stack (construcción), patrones, vetos, estándares de código y umbrales de calidad que los agentes tratarán como restricciones duras. Es opcional — si dice que no, sigue sin insistir. NO lo llenes tú: cópialo y deja que el humano decida su contenido.
