@@ -153,6 +153,8 @@ Antes del primer feature, una sola vez por repo, corre estas dos skills desde Cl
 
 Los tres archivos viven en `docs/` raíz (no dentro de `features/`) porque aplican a todo el sistema. El agente de mantenimiento los lee como contexto base. **Si no los generas:** el pipeline funciona igual, pero el agente infiere más del código y aumenta la probabilidad de perder invariantes. Inversión: 5–10 minutos cada skill, una vez por sistema.
 
+Al validar el sustrato no solo revises lo encontrado: `REGLAS_DE_NEGOCIO.md` trae estado de procedencia por regla (`confirmada` / `inferida` / `en-duda`) y una sección 11 de **Descubrimiento** con contradicciones, zonas no comprendidas y preguntas abiertas para el Stakeholder técnico. Cada respuesta con nombre promueve la regla a `confirmada`; lo que quede `en-duda` exigirá decisión explícita en cada feature que lo toque (`DECISIONES.md` B-D11 y B-D12).
+
 #### Preparar el feature
 
 Define un slug (kebab-case: `exportar-reportes-pdf`, `auth-mfa`), crea `docs/features/<slug>/`, copia `templates/intent.md` dentro y rellénalo. Secciones del template: **Qué queremos**, **Por qué**, **Quién pidió**, **En qué área del sistema vive** (intuición inicial), **Out of scope explícito**, **Pistas técnicas conocidas** (opcional), **Stakeholder técnico**, **Fecha de pedido / urgencia** y **Notas adicionales**. Escríbelo en prosa libre — es un input para el agente, no un documento formal; él lo refina y formaliza después. Invocación:
@@ -171,7 +173,7 @@ El agente va a ejecutar 7 fases internamente. Tu trabajo es responder cuando pre
 |--|--|--|
 | 1. Lectura del intent + sustrato | Lee `intent.md`, `docs/CLAUDE.md`, `docs/BIG_PICTURE.md`, `docs/REGLAS_DE_NEGOCIO.md` (si existen), mapea estructura del código. Reporta qué encontró. | Confirmar la lectura inicial. Si malinterpretó algo, corrígelo. Si falta sustrato, el agente te avisa — decide si pausas para correrlo o continúas. |
 | 2. Triangulación intent ↔ código | Para cada capacidad del intent, localiza módulos relacionados en el código y mapea Surface of Contact (qué módulos toca el feature, lee, modifica, o NO toca). | Validar el mapa preliminar. |
-| 3. Identificación de invariantes | Infiere invariantes preservadas (comportamientos del sistema que NO deben cambiar) con referencias al código. Te las presenta numeradas (I.1, I.2, ...). | Confirmar o descartar cada invariante numerada. Mejor sobre-listar y descartar que omitir. |
+| 3. Identificación de invariantes | Infiere invariantes preservadas (comportamientos del sistema que NO deben cambiar) con referencias al código y su estado de procedencia. Te las presenta numeradas (I.1, I.2, ...). | Confirmar o descartar cada invariante numerada; lo `en-duda` no se blinda — va a decisión explícita. Mejor sobre-listar y descartar que omitir. |
 | 4. Resolución de huecos | Preguntas numeradas sobre actores, casos borde, NFR del feature, out-of-scope, términos ambiguos. | Responder **TODAS** las preguntas por número. |
 | 5. Síntesis incremental | Genera el `requirements.md` sección por sección y te lo muestra. | Revisar cada sección. Surface of Contact e Invariantes Preservadas son las más críticas. |
 | 6. Auto-validación | Ejecuta el checklist del SKILL contra el archivo. Reporta ✅ / ❌. | Esperar a 100% ✅. |
@@ -183,7 +185,9 @@ El `requirements.md` de mantenimiento es distinto del de nuevo. Verifica:
 
 - [ ] Existe sección `## Contexto` con qué/por qué/quién/dónde vive el feature.
 - [ ] Existe sección `## Surface of Contact` con tabla rellena. Cada fila lista un módulo/archivo/endpoint/tabla que el feature toca, lee, o explícitamente NO toca, con su nivel de riesgo.
-- [ ] Existe sección `## Invariantes Preservadas` con mínimo una invariante numerada **I.N**, cada una con comentario `<!-- source: archivo:líneas -->`.
+- [ ] Existe sección `## Invariantes Preservadas` con mínimo una invariante numerada **I.N**, cada una con comentario `<!-- source: archivo:líneas -->` y su estado (`confirmada` | `inferida`) — ninguna `en-duda` listada como invariante.
+- [ ] Existe `## Decisiones sobre hallazgos en-duda` sin filas sin decisión (o con "Sin hallazgos en-duda en la superficie de este feature").
+- [ ] La línea `> Ruta:` existe con justificación de superficie tocada; si es corta, cumple los cuatro criterios de `DECISIONES.md` B-D13 e incorpora `## Encaje de diseño` y `## Tasks por riesgo`.
 - [ ] Existe sección `## Tests Existentes a Preservar` con tabla que indica qué tests cubren cada invariante (y cuáles son gaps sin test).
 - [ ] Existe sección `## Requirements (del delta)` con al menos un `### Requirement N` que describe solo el feature nuevo, no el sistema.
 - [ ] Cada Requirement con **User Story:** "Como X, quiero Y, para Z". en español.
@@ -192,7 +196,11 @@ El `requirements.md` de mantenimiento es distinto del de nuevo. Verifica:
 - [ ] El requirements **NO** documenta el sistema completo — solo el delta.
 - [ ] El requirements **NO** propone reescribir arquitectura existente. Si lo hace, pausa: probablemente el caso correcto es reingeniería, no mantenimiento.
 
-Si todo está, di explícitamente **"aprobado, sigue con design"** (o pasa a la fase opcional de prototipo si el feature tiene UI nueva).
+Si todo está, aprueba explícitamente y sigue según la ruta: prototipo opcional si trae UI nueva, Fase 4 (design) en ruta completa, o directo a build en ruta corta.
+
+#### Ruta corta (cambios internos de bajo riesgo)
+
+El agente propone la ruta en la línea `> Ruta:` del requirements, con justificación de superficie tocada — criterios en `DECISIONES.md` B-D13: dinero, UI, permisos, integraciones, schema o zonas `en-duda` la mandan a completa aunque el cambio sea de una línea. Tú confirmas en el gate: puedes subirla a completa, nunca bajarla. Si queda corta, el mismo `requirements.md` incorpora `## Encaje de diseño` y `## Tasks por riesgo`, el gate único aprueba el documento completo, te saltas las Fases 4 y 5, y pasas directo a build. Regression Shield y No-Regression Validation siguen siendo obligatorias.
 
 #### Caso especial: el feature requiere cambiar arquitectura
 
@@ -329,7 +337,7 @@ Distinto agente según caso. Asegúrate de invocar el correcto.
 ### Pre-requisito
 
 - **Nuevo / reingeniería:** `docs/requirements.md` aprobado por ti.
-- **Mantenimiento:** `docs/features/<slug>/requirements.md` aprobado por ti.
+- **Mantenimiento:** `docs/features/<slug>/requirements.md` aprobado por ti. Si quedó en **ruta corta**, esta fase no aplica: el encaje de diseño ya vive en el requirements (ver §2C).
 
 ### (Opcional pero recomendado) Crea un `CONSTITUTION.md`
 
@@ -440,7 +448,7 @@ Distinto agente según caso.
 ### Pre-requisito
 
 - **Nuevo / reingeniería:** `docs/design.md` aprobado por ti.
-- **Mantenimiento:** `docs/features/<slug>/design.md` aprobado por ti.
+- **Mantenimiento:** `docs/features/<slug>/design.md` aprobado por ti. Si el feature va en **ruta corta**, esta fase no aplica: las tasks por riesgo ya viven en el requirements (ver §2C).
 
 ### Invocación
 
@@ -763,8 +771,8 @@ Rompe siempre, sin excepción:
 
 - **Delta:** el conjunto de cambios que un feature de mantenimiento introduce. Los artefactos del pipeline de mantenimiento describen solo el delta, no el sistema completo.
 - **Surface of Contact:** tabla en el `requirements.md` de mantenimiento que lista exhaustivamente los módulos, archivos, endpoints, tablas que el feature toca, lee, modifica o explícitamente NO toca. Cada fila con nivel de riesgo (alto / medio / bajo / — no se toca).
-- **Invariantes Preservadas:** lista numerada (I.1, I.2, ...) de comportamientos del sistema existente que **NO deben cambiar** tras el feature. Cada una con referencia al código fuente (`<!-- source: archivo:líneas -->`) y un test (existente o de blindaje) que la valida.
-- **Sustrato** (de mantenimiento): los tres archivos `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md` que documentan el sistema existente. Generados por las skills auxiliares `onboarding` y `reglas-negocio` (incluidas en `.claude/skills/`). Recomendados pero no obligatorios.
+- **Invariantes Preservadas:** lista numerada (I.1, I.2, ...) de comportamientos del sistema existente que **NO deben cambiar** tras el feature. Cada una con referencia al código fuente (`<!-- source: archivo:líneas -->`), su estado de procedencia (`confirmada` | `inferida` — lo `en-duda` no puede ser invariante) y un test (existente o de blindaje) que la valida.
+- **Sustrato** (de mantenimiento): los tres archivos `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md` que documentan el sistema existente. Generados por las skills auxiliares `onboarding` y `reglas-negocio` (incluidas en `.claude/skills/`). Recomendados pero no obligatorios. Su sección 11 (Descubrimiento) lista lo que el análisis no pudo determinar.
 - **Intent.md:** archivo de entrada del pipeline de mantenimiento. Lo escribe el humano describiendo el feature en lenguaje de negocio. Vive en `docs/features/<slug>/intent.md`.
 - **Regression Shield:** primera sección del `tasks.md` de mantenimiento. Tareas de blindaje (verbo Blindar) que escriben tests de regresión sobre código existente que el feature va a tocar. Se ejecutan **ANTES** de cualquier modificación.
 - **No-Regression Validation:** última sección obligatoria del `tasks.md` de mantenimiento. Tarea de verbo Verificar regresión que corre suite completa + verifica cada invariante manualmente antes de cerrar el feature.
@@ -772,6 +780,8 @@ Rompe siempre, sin excepción:
 - **Blindar:** verbo nuevo de tareas en pipeline de mantenimiento. Significa "escribir un test de regresión sobre código existente para asegurar que su comportamiento actual se preserve durante el feature".
 - **Coexistencia:** estrategia de cómo el delta convive con flujos existentes sin alterarlos. Documentada en sección 6 del `design.md` delta cuando hay puntos de Surface of Contact con riesgo medio/alto.
 - **Válvula de retorno:** volver al analista del pipeline para actualizar el requirements antes de seguir. Dos disparadores: feedback estructural del cliente durante el prototipo (Fase 3), y un design delta que propone tocar componentes fuera de Surface of Contact (mantenimiento, Fase 4).
+- **Procedencia:** estado de cada regla del sustrato y de cada invariante: `confirmada` (una persona con nombre respondió por ella), `inferida` (solo el código la respalda) o `en-duda` (contradictoria, sin explicación, o posible defecto). El Shield blinda las dos primeras; lo `en-duda` exige decisión explícita. Ver `DECISIONES.md` B-D11.
+- **Ruta corta:** fusión de los tres gates de mantenimiento en uno para cambios internos de bajo riesgo, decidida por superficie tocada (no por tamaño). El mismo requirements incorpora encaje de diseño y tasks por riesgo; Shield y No-Regression Validation intactos. Ver `DECISIONES.md` B-D13.
 
 ### Skills auxiliares del framework (usadas como sustrato del pipeline de mantenimiento)
 

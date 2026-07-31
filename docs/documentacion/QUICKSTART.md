@@ -57,13 +57,15 @@ Secuencia: `init (+sustrato)` → `requirements` → `[prototype]` → `design` 
 
 Agregar un feature a producción sin romper lo que funciona. Trabajas sobre el repo del sistema, no un repo nuevo.
 
-1. `/stark-init` — genera el **sustrato** y crea `docs/features/<slug>/intent.md` (descríbelo en lenguaje de negocio).
-2. `/stark-requirements <slug>` — intent + código → `docs/features/<slug>/requirements.md`: el **delta**, con Surface of Contact e Invariantes Preservadas. ✋
+1. `/stark-init` — genera el **sustrato** y crea `docs/features/<slug>/intent.md` (descríbelo en lenguaje de negocio). Al validar el sustrato, responde las preguntas abiertas de su sección de Descubrimiento — cada respuesta con nombre promueve reglas a `confirmada`.
+2. `/stark-requirements <slug>` — intent + código → `docs/features/<slug>/requirements.md`: el **delta**, con Surface of Contact, Invariantes Preservadas (con su estado de procedencia) y la propuesta de **ruta** (corta o completa, por superficie tocada). ✋
 3. `[ ]` `/stark-prototype <slug>` — si el feature trae UI nueva. ✋ cliente.
 4. `/stark-design <slug>` — delta sobre la arquitectura **heredada e inmutable** → `docs/features/<slug>/design.md`. ✋
 5. `/stark-tasks <slug>` — **orden por riesgo**: Regression Shield primero, No-Regression Validation al final. ✋
 6. `/stark-build <slug>` — un lote por sesión; las tareas de blindaje y la validación final van **solas**. ✋ por lote.
 
+> **Ruta corta** (cambios internos de bajo riesgo — criterio por superficie tocada, `DECISIONES.md` B-D13): si la confirmas en el gate del paso 2, el mismo requirements trae `## Encaje de diseño` y `## Tasks por riesgo`, te saltas los pasos 4 y 5, y vas directo a `/stark-build`. Shield y No-Regression Validation, intactos.
+>
 > Mantenimiento no cierra sin la **No-Regression Validation** final. Es no negociable.
 
 ### Prototipo
@@ -97,7 +99,7 @@ Las fases 1–6 son la columna vertebral; `/stark-review` y `/stark-audit` son t
 
 ✋ **Una fase a la vez. Tú apruebas entre cada una.** Saltarte un gate propaga el error 10× a la fase siguiente.
 
-- Después de **requirements**, **design** y **tasks**: revísalos y di explícitamente "aprobado, sigue".
+- Después de **requirements**, **design** y **tasks**: revísalos y di explícitamente "aprobado, sigue" (en ruta corta de mantenimiento hay un solo gate: apruebas el documento único).
 - En **prototipo**: aprueba el **cliente**, no tú.
 - En **build**: revisas **cada lote** — corres los tests, verificas el criterio de hecho, y **solo tú** marcas `[x]`. El agente nunca se auto-aprueba.
 - El gate de build valida **software funcionando** (el sistema corre y el Slice es demostrable de punta a punta), no solo código que compila.
