@@ -9,7 +9,7 @@
 
 **MARK integra SDD para especificar, YAGNI para limitar y RDD para demostrar que lo validado es exactamente lo entregado. stark convierte ese método en un workflow ejecutable para agentes.**
 
-En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada tarea y cada cambio hasta su requirement, y sellos de aprobación (quién, cuándo, qué commit) en cada artefacto. Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
+En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada tarea y cada cambio hasta su requirement, y sellos de aprobación **experimentales** (quién, cuándo, qué contenido — y en cada lote, qué commit): límites en [¿Qué es RDD?](#qué-es-rdd). Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
 
 Clonas, corres `/stark-init`, y el framework te lleva fase por fase: [empieza aquí →](docs/documentacion/QUICKSTART.md)
 
@@ -46,13 +46,13 @@ Thoughtworks lo colocó en "Assess" en su Tech Radar de noviembre de 2025; la ed
 En stark son **dos sellos**, con una autoridad ejecutable (`.claude/scripts/sello.py`) que no se desincroniza por accidente — a diferencia de una línea de Markdown, el receipt deja de coincidir en cuanto el documento cambia:
 
 1. **Sello de documento** — al aprobar requirements, design o tasks, el gate corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` en el header y genera un **receipt** (schema versionado) con el hash sha256 del contenido aprobado, atado a la ruta canónica del artefacto (en `docs/.stark/receipts/`, se commitea). La fase siguiente recalcula el hash: si cambió una coma después de la aprobación, se bloquea y se re-aprueba. Marcar checkboxes `[x]` en el plan NO invalida el sello — el estado de las tareas no es contenido aprobado; re-sellar exige el flag explícito `--re-sellar`; y un receipt no es transferible entre rutas.
-2. **Sello de lote** — al cerrar cada lote de build, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<id>`; en mantenimiento usa `<feature>-<n>`). El tag no modifica el árbol validado y cubre los commits del lote. El **hook pre-push** valida **cada commit de cada ref que se empuja** contra su remoto objetivo: código sin sellar no pasa — ni por otra rama, ni escondido tras un revert, ni renombrado hacia `docs/` —, los tags de lote son inmutables (ni borrarlos ni moverlos), y **la evidencia viaja con el código**: el tag va en el mismo push o ya existe en el remoto. Los commits que solo tocan documentación pasan sin sello, y el candado se activa con el primer sello — un clon con receipts lo hereda activado.
+2. **Sello de lote** — al cerrar cada lote de build, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<id>`; en mantenimiento usa `<feature>-<n>`). El tag no modifica el árbol validado y cubre los commits del lote. El **hook pre-push** valida **cada commit de cada ref que se empuja** contra su remoto objetivo: código sin sellar no pasa — ni por otra rama, ni escondido tras un revert, ni renombrado hacia `docs/` —, los tags de lote son inmutables vía push (el hook rechaza borrarlos y moverlos; la inmutabilidad total exige tags protegidos server-side — pendiente), y **la evidencia viaja con el código**: el tag va en el mismo push o ya existe en el remoto. Los commits que solo tocan documentación pasan sin sello, y el candado se activa con el primer sello — un clon con receipts hereda el candado activado en cuanto copia la herramienta y corre `instalar-hook` (el hook no viaja en git).
 
 Las pruebas que sostienen el claim son **reproducibles por cualquiera**: `python3 scripts/test_sello.py` monta repos git temporales (remotos bare y hooks reales, `core.hooksPath`, multi-remoto, repos SHA-256) y ejercita 50+ escenarios — incluidos todos los probes de la auditoría externa que rompieron la versión anterior de esta mecánica. El CI los corre en cada push.
 
-Con eso, cualquiera que abra un proyecto hecho con stark puede verificar **qué contenido exacto se aprobó, cuándo y a nombre de quién — y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
+Con eso, cualquiera con la herramienta (una copia de `sello.py`) que abra un proyecto hecho con stark puede verificar **qué contenido exacto se aprobó, cuándo y a nombre de quién — y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
 
-**Los límites, dichos de frente**: el sello *registra* la identidad del aprobador y la declaración `Tests: PASS` — no los firma criptográficamente ni ejecuta la suite; que los tests corrieran en verde lo garantiza el gate humano, no el script. Como todo hook de git, el candado es por clon (lo instala `/stark-init`) y `--no-verify` lo salta: es un candado contra el descuido y la deriva — que es como fallan los agentes —, no contra la mala fe de quien tiene las llaves del repo. Y la exención de documentación es política deliberada (specs y prototipo viajan libres): si tu `docs/` contiene código desplegable, ajústala en `sello.py`.
+**Los límites, dichos de frente**: el sello *registra* la identidad del aprobador y la declaración `Tests: PASS` — no los firma criptográficamente ni ejecuta la suite; que los tests corrieran en verde lo garantiza el gate humano, no el script. Como todo hook de git, el candado es por clon (lo instala `/stark-init`) y `--no-verify` lo salta: es un candado contra el descuido y la deriva — que es como fallan los agentes —, no contra la mala fe de quien tiene las llaves del repo. En esa misma línea: un receipt o un tag con el formato correcto los puede fabricar cualquiera con escritura al repo — el sello autentica **consistencia** (qué contenido, qué commit), no autoría; la autoría la protegen el control de acceso, la revisión de PRs y las reglas server-side pendientes. Y la exención de documentación es política deliberada (specs y prototipo viajan libres): si tu `docs/` contiene código desplegable, ajústala en `sello.py`.
 
 Honestidad de posicionamiento: RDD es una disciplina emergente de la era de agentes de IA, sin autor canónico ni estándar consagrado (a diferencia de SDD). stark no la presume: la implementa.
 
@@ -210,8 +210,9 @@ stark/
 │       ├── TROUBLESHOOTING.md                        ← problemas comunes
 │       └── DECISIONES.md                             ← decisiones de diseño (prototipo + mantenimiento)
 ├── scripts/
-│   └── verificar.py                                  ← auto-verificación del framework (CI la
-│                                                       corre en cada push)
+│   ├── verificar.py                                  ← auto-verificación del framework
+│   └── test_sello.py                                 ← suite RDD: 50+ escenarios en repos git
+│                                                       temporales (CI corre ambos en cada push)
 └── templates/
     ├── intent.md                                     ← se copia y llena (input de mantenimiento)
     ├── CONSTITUTION.md                               ← se copia a la raíz y llena (decisiones
@@ -309,7 +310,7 @@ entrevistas               codigo                       mantenimiento
 ## Stack y requisitos
 
 - **Claude Code** instalado
-- **Python 3.9+ y Git 2.28+** (los usa la autoridad de sellos `sello.py` y su suite de pruebas)
+- **Python 3.9+ y Git 2.29+** (los usa la autoridad de sellos `sello.py` y su suite de pruebas)
 - Acceso a modelo Claude Opus (recomendado para los 8 subagentes)
 - Material según el caso de uso:
   - Nuevo: entrevistas, transcripciones, formularios

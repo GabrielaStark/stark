@@ -147,6 +147,11 @@ def sellar_doc(artefacto: str, por: str, re_sellar: bool = False) -> None:
     rel, absoluta = ruta_canonica(artefacto)
     if not absoluta.is_file():
         fallo(f"no existe el artefacto {artefacto}")
+    if not (rel.startswith("docs/") or rel in NO_CODIGO):
+        fallo(
+            f"sellar-doc es para artefactos de documentación (docs/ o {', '.join(sorted(NO_CODIGO))}): "
+            f"{rel} es código. El código se valida por lote y se sella con sellar-lote."
+        )
     raiz = raiz_repo()
     destino = ruta_receipt(rel, raiz)
     if destino.is_file() and not re_sellar:
@@ -289,10 +294,21 @@ def archivos_de_commit(sha: str) -> list:
 
 def commits_introducidos(local_sha: str, remote_sha: str, remoto: "str | None") -> list:
     if es_sha_cero(remote_sha):
-        # Ref nueva: cuentan los commits que el REMOTO OBJETIVO no tiene aún
-        # (no cualquier remoto — eso dejaba pasar código presente en otro remote).
-        exclusion = f"--remotes={remoto}" if remoto else "--remotes"
-        return [c for c in git("rev-list", local_sha, "--not", exclusion).splitlines() if c]
+        # Ref nueva: excluye SOLO lo alcanzable desde los SHAs que el remoto
+        # objetivo reporta AHORA (ls-remote), no la caché local de
+        # remote-tracking — esa puede estar obsoleta (rama borrada en el
+        # servidor) o manipulada, y excusaría código sin sellar. Un SHA del
+        # remoto que no exista localmente no se puede excluir: se enumera de
+        # más, nunca de menos (fail-closed).
+        exclusiones = []
+        if remoto:
+            r = git_rc("ls-remote", "--heads", "--tags", remoto)
+            if r.returncode == 0:
+                for linea in r.stdout.splitlines():
+                    partes = linea.split()
+                    if partes and git_rc("cat-file", "-e", f"{partes[0]}^{{commit}}").returncode == 0:
+                        exclusiones.append(f"^{partes[0]}")
+        return [c for c in git("rev-list", local_sha, *exclusiones).splitlines() if c]
     r = git_rc("rev-list", f"{remote_sha}..{local_sha}")
     if r.returncode != 0:
         fallo(

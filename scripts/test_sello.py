@@ -9,7 +9,7 @@ core.hooksPath, tag lightweight, colisión de receipts, alias de ruta,
 symlinks, checkboxes que no invalidan, receipts malformados, borrado de
 tags, clon con candado heredado y repos SHA-256.
 
-Requisitos: Python 3.9+ y Git 2.28+ en PATH (sin dependencias de pip).
+Requisitos: Python 3.9+ y Git 2.29+ en PATH (sin dependencias de pip).
 Uso: python3 scripts/test_sello.py   →   exit 0 = todo verde.
 """
 import json
@@ -121,6 +121,8 @@ def flujo_principal(base):
     (repo / "docs/enlace.md").symlink_to(doc.resolve())
     caso("un symlink no se puede sellar", sello(repo, "sellar-doc", "docs/enlace.md", "--por", "Gabriela"), False)
     (repo / "docs/enlace.md").unlink()
+    caso("sellar-doc sobre código de producción se rechaza",
+         sello(repo, "sellar-doc", "app.py", "--por", "Gabriela"), False)
 
     print("— Placeholders y receipts malformados (P2-01) —")
     caso("sellar-doc --por '[nombre]' se rechaza", sello(repo, "sellar-doc", "docs/a/b.md", "--por", "[nombre]"), False)
@@ -218,6 +220,14 @@ def flujo_principal(base):
     commit_todo(repo, "código no sellado para B")
     caso("ref nueva hacia remoto B no se excusa con los refs de origin",
          run(["git", "push", "-q", "b", "main"], repo), False)
+    fantasma = git(repo, "rev-parse", "HEAD")
+    git(repo, "update-ref", "refs/remotes/b/fantasma", fantasma)
+    git(repo, "checkout", "-q", "-b", "colada")
+    caso("caché de remote-tracking obsoleta/manipulada tampoco excusa código (ls-remote manda)",
+         run(["git", "push", "-q", "b", "colada"], repo), False)
+    git(repo, "checkout", "-q", "main")
+    git(repo, "branch", "-D", "colada")
+    git(repo, "update-ref", "-d", "refs/remotes/b/fantasma")
     git(repo, "reset", "-q", "--hard", "HEAD~1")
 
     print("— Clon hereda el candado (receipts commiteados) —")
