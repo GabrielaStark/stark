@@ -108,8 +108,8 @@ Antes de generar HTML:
 
 Con plan aprobado:
 
-1. Genera `index.html` con banner permanente y la pantalla principal.
-2. Genera pantallas adicionales en `docs/prototype/pantallas/`.
+1. Genera `public/index.html` con banner permanente y la pantalla principal.
+2. Genera pantallas adicionales en `<prototype>/public/pantallas/`.
 3. Genera `assets/` con placeholders o assets reales del cliente.
 4. Si la plataforma requiere server: genera `server.js` y `package.json` siguiendo la plantilla del skill.
 5. Genera `DEPLOY.md` con setup + redeploy + sección de cambio de plataforma (alternativas referenciadas según el skill §5).

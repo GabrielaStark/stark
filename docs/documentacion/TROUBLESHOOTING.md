@@ -64,9 +64,9 @@ Es el sello RDD haciendo su trabajo: el receipt (`docs/.stark/receipts/`) guarda
 
 ### "git me bloquea el push (código sin sellar / working tree sucio)"
 
-El hook pre-push solo deja pasar código sellado (los pushes que solo tocan documentación pasan libres, y el candado se activa con el primer lote sellado).
+El hook pre-push revisa cada commit empujado y solo deja pasar código sellado (los pushes que solo tocan documentación pasan libres, y el candado se activa con el primer sello).
 
-- Si empujas un lote validado: deja el tree limpio (commitea o descarta todo), `python3 .claude/scripts/sello.py sellar-lote <n> --por "<nombre>"`, y pushea con `--tags`.
+- Si empujas un lote validado: deja el tree limpio (commitea o descarta todo), `python3 .claude/scripts/sello.py sellar-lote <id> --por "<nombre>"` (`<feature>-<n>` en mantenimiento), y empuja rama y tag juntos: `git push <remoto> <rama> refs/tags/stark-lote-<id>`.
 - Si el bloqueo te sorprende, esa sorpresa es el punto: algo cambió después de la validación. Revalida con el humano antes de entregar.
 - `git push --no-verify` salta el candado — úsalo solo sabiendo que rompes la cadena de evidencia.
 

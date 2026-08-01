@@ -30,13 +30,14 @@ Todas las reglas de este skill aplican igual en ambos casos; solo cambia la carp
 
 ```
 <prototype>/                      ← carpeta base según pipeline (§1)
-├── index.html                    ← OUTPUT pantalla principal
-├── pantallas/                    ← OUTPUT pantallas adicionales (si aplica)
-│   ├── <nombre>.html
-│   └── ...
-├── assets/                       ← OUTPUT imágenes, iconos, logos (o placeholders)
-│   └── ...
-├── context/                      ← INPUT del dev (puede estar parcialmente vacío)
+├── public/                       ← DOCUMENT ROOT: lo ÚNICO que el server sirve
+│   ├── index.html                ← OUTPUT pantalla principal
+│   ├── pantallas/                ← OUTPUT pantallas adicionales (si aplica)
+│   │   ├── <nombre>.html
+│   │   └── ...
+│   └── assets/                   ← OUTPUT imágenes, iconos, logos (o placeholders)
+│       └── ...
+├── context/                      ← INPUT del dev — FUERA del document root
 │   ├── branding.md               ← colores, tipografía, tono (opcional)
 │   ├── logos/                    ← assets de marca (opcional)
 │   └── referencias/              ← screenshots inspiracionales (opcional)
@@ -50,8 +51,9 @@ Todas las reglas de este skill aplican igual en ambos casos; solo cambia la carp
 
 ### Reglas estructurales
 
+- **Solo `public/` se sirve por URL.** `context/` (notas internas, branding, referencias), los `validation-log-vN.md` (feedback del cliente), `DEPLOY.md`, `server.js` y `package.json` viven FUERA del document root: jamás deben quedar accesibles desde el navegador. En despliegues estáticos (GitHub Pages, Cloudflare Pages), publica únicamente `public/`.
 - `context/` siempre existe, aunque alguna subcarpeta esté vacía. Si no existe, el agente lo crea con un `.gitkeep`.
-- `index.html` es **obligatorio**. Pantallas adicionales viven en `pantallas/`.
+- `public/index.html` es **obligatorio**. Pantallas adicionales viven en `public/pantallas/`.
 - `server.js` + `package.json` solo aplican para despliegues que requieren servidor (Railway default, Netlify con basic auth, etc.). Para GitHub Pages / Cloudflare Pages estático, no se generan.
 - `validation-log-vN.md` se versiona por iteración. NO se sobrescribe. La iteración N+1 lee `validation-log-vN.md` como input.
 - `DEPLOY.md` siempre existe desde la iteración 1.
@@ -116,16 +118,22 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(basicAuth({
-  users: { [process.env.AUTH_USER || 'cliente']: process.env.AUTH_PASS || 'cambiame' },
-  challenge: true,
-  realm: 'Prototipo'
-}));
+const { AUTH_USER, AUTH_PASS } = process.env;
+if (!AUTH_USER || !AUTH_PASS) {
+  if (process.env.PROTO_LOCAL === '1') {
+    console.warn('PROTO_LOCAL=1: sirviendo SIN autenticación — solo para tu máquina.');
+  } else {
+    console.error('Faltan AUTH_USER / AUTH_PASS. Configúralas antes de desplegar (PROTO_LOCAL=1 solo para correr local).');
+    process.exit(1);
+  }
+} else {
+  app.use(basicAuth({ users: { [AUTH_USER]: AUTH_PASS }, challenge: true, realm: 'Prototipo' }));
+}
 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.listen(PORT, () => {
-  console.log(`Prototipo sirviendo en puerto ${PORT}`);
+  console.log(`Prototipo sirviendo public/ en puerto ${PORT}`);
 });
 ```
 
@@ -148,8 +156,8 @@ Y `package.json`:
 
 ### Reglas del server
 
-- Credenciales SIEMPRE por env vars (`AUTH_USER`, `AUTH_PASS`). Defaults solo para no romper en local.
-- Sirve la carpeta donde reside `server.js` (es decir, `<prototype>/`).
+- Credenciales SIEMPRE por env vars (`AUTH_USER`, `AUTH_PASS`). **Sin credenciales configuradas el server NO arranca** — los defaults públicos tipo `cliente`/`cambiame` están prohibidos. `PROTO_LOCAL=1` permite correr sin auth ÚNICAMENTE en tu máquina, nunca desplegado.
+- Sirve **exclusivamente `public/`** — nunca `__dirname` completo: `context/`, los validation-logs y `DEPLOY.md` no deben ser alcanzables por URL.
 - Sin lógica adicional. NO endpoints, NO API, NO base de datos.
 - Sin variables sensibles hardcodeadas en código. Si aparece una, FALLO.
 
@@ -376,7 +384,7 @@ Problemas: nombre plausible, cifra demasiado específica, email de empresa real.
 
 > Cliente dijo: *"y debería existir un rol de supervisor que apruebe los cálculos antes de mandarlos"*
 >
-> Agente: *crea una pantalla `pantallas/supervisor.html` con un login simulado*
+> Agente: *crea una pantalla `public/pantallas/supervisor.html` con un login simulado*
 
 Problemas: el agente está absorbiendo un Requirement nuevo (rol supervisor) sin que pase por `requirements.md`. Trazabilidad rota.
 
@@ -390,7 +398,7 @@ Antes de declarar una iteración del prototipo lista para mostrar al cliente, ej
 
 ### Estructura de carpeta
 
-- [ ] Existe `<prototype>/index.html`
+- [ ] Existe `<prototype>/public/index.html` (y el server sirve solo `public/`)
 - [ ] Existe `<prototype>/context/` (aunque alguna subcarpeta esté vacía)
 - [ ] Existe `<prototype>/DEPLOY.md` con plataforma declarada
 - [ ] Si plataforma requiere server, existen `server.js` y `package.json`
@@ -398,7 +406,7 @@ Antes de declarar una iteración del prototipo lista para mostrar al cliente, ej
 
 ### HTML / Visual
 
-- [ ] Todas las pantallas (`index.html` + `pantallas/*.html`) tienen el banner permanente
+- [ ] Todas las pantallas (`public/index.html` + `public/pantallas/*.html`) tienen el banner permanente
 - [ ] Banner usa color de alto contraste, position fixed, no dismissible
 - [ ] Todos los nombres visibles son obviamente ficticios
 - [ ] Todos los números visibles son valores planos (1,234.56 / 100 / 1,000)

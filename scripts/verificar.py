@@ -124,11 +124,12 @@ def verifica_nombres():
     for p in archivos_md():
         for m in patron.finditer(p.read_text(encoding="utf-8")):
             token = m.group(1).rstrip("-")
-            # Tolera nombres partidos en diagramas ASCII: un token que es
-            # prefijo de un nombre válido (o lo contiene) no es error.
+            # Tolera nombres partidos en diagramas ASCII: solo un token que es
+            # PREFIJO de un nombre válido (texto truncado por el diagrama).
+            # La dirección inversa NO se tolera: 'sdd-design-typo' es error.
             if token in validos:
                 continue
-            if any(v.startswith(token) or token.startswith(v) for v in validos):
+            if any(v.startswith(token) for v in validos):
                 continue
             error(f"{p.relative_to(RAIZ)}: nombre citado inexistente → '{token}'")
 

@@ -34,7 +34,7 @@ El humano que te invoca es ingeniera/o que ya validó el requirements. Habla con
 - Cualquier material adicional que el humano referencie (diagramas previos, código existente para integrarse, etc.).
 - **`docs/prototype/` si existe** (opcional, informativo): un prototipo validado por el cliente en la fase opcional previa. Lo lees como **referencia informativa del flujo y la UX validada**, NO como vinculante para decisiones de stack. El HTML del prototipo es throwaway por diseño — el stack final se decide aquí en `design.md`, no se hereda del prototipo. Lee específicamente:
   - El último `validation-log-v{N}.md` con `Status: APROBADO` para confirmar que la fase cerró.
-  - `index.html` y `pantallas/` para entender el flujo de UX que el cliente aceptó.
+  - `public/index.html` y `public/pantallas/` para entender el flujo de UX que el cliente aceptó.
   - `context/branding.md` si existe (informa decisiones de UI library en `design.md`).
 
 ## Output
@@ -49,7 +49,7 @@ Estructura y reglas: lee y aplica **estrictamente** el skill `sdd-design` cargad
 
 1. Lee `docs/requirements.md` completo.
 2. Lee `CONSTITUTION.md` si existe.
-3. Si existe `docs/prototype/`, verifica que el último `validation-log` tenga `Status: APROBADO`. Si NO está aprobado, detente y avisa: *"La fase de prototipo está abierta (último validation-log es `<status>`). Necesita aprobación del cliente antes de pasar a design."*. Si está aprobado, lee `index.html`, las pantallas en `pantallas/` y `context/branding.md` si existe — como referencia informativa de UX, no vinculante.
+3. Si existe `docs/prototype/`, verifica que el último `validation-log` tenga `Status: APROBADO`. Si NO está aprobado, detente y avisa: *"La fase de prototipo está abierta (último validation-log es `<status>`). Necesita aprobación del cliente antes de pasar a design."*. Si está aprobado, lee `public/index.html`, las pantallas en `public/pantallas/` y `context/branding.md` si existe — como referencia informativa de UX, no vinculante.
 4. Lista al humano:
    - Cantidad de Requirements en el requirements.md.
    - Áreas funcionales principales que detectaste.

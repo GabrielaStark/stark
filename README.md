@@ -9,7 +9,7 @@
 
 **MARK integra SDD para especificar, YAGNI para limitar y RDD para demostrar que lo validado es exactamente lo entregado. stark convierte ese método en un workflow ejecutable para agentes.**
 
-En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada línea de código hasta su requirement, y sellos de aprobación (quién, cuándo, qué commit) en cada artefacto. Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
+En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada tarea y cada cambio hasta su requirement, y sellos de aprobación (quién, cuándo, qué commit) en cada artefacto. Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
 
 Clonas, corres `/stark-init`, y el framework te lleva fase por fase: [empieza aquí →](docs/documentacion/QUICKSTART.md)
 
@@ -33,7 +33,7 @@ La primera línea de este README usa cinco nombres. Uno por uno:
 
 Resuelve el problema del vibe-coding: prototipos rápidos pero código frágil. SDD recupera disciplina de ingeniería sin perder velocidad.
 
-Está en fase "Assess" del Tech Radar de Thoughtworks (2025-2026). Práctica emergente bien fundamentada que probablemente sea estándar en 2027. MARK es la adaptación de la autora dentro de ese género; stark la implementa.
+Thoughtworks lo colocó en "Assess" en su Tech Radar de noviembre de 2025; la edición de 2026 movió el foco a herramientas concretas del género (GitHub Spec Kit). Práctica emergente bien fundamentada, todavía no estándar. MARK es la adaptación de la autora dentro de ese género; stark la implementa.
 
 > stark te da el **formato** (la gramática de requirements/design/tasks) y el **workflow**. Lo que hace que entregue código que funciona — no solo documentación preciosa — son los **gates humanos** y el rigor de tu revisión. Esos los pones tú.
 
@@ -41,16 +41,18 @@ Está en fase "Assess" del Tech Radar de Thoughtworks (2025-2026). Práctica eme
 
 **Receipt-Driven Development** (desarrollo guiado por comprobantes): ninguna validación sin evidencia verificable. No basta con que el agente diga "ya quedó" — cada aprobación deja huella escrita en el repo.
 
+**Estado: experimental.** La mecánica funciona y está testeada, pero es joven y sigue bajo auditoría adversarial externa. Trátala como evidencia fuerte de proceso, no como única línea de defensa: la garantía definitiva contra manipulación deliberada exige además reglas server-side (tags protegidos y CI obligatorio en tu hosting) y una release pinneable de stark — ambas pendientes.
+
 En stark son **dos sellos**, con una autoridad ejecutable (`.claude/scripts/sello.py`) que no se desincroniza por accidente — a diferencia de una línea de Markdown, el receipt deja de coincidir en cuanto el documento cambia:
 
-1. **Sello de documento** — al aprobar requirements, design o tasks, el gate corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` en el header y genera un **receipt** con el hash sha256 del contenido aprobado (en `docs/.stark/receipts/`, se commitea). La fase siguiente recalcula el hash: si cambió una coma después de la aprobación, se bloquea y se re-aprueba. Re-sellar exige el flag explícito `--re-sellar` — nunca ocurre en silencio.
-2. **Sello de lote** — al cerrar cada lote de build, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<n>`) que registra la declaración del gate: `Tests: PASS`, aprobador y fecha. El tag no modifica el árbol validado, así que el sello no se invalida a sí mismo. El **hook pre-push** valida las **refs que realmente se empujan** (no el HEAD local): código sin sellar no pasa — ni empujando otra rama por nombre —, y el árbol debe estar limpio. Los pushes que solo tocan documentación (`docs/`, README, CONSTITUTION) pasan sin sello: no son código. El candado se activa con el primer lote sellado — antes de eso stark aún no ha validado nada que proteger.
+1. **Sello de documento** — al aprobar requirements, design o tasks, el gate corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` en el header y genera un **receipt** (schema versionado) con el hash sha256 del contenido aprobado, atado a la ruta canónica del artefacto (en `docs/.stark/receipts/`, se commitea). La fase siguiente recalcula el hash: si cambió una coma después de la aprobación, se bloquea y se re-aprueba. Marcar checkboxes `[x]` en el plan NO invalida el sello — el estado de las tareas no es contenido aprobado; re-sellar exige el flag explícito `--re-sellar`; y un receipt no es transferible entre rutas.
+2. **Sello de lote** — al cerrar cada lote de build, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<id>`; en mantenimiento usa `<feature>-<n>`). El tag no modifica el árbol validado y cubre los commits del lote. El **hook pre-push** valida **cada commit de cada ref que se empuja** contra su remoto objetivo: código sin sellar no pasa — ni por otra rama, ni escondido tras un revert, ni renombrado hacia `docs/` —, los tags de lote son inmutables (ni borrarlos ni moverlos), y **la evidencia viaja con el código**: el tag va en el mismo push o ya existe en el remoto. Los commits que solo tocan documentación pasan sin sello, y el candado se activa con el primer sello — un clon con receipts lo hereda activado.
 
-Las pruebas que sostienen el claim son **reproducibles por cualquiera**: `python3 scripts/test_sello.py` monta un repo git temporal con remoto y hook reales y ejercita los escenarios completos — editar el documento tras aprobarlo bloquea la fase siguiente; código dirty, untracked, commiteado después de validar o empujado desde una rama no sellada bloquea el push; los placeholders se rechazan; el re-sellado silencioso no existe. El CI las corre en cada push.
+Las pruebas que sostienen el claim son **reproducibles por cualquiera**: `python3 scripts/test_sello.py` monta repos git temporales (remotos bare y hooks reales, `core.hooksPath`, multi-remoto, repos SHA-256) y ejercita 50+ escenarios — incluidos todos los probes de la auditoría externa que rompieron la versión anterior de esta mecánica. El CI los corre en cada push.
 
 Con eso, cualquiera que abra un proyecto hecho con stark puede verificar **qué contenido exacto se aprobó, cuándo y a nombre de quién — y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
 
-**Los límites, dichos de frente**: el sello *registra* la identidad del aprobador y la declaración `Tests: PASS` — no los firma criptográficamente ni ejecuta la suite; que los tests corrieran en verde lo garantiza el gate humano, no el script. Y como todo hook de git, el candado es por clon (lo instala `/stark-init`) y `--no-verify` lo salta. Es un candado contra el descuido y la deriva — que es como fallan los agentes —, no contra la mala fe de quien tiene las llaves del repo.
+**Los límites, dichos de frente**: el sello *registra* la identidad del aprobador y la declaración `Tests: PASS` — no los firma criptográficamente ni ejecuta la suite; que los tests corrieran en verde lo garantiza el gate humano, no el script. Como todo hook de git, el candado es por clon (lo instala `/stark-init`) y `--no-verify` lo salta: es un candado contra el descuido y la deriva — que es como fallan los agentes —, no contra la mala fe de quien tiene las llaves del repo. Y la exención de documentación es política deliberada (specs y prototipo viajan libres): si tu `docs/` contiene código desplegable, ajústala en `sello.py`.
 
 Honestidad de posicionamiento: RDD es una disciplina emergente de la era de agentes de IA, sin autor canónico ni estándar consagrado (a diferencia de SDD). stark no la presume: la implementa.
 
@@ -86,10 +88,10 @@ stark tiene dos partes que no se confunden:
 ```bash
 git clone https://github.com/GabrielaStark/stark.git mi-proyecto
 cd mi-proyecto && rm -rf .git && git init
-printf '.claude/\ntemplates/\nscripts/verificar.py\n.github/workflows/verificar.yml\n' >> .gitignore
+printf '.claude/\ntemplates/\nscripts/\n.github/workflows/verificar.yml\n' >> .gitignore
 ```
 
-El README y el LICENSE de stark los reemplazas por los de tu proyecto cuando arranque el código.
+El README y el LICENSE de stark los reemplazas por los de tu proyecto cuando arranque el código — pero conserva el aviso MIT de stark en una copia (`mv LICENSE LICENSE.stark`): la licencia exige mantenerlo al redistribuir porciones sustanciales de la herramienta.
 
 Carga inputs:
 - **Nuevo**: material de levantamiento en `docs/inputs/` (transcripciones, imágenes, formularios).
@@ -105,11 +107,12 @@ cp -r /tmp/stark/.claude /tmp/stark/templates . && \
 mkdir -p docs/documentacion docs/features && \
 cp /tmp/stark/docs/documentacion/*.md docs/documentacion/ && \
 cp /tmp/stark/docs/features/README.md docs/features/ && \
+cp /tmp/stark/LICENSE LICENSE.stark && \
 printf '.claude/\ntemplates/\n' >> .gitignore && \
 rm -rf /tmp/stark
 ```
 
-Agrega la herramienta (`.claude/`, `templates/` — gitignoreadas: no ensucian el git del cliente) y la documentación (`docs/documentacion/`, `docs/features/` — estas sí se commitean: son parte del proyecto). No toca nada más.
+Agrega la herramienta (`.claude/`, `templates/` — gitignoreadas: no ensucian el git del cliente), la documentación (`docs/documentacion/`, `docs/features/` — estas sí se commitean: son parte del proyecto) y el aviso MIT (`LICENSE.stark`, lo exige la licencia al copiar la herramienta). Si alguna de esas carpetas ya existe con contenido tuyo, revisa antes: `cp -r` sobreescribe archivos del mismo nombre.
 
 **Antes del primer feature** (una vez por repo): genera el sustrato corriendo las skills `onboarding` y `reglas-negocio` desde Claude Code. Producen `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md`.
 
@@ -306,6 +309,7 @@ entrevistas               codigo                       mantenimiento
 ## Stack y requisitos
 
 - **Claude Code** instalado
+- **Python 3.9+ y Git 2.28+** (los usa la autoridad de sellos `sello.py` y su suite de pruebas)
 - Acceso a modelo Claude Opus (recomendado para los 8 subagentes)
 - Material según el caso de uso:
   - Nuevo: entrevistas, transcripciones, formularios
@@ -313,7 +317,7 @@ entrevistas               codigo                       mantenimiento
   - Mantenimiento: código en producción + descripción del feature
 - (Mantenimiento recomendado) Skills auxiliares `onboarding` y `reglas-negocio` (ya incluidas en `.claude/skills/`) para generar el sustrato (`CLAUDE.md`, `BIG_PICTURE.md`, `REGLAS_DE_NEGOCIO.md`)
 
-El repo se auto-verifica: `python3 scripts/verificar.py` valida frontmatters, fences, links y nombres citados; el CI lo corre en cada push. En tus proyectos, los sellos RDD los verifica `python3 .claude/scripts/sello.py` (receipts sha256, tags de lote, hook pre-push).
+El repo se auto-verifica: `python3 scripts/verificar.py` (requiere PyYAML: `pip install -r requirements-dev.txt`) valida frontmatters, fences, links y nombres citados, y `python3 scripts/test_sello.py` (sin dependencias) corre los 50+ escenarios RDD; el CI ejecuta ambos en cada push. En tus proyectos, los sellos los verifica `python3 .claude/scripts/sello.py` (receipts sha256, tags de lote, hook pre-push).
 
 ---
 
