@@ -41,7 +41,9 @@ Thoughtworks lo colocó en "Assess" en su Tech Radar de noviembre de 2025; la ed
 
 **Receipt-Driven Development** (desarrollo guiado por comprobantes): ninguna validación sin evidencia verificable. No basta con que el agente diga "ya quedó" — cada aprobación deja huella escrita en el repo.
 
-**Estado: experimental.** La mecánica funciona y está testeada, pero es joven y sigue bajo auditoría adversarial externa. Trátala como evidencia fuerte de proceso, no como única línea de defensa: la garantía definitiva contra manipulación deliberada exige además reglas server-side (tags protegidos y CI obligatorio en tu hosting) y una release pinneable de stark — ambas pendientes.
+**Estado: experimental.** La mecánica funciona y está testeada, pero es joven y sigue bajo auditoría adversarial externa. Trátala como evidencia fuerte de proceso, no como única línea de defensa.
+
+**Para blindar tu proyecto del todo** (dos ajustes en el hosting de **tu** repo, no en stark): protege los tags `stark-lote-*` para que nadie pueda borrarlos ni moverlos desde la web, y marca el CI como obligatorio para mergear. El candado de stark es un hook de git — vive en cada clon y `--no-verify` lo salta; esas dos reglas del servidor son lo que ningún colaborador puede brincarse.
 
 En stark son **dos sellos**, con una autoridad ejecutable (`.claude/scripts/sello.py`) que no se desincroniza por accidente — a diferencia de una línea de Markdown, el receipt deja de coincidir en cuanto el documento cambia:
 
