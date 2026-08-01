@@ -7,12 +7,19 @@ Los sellos visibles en Markdown son cortesía de lectura; la autoridad es esto:
   deja de coincidir y la fase siguiente se bloquea.
 - Sello de lote: annotated tag `stark-lote-<id>` sobre el commit validado.
   No modifica el árbol (sin Ouroboros) y exige working tree limpio.
-- verificar-push: comprobación determinista pre-push (tree limpio, sin
-  untracked, HEAD sellado, Tests: PASS registrado). instalar-hook la
+- verificar-push: comprobación determinista pre-push. En el hook valida las
+  REFS que realmente se empujan (no HEAD): cada commit empujado con cambios
+  fuera de docs/ debe tener su tag de lote; los pushes que solo tocan docs/
+  (specs, receipts, prototipo) pasan — no son código. instalar-hook lo
   cablea a git para que el push se bloquee solo.
 
+Límites (dichos de frente): el sello REGISTRA la identidad del aprobador y
+la declaración `Tests: PASS` — no los firma criptográficamente ni ejecuta la
+suite; eso lo garantiza el gate humano. El hook es por clon y `--no-verify`
+lo salta: es un candado contra el descuido y la deriva, no contra la mala fe.
+
 Uso:
-  python3 .claude/scripts/sello.py sellar-doc <artefacto.md> --por "Nombre"
+  python3 .claude/scripts/sello.py sellar-doc <artefacto.md> --por "Nombre" [--re-sellar]
   python3 .claude/scripts/sello.py verificar-doc <artefacto.md>
   python3 .claude/scripts/sello.py sellar-lote <id> --por "Nombre" [--invariantes]
   python3 .claude/scripts/sello.py verificar-push
@@ -33,6 +40,7 @@ from pathlib import Path
 RECEIPTS_DIR = Path("docs/.stark/receipts")
 PREFIJO_TAG = "stark-lote-"
 FECHA_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+SHA_CERO = "0" * 40
 
 
 def fallo(msg: str) -> "None":
@@ -67,11 +75,22 @@ def ruta_receipt(artefacto: Path) -> Path:
     return RECEIPTS_DIR / f"{plano}.json"
 
 
-def sellar_doc(artefacto: str, por: str) -> None:
+def sellar_doc(artefacto: str, por: str, re_sellar: bool = False) -> None:
     por = valida_nombre(por)
     ruta = Path(artefacto)
     if not ruta.is_file():
         fallo(f"no existe el artefacto {artefacto}")
+    previo = ruta_receipt(ruta)
+    if previo.is_file() and not re_sellar:
+        try:
+            r = json.loads(previo.read_text(encoding="utf-8"))
+            quien = f"{r.get('approved_by')} el {r.get('approved_at')}"
+        except json.JSONDecodeError:
+            quien = "(receipt ilegible)"
+        fallo(
+            f"{artefacto} ya tiene receipt (aprobado por {quien}). Re-sellar PISA esa aprobación:\n"
+            "   hazlo solo tras una NUEVA aprobación humana explícita, con --re-sellar."
+        )
     hoy = datetime.date.today().isoformat()
     sello = f"> Aprobado por {por} — {hoy}"
 
@@ -159,23 +178,84 @@ def sellar_lote(lote_id: str, por: str, invariantes: bool) -> None:
     print("   Recuerda pushear el tag junto con la rama: git push origin <rama> --tags")
 
 
+def tag_valido_en(sha: str) -> "str | None":
+    tags = [t for t in git("tag", "--points-at", sha).splitlines() if t.startswith(PREFIJO_TAG)]
+    for tag in tags:
+        contenido = git("tag", "-l", "--format=%(contents)", tag)
+        m = re.search(r"Aprobado por: (.+)", contenido)
+        if "Tests: PASS" in contenido and m and "[" not in m.group(1) and "YYYY" not in m.group(1):
+            return tag
+    return None
+
+
+def archivos_del_push(local: str, remoto: str) -> list:
+    if remoto == SHA_CERO:
+        # Ref nueva en el remoto: cuentan los commits que ningún remoto tiene aún.
+        commits = [c for c in git("rev-list", local, "--not", "--remotes").splitlines() if c]
+        archivos = set()
+        for c in commits:
+            archivos |= {a for a in git("show", "--format=", "--name-only", c).splitlines() if a}
+        return sorted(archivos)
+    return [a for a in git("diff", "--name-only", remoto, local).splitlines() if a]
+
+
+NO_CODIGO = {"CONSTITUTION.md", "README.md", "LICENSE", ".gitignore"}
+
+
+def solo_docs(archivos: list) -> bool:
+    return all(a in NO_CODIGO or a.startswith("docs/") for a in archivos)
+
+
 def verificar_push() -> None:
-    exige_tree_limpio()
-    head = git("rev-parse", "HEAD")
-    tags_en_head = [t for t in git("tag", "--points-at", "HEAD").splitlines() if t.startswith(PREFIJO_TAG)]
-    if not tags_en_head:
-        fallo(
-            f"HEAD ({head[:12]}) no está sellado: ningún tag {PREFIJO_TAG}* apunta a este commit.\n"
-            "   Valida el lote con el humano y séllalo (sellar-lote) antes de pushear."
-        )
-    tag = tags_en_head[0]
-    contenido = git("tag", "-l", "--format=%(contents)", tag)
-    if "Tests: PASS" not in contenido:
-        fallo(f"el tag {tag} no registra 'Tests: PASS'.")
-    m = re.search(r"Aprobado por: (.+)", contenido)
-    if not m or "[" in m.group(1) or "YYYY" in m.group(1):
-        fallo(f"el tag {tag} no registra un aprobador válido.")
-    ok(f"HEAD {head[:12]} está sellado ({tag}, {m.group(1).strip()}). Push permitido.")
+    # En el hook pre-push, git entrega por stdin las refs que se empujan:
+    # "<local ref> <local sha> <remote ref> <remote sha>" por línea.
+    updates = []
+    if not sys.stdin.isatty():
+        for linea in sys.stdin.read().splitlines():
+            partes = linea.split()
+            if len(partes) == 4:
+                updates.append(partes)
+
+    if not git("tag", "-l", f"{PREFIJO_TAG}*"):
+        # Aún no hay lotes sellados: stark no ha validado nada que proteger.
+        # El candado se activa con el primer sello de lote.
+        ok("aún no hay lotes sellados — el candado se activa con el primer sellar-lote. Push permitido.")
+        return
+
+    if not updates:
+        # Invocación manual (sin refs): pre-vuelo sobre HEAD.
+        exige_tree_limpio()
+        head = git("rev-parse", "HEAD")
+        tag = tag_valido_en(head)
+        if not tag:
+            fallo(
+                f"HEAD ({head[:12]}) no está sellado: ningún tag {PREFIJO_TAG}* válido apunta a este commit.\n"
+                "   Valida el lote con el humano y séllalo (sellar-lote) antes de pushear código."
+            )
+        ok(f"HEAD {head[:12]} está sellado ({tag}). Push permitido.")
+        return
+
+    hay_codigo = False
+    detalle = []
+    for _local_ref, local_sha, remote_ref, remote_sha in updates:
+        if local_sha == SHA_CERO:  # borrado de ref remota: no entrega contenido
+            continue
+        archivos = archivos_del_push(local_sha, remote_sha)
+        if solo_docs(archivos):
+            detalle.append(f"{remote_ref}: solo docs/ — pasa sin sello")
+            continue
+        hay_codigo = True
+        tag = tag_valido_en(local_sha)
+        if not tag:
+            fallo(
+                f"el push a {remote_ref} entrega CÓDIGO sin sellar (commit {local_sha[:12]}):\n"
+                f"   ningún tag {PREFIJO_TAG}* válido apunta a ese commit exacto.\n"
+                "   Lo validado debe ser exactamente lo entregado: valida el lote y séllalo (sellar-lote)."
+            )
+        detalle.append(f"{remote_ref}: sellado ({tag})")
+    if hay_codigo:
+        exige_tree_limpio()
+    ok("push verificado — " + ("; ".join(detalle) if detalle else "sin contenido nuevo") + ".")
 
 
 def instalar_hook() -> None:
@@ -202,6 +282,8 @@ def main() -> None:
     s1 = sub.add_parser("sellar-doc", help="sella un artefacto aprobado (línea visible + receipt sha256)")
     s1.add_argument("artefacto")
     s1.add_argument("--por", required=True)
+    s1.add_argument("--re-sellar", action="store_true", dest="re_sellar",
+                    help="pisa un receipt existente (solo tras nueva aprobación humana)")
 
     s2 = sub.add_parser("verificar-doc", help="verifica que el artefacto coincide con su receipt")
     s2.add_argument("artefacto")
@@ -216,7 +298,7 @@ def main() -> None:
 
     args = p.parse_args()
     if args.cmd == "sellar-doc":
-        sellar_doc(args.artefacto, args.por)
+        sellar_doc(args.artefacto, args.por, args.re_sellar)
     elif args.cmd == "verificar-doc":
         verificar_doc(args.artefacto)
     elif args.cmd == "sellar-lote":

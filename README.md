@@ -41,14 +41,16 @@ Está en fase "Assess" del Tech Radar de Thoughtworks (2025-2026). Práctica eme
 
 **Receipt-Driven Development** (desarrollo guiado por comprobantes): ninguna validación sin evidencia verificable. No basta con que el agente diga "ya quedó" — cada aprobación deja huella escrita en el repo.
 
-En stark son **dos sellos**, con una autoridad ejecutable (`.claude/scripts/sello.py`) — no líneas de Markdown que cualquiera edita:
+En stark son **dos sellos**, con una autoridad ejecutable (`.claude/scripts/sello.py`) que no se desincroniza por accidente — a diferencia de una línea de Markdown, el receipt deja de coincidir en cuanto el documento cambia:
 
-1. **Sello de documento** — al aprobar requirements, design o tasks, el gate corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` en el header y genera un **receipt** con el hash sha256 del contenido aprobado (en `docs/.stark/receipts/`, se commitea). La fase siguiente recalcula el hash: si cambió una coma después de la aprobación, se bloquea y se re-aprueba.
-2. **Sello de lote** — al cerrar cada lote de build con tests en verde, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<n>`, registrando `Tests: PASS`, aprobador y fecha — el tag no modifica el árbol validado). Un **hook pre-push** corre la comprobación determinista: árbol limpio, sin untracked, HEAD sellado — si algo cambió después de validar, **git bloquea el push**, no la buena voluntad del agente.
+1. **Sello de documento** — al aprobar requirements, design o tasks, el gate corre `sello.py sellar-doc`: estampa `> Aprobado por [nombre] — fecha` en el header y genera un **receipt** con el hash sha256 del contenido aprobado (en `docs/.stark/receipts/`, se commitea). La fase siguiente recalcula el hash: si cambió una coma después de la aprobación, se bloquea y se re-aprueba. Re-sellar exige el flag explícito `--re-sellar` — nunca ocurre en silencio.
+2. **Sello de lote** — al cerrar cada lote de build, `sello.py sellar-lote` exige working tree limpio y sella el commit exacto con un **annotated tag** (`stark-lote-<n>`) que registra la declaración del gate: `Tests: PASS`, aprobador y fecha. El tag no modifica el árbol validado, así que el sello no se invalida a sí mismo. El **hook pre-push** valida las **refs que realmente se empujan** (no el HEAD local): código sin sellar no pasa — ni empujando otra rama por nombre —, y el árbol debe estar limpio. Los pushes que solo tocan documentación (`docs/`, README, CONSTITUTION) pasan sin sello: no son código. El candado se activa con el primer lote sellado — antes de eso stark aún no ha validado nada que proteger.
 
-Las seis pruebas que sostienen el claim (verificadas en repo real): editar el documento tras aprobarlo bloquea la fase siguiente; modificar código sin commit, dejar un archivo untracked o commitear después de validar bloquean el push; los placeholders se rechazan; y el push sin sellar lo bloquea git solo.
+Las pruebas que sostienen el claim son **reproducibles por cualquiera**: `python3 scripts/test_sello.py` monta un repo git temporal con remoto y hook reales y ejercita los escenarios completos — editar el documento tras aprobarlo bloquea la fase siguiente; código dirty, untracked, commiteado después de validar o empujado desde una rama no sellada bloquea el push; los placeholders se rechazan; el re-sellado silencioso no existe. El CI las corre en cada push.
 
-Con eso, cualquiera que abra un proyecto hecho con stark puede verificar **quién aprobó qué, cuándo, y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
+Con eso, cualquiera que abra un proyecto hecho con stark puede verificar **qué contenido exacto se aprobó, cuándo y a nombre de quién — y que lo validado es exactamente lo entregado** — sin acceso al chat donde ocurrió.
+
+**Los límites, dichos de frente**: el sello *registra* la identidad del aprobador y la declaración `Tests: PASS` — no los firma criptográficamente ni ejecuta la suite; que los tests corrieran en verde lo garantiza el gate humano, no el script. Y como todo hook de git, el candado es por clon (lo instala `/stark-init`) y `--no-verify` lo salta. Es un candado contra el descuido y la deriva — que es como fallan los agentes —, no contra la mala fe de quien tiene las llaves del repo.
 
 Honestidad de posicionamiento: RDD es una disciplina emergente de la era de agentes de IA, sin autor canónico ni estándar consagrado (a diferencia de SDD). stark no la presume: la implementa.
 
@@ -276,7 +278,7 @@ entrevistas               codigo                       mantenimiento
 ## Reglas no negociables
 
 1. **La unidad de ejecución es el lote** (un Slice vertical, o un grupo contiguo de la misma capa/sección), con revisión humana al cerrar cada lote. Nunca "ejecuta todo tasks.md". Las tareas de validación — y en mantenimiento el Regression Shield y la No-Regression Validation — van solas.
-2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente, y toda aprobación deja sello en el artefacto — de documento o de lote (en la ruta corta de mantenimiento los gates se fusionan en uno; la aprobación humana y su sello se conservan — ver `DECISIONES.md` B-D13).
+2. **Cada fase requiere aprobación humana explícita** antes de pasar a la siguiente, y toda aprobación de documentos y lotes deja sello verificable; la del prototipo la da el **cliente** y queda en su validation-log — declarativa por diseño (en la ruta corta de mantenimiento los gates se fusionan en uno; la aprobación humana y su sello se conservan — ver `DECISIONES.md` B-D13).
 3. **Los SKILLs son absolutos.** Si una regla no encaja en un caso, el caso no es para stark — no inventes excepciones.
 4. **Trazabilidad bidireccional.** Cada línea de código se justifica en una tarea → decisión de design → criterio EARS → historia de usuario.
 5. **Nada gana su lugar por defecto.** Lo especulativo no se construye; lo que no aporta se recorta (escalera YAGNI, ver Principios).

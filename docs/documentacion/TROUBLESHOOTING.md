@@ -50,8 +50,29 @@ Probablemente cambiaron requirements después de aprobar design (o viceversa) y 
 1. Vuelve a la fase que cambió primero.
 2. Vuelve a ejecutar la siguiente fase con el cambio.
 3. No edites manualmente `design.md` sin volver a validar contra `requirements.md`.
+4. Re-aprueba y re-sella cada documento que cambió: `python3 .claude/scripts/sello.py sellar-doc <doc> --por "<nombre>" --re-sellar`. Sin eso, el gate de la fase siguiente te va a bloquear (el receipt ya no coincide) — y con razón.
 
 **Anti-patrón:** tratar de "remendar" el `design.md` a mano para que cuadre con el nuevo requirement. Casi siempre rompe la trazabilidad.
+
+### "El gate me bloquea: 'el documento CAMBIÓ después de aprobarse'"
+
+Es el sello RDD haciendo su trabajo: el receipt (`docs/.stark/receipts/`) guarda el hash sha256 de la versión aprobada, y el documento actual ya no coincide.
+
+1. Mira el diff del documento: ¿qué cambió y quién lo cambió?
+2. Si el cambio es legítimo, re-apruébalo con el humano y re-sella: `python3 .claude/scripts/sello.py sellar-doc <doc> --por "<nombre>" --re-sellar`.
+3. Si nadie sabe de dónde salió el cambio, eso es un hallazgo — investiga antes de re-sellar. No re-selles "para que pase".
+
+### "git me bloquea el push (código sin sellar / working tree sucio)"
+
+El hook pre-push solo deja pasar código sellado (los pushes que solo tocan documentación pasan libres, y el candado se activa con el primer lote sellado).
+
+- Si empujas un lote validado: deja el tree limpio (commitea o descarta todo), `python3 .claude/scripts/sello.py sellar-lote <n> --por "<nombre>"`, y pushea con `--tags`.
+- Si el bloqueo te sorprende, esa sorpresa es el punto: algo cambió después de la validación. Revalida con el humano antes de entregar.
+- `git push --no-verify` salta el candado — úsalo solo sabiendo que rompes la cadena de evidencia.
+
+### "Ya tenía un hook pre-push propio y stark no quiere instalarse"
+
+`instalar-hook` se rehúsa a pisar un hook ajeno (a propósito). Intégralo a mano: agrega al final de tu hook existente la línea `python3 .claude/scripts/sello.py verificar-push || exit 1`.
 
 ### "El agente marca una tarea como `[x]` pero el código no funciona"
 

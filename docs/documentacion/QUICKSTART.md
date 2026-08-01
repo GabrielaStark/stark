@@ -66,7 +66,7 @@ Agregar un feature a producción sin romper lo que funciona. Trabajas sobre el r
 5. `/stark-tasks <slug>` — **orden por riesgo**: Regression Shield primero, No-Regression Validation al final. ✋
 6. `/stark-build <slug>` — un lote por sesión; las tareas de blindaje y la validación final van **solas**. ✋ por lote.
 
-> **Ruta corta** (cambios internos de bajo riesgo — criterio por superficie tocada, `DECISIONES.md` B-D13): si la confirmas en el gate del paso 2, el mismo requirements trae `## Encaje de diseño` y `## Tasks por riesgo`, te saltas los pasos 4 y 5, y vas directo a `/stark-build`. Shield y No-Regression Validation, intactos.
+> **Ruta corta** (cambios internos de bajo riesgo — criterio por superficie tocada, `DECISIONES.md` B-D13): si la confirmas en el gate del paso 2, el mismo requirements trae `## Encaje de diseño` y `## Tasks por riesgo`, te saltas los pasos 4 y 5, y vas directo a `/stark-build` — que verifica el sello de ese documento único (no hay `tasks.md` aparte). Shield y No-Regression Validation, intactos.
 >
 > Mantenimiento no cierra sin la **No-Regression Validation** final. Es no negociable.
 
@@ -105,7 +105,7 @@ Las fases 1–6 son la columna vertebral; `/stark-review` y `/stark-audit` son t
 - En **prototipo**: aprueba el **cliente**, no tú.
 - En **build**: revisas **cada lote** — corres los tests, verificas el criterio de hecho, y **solo tú** marcas `[x]`. El agente nunca se auto-aprueba.
 - El gate de build valida **software funcionando** (el sistema corre y el Slice es demostrable de punta a punta), no solo código que compila.
-- **Toda aprobación deja sello** (RDD): al aprobar, el gate corre `sello.py` — estampa `> Aprobado por [nombre] — fecha` en el documento y genera un receipt con el hash sha256 del contenido aprobado; si el documento cambia después, la fase siguiente se bloquea. En build, el lote validado se sella con un tag de git sobre el commit exacto, y el hook pre-push bloquea el push de cualquier cosa que cambiara tras la validación. Sin sello no hay aprobación: es el recibo que tu repo demuestra sin el chat.
+- **Toda aprobación de documentos y lotes deja sello** (RDD): al aprobar, el gate corre `sello.py` — estampa `> Aprobado por [nombre] — fecha` en el documento y genera un receipt con el hash sha256 del contenido aprobado; si el documento cambia después, la fase siguiente se bloquea (re-sellar exige `--re-sellar`, nunca es silencioso). En build, el lote validado se sella con un tag de git sobre el commit exacto, y el hook pre-push bloquea el push de código sin sellar — los pushes de solo documentación pasan, y el candado se activa con el primer lote sellado. La aprobación del **prototipo** es distinta por diseño: la da el cliente y queda en el validation-log. Sin sello no hay aprobación: es el recibo que tu repo demuestra sin el chat.
 
 Los checklists de validación de cada fase (qué revisar antes de aprobar) están completos en la referencia: [requirements](REFERENCIA.md#2-fase-2-requirements-levantamiento) · [prototipo](REFERENCIA.md#3-fase-3-prototipo-visual-opcional) · [design](REFERENCIA.md#4-fase-4-design-diseño-técnico) · [tasks](REFERENCIA.md#5-fase-5-tasks-descomposición) · [build](REFERENCIA.md#6-fase-6-build--ejecución-del-código).
 
