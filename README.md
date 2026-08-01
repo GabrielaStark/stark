@@ -9,7 +9,7 @@
 
 **MARK integra SDD para especificar, YAGNI para limitar y RDD para demostrar que lo validado es exactamente lo entregado. stark convierte ese método en un workflow ejecutable para agentes.**
 
-En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada tarea y cada cambio hasta su requirement, y sellos de aprobación **experimentales** (quién, cuándo, qué contenido — y en cada lote, qué commit): límites en [¿Qué es RDD?](#qué-es-rdd). Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción sin romperlo, y prototipos para validar con el cliente.
+En la práctica: stark convierte Claude Code en un equipo de ingeniería que trabaja con specs, no con vibras. Subagentes especializados levantan requirements formales (EARS), diseñan, descomponen en tareas y construyen por lotes — con un gate humano entre cada fase, trazabilidad de cada tarea y cada cambio hasta su requirement, y sellos de aprobación **experimentales** (quién, cuándo, qué contenido — y en cada lote, qué commit): límites en [¿Qué es RDD?](#qué-es-rdd). Cubre cuatro situaciones: proyecto nuevo, reingeniería de un legacy, feature sobre un sistema en producción con blindaje explícito contra regresiones y prototipos para validar con el cliente.
 
 Clonas, corres `/stark-init`, y el framework te lleva fase por fase: [empieza aquí →](docs/documentacion/QUICKSTART.md)
 
@@ -68,7 +68,7 @@ stark cubre tres casos de uso de construcción/cambio, más el prototipo como mo
 |---|---|---|
 | Construir desde cero (entrevistas, formularios, imágenes) | **Nuevo** (greenfield) | Clonar como repo nuevo |
 | Reescribir/modernizar un legacy (código + arqueología previa) | **Reingeniería** (brownfield-rewrite) | Clonar como repo nuevo |
-| Sistema en producción + agregar feature sin romper nada | **Mantenimiento** | Copiar `.claude/`, `templates/`, `docs/features/` y `docs/documentacion/` **al repo existente** |
+| Sistema en producción + agregar feature con blindaje contra regresiones| **Mantenimiento** | Copiar `.claude/`, `templates/`, `docs/features/` y `docs/documentacion/` **al repo existente** |
 | Mockup interactivo desplegable a partir de requirements | **Prototipo** (transversal/standalone) | Sobre cualquiera de los anteriores |
 
 ### La regla de oro: la herramienta no se commitea, las specs sí
