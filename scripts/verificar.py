@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 
 """Auto-verificación de stark — el Regression Shield del propio framework.
 
 Valida todo lo verificable por máquina en el repo:
