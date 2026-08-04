@@ -1,5 +1,6 @@
 # stark
 
+
 > Especificación exhaustiva, implementación mínima. Especifica todo, construye lo mínimo.
 > 
 > Por [@iamgabstark_](https://iamgabstark.com/)
