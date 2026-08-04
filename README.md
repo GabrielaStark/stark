@@ -68,7 +68,7 @@ stark cubre tres casos de uso de construcción/cambio, más el prototipo como mo
 |---|---|---|
 | Construir desde cero (entrevistas, formularios, imágenes) | **Nuevo** (greenfield) | Clonar como repo nuevo |
 | Reescribir/modernizar un legacy (código + arqueología previa) | **Reingeniería** (brownfield-rewrite) | Clonar como repo nuevo |
-| Sistema en producción + agregar feature con blindaje contra regresiones| **Mantenimiento** | Copiar `.claude/`, `templates/`, `docs/features/` y `docs/documentacion/` **al repo existente** |
+| Sistema en producción + agregar feature con blindaje contra regresiones| **Mantenimiento** | Copiar la herramienta (`.claude/`, `templates/`, `docs/documentacion/`) **al disco del repo existente**, gitignoreada |
 | Mockup interactivo desplegable a partir de requirements | **Prototipo** (transversal/standalone) | Sobre cualquiera de los anteriores |
 
 ### La regla de oro: la herramienta no se commitea, las specs sí
@@ -77,23 +77,25 @@ stark tiene dos partes que no se confunden:
 
 | | Qué es | ¿Va al git de tu proyecto? |
 |---|---|---|
-| **Herramienta** | `.claude/` (agentes, skills, comandos) y `templates/` | ❌ NO — va en `.gitignore`; vive en tu disco |
-| **Producto** | Tu código + `docs/` (specs, sustrato, manual) + `CONSTITUTION.md` | ✅ SÍ — es tu proyecto y su evidencia SDD |
+| **Herramienta** | `.claude/` (agentes, skills, comandos), `templates/`, `docs/documentacion/` (este manual) y `LICENSE.stark` | ❌ NO — va en `.gitignore`; vive en tu disco |
+| **Producto** | Tu código + lo que TÚ escribes en `docs/` (specs, sustrato, receipts) + `CONSTITUTION.md` | ✅ SÍ — es tu proyecto y su evidencia SDD |
 
-- Gitignorear **no borra nada**: los archivos siguen en tu disco y los agentes funcionan igual. Git simplemente no los sube.
-- **Actualizar stark** en cualquier proyecto = recopiar `.claude/` y `templates/` encima. Como están ignoradas, git ni se entera.
+El corte es uno solo y no tiene excepciones: **lo que stark te entrega se ignora; lo que tú escribes se commitea.** `docs/documentacion/` cae del lado de la herramienta porque es idéntico en todos tus proyectos y se renueva cada vez que actualizas stark — commiteado, lo único que hace es envejecer dentro del repo del cliente. `LICENSE.stark` es el aviso MIT que acompaña a la herramienta: si la herramienta no viaja en el repo, el aviso tampoco necesita viajar.
+
+- Gitignorear **no borra nada**: los archivos siguen en tu disco y los agentes los leen igual. Git simplemente no los sube.
+- **Actualizar stark** en cualquier proyecto = recopiar la herramienta encima. Como está ignorada, git ni se entera.
 - **Entregar o vender el proyecto** = el repo ya está limpio: se va con sus specs, sin tu herramienta.
-- **¿Proyecto viejo con stark commiteado adentro?** Desde su raíz: `printf '.claude/\ntemplates/\n' >> .gitignore && git rm -r --cached .claude templates && git commit -am "stark: herramienta fuera del repo"` — salen del repo, siguen en tu disco.
+- **¿Proyecto viejo con stark commiteado adentro?** Desde su raíz: `printf '.claude/\ntemplates/\ndocs/documentacion/\ndocs/features/README.md\nLICENSE.stark\n' >> .gitignore && git rm -r --cached --ignore-unmatch .claude templates docs/documentacion docs/features/README.md LICENSE.stark && git commit -am "stark: herramienta fuera del repo"` — salen del repo, siguen en tu disco. (`--ignore-unmatch` es lo que evita que el comando truene entero si alguna de esas rutas no estaba rastreada.)
 
 ### Instalar (nuevo / reingeniería)
 
 ```bash
 git clone https://github.com/GabrielaStark/stark.git mi-proyecto
 cd mi-proyecto && rm -rf .git && git init
-printf '.claude/\ntemplates/\nscripts/\n.github/workflows/verificar.yml\n' >> .gitignore
+printf '.claude/\ntemplates/\nscripts/\n.github/workflows/verificar.yml\nrequirements-dev.txt\ndocs/documentacion/\ndocs/features/README.md\nLICENSE.stark\n' >> .gitignore
 ```
 
-El README y el LICENSE de stark los reemplazas por los de tu proyecto cuando arranque el código — pero conserva el aviso MIT de stark en una copia (`mv LICENSE LICENSE.stark`): la licencia exige mantenerlo al redistribuir porciones sustanciales de la herramienta.
+El README y el LICENSE de stark los reemplazas por los de tu proyecto cuando arranque el código — pero conserva el aviso MIT de stark en una copia local (`mv LICENSE LICENSE.stark`): la licencia exige mantenerlo mientras tengas la herramienta encima. Va gitignoreado como el resto de la herramienta: se queda en tu disco, junto a lo que ampara.
 
 Carga inputs:
 - **Nuevo**: material de levantamiento en `docs/inputs/` (transcripciones, imágenes, formularios).
@@ -110,11 +112,11 @@ mkdir -p docs/documentacion docs/features && \
 cp /tmp/stark/docs/documentacion/*.md docs/documentacion/ && \
 cp /tmp/stark/docs/features/README.md docs/features/ && \
 cp /tmp/stark/LICENSE LICENSE.stark && \
-printf '.claude/\ntemplates/\n' >> .gitignore && \
+printf '.claude/\ntemplates/\ndocs/documentacion/\ndocs/features/README.md\nLICENSE.stark\n' >> .gitignore && \
 rm -rf /tmp/stark
 ```
 
-Agrega la herramienta (`.claude/`, `templates/` — gitignoreadas: no ensucian el git del cliente), la documentación (`docs/documentacion/`, `docs/features/` — estas sí se commitean: son parte del proyecto) y el aviso MIT (`LICENSE.stark`, lo exige la licencia al copiar la herramienta). Si alguna de esas carpetas ya existe con contenido tuyo, revisa antes: `cp -r` sobreescribe archivos del mismo nombre.
+Todo lo que ese comando copia es herramienta y todo queda gitignoreado: `.claude/` y `templates/` (agentes y plantillas), `docs/documentacion/` (este manual), `docs/features/README.md` (el índice que stark trae, no tus features) y `LICENSE.stark` (el aviso MIT que exige la licencia al copiar la herramienta). El git del cliente no se ensucia con nada de esto. Lo que sí se commitea son **tus** specs: `docs/features/<slug>/` en adelante. Si alguna de esas carpetas ya existe con contenido tuyo, revisa antes: `cp -r` sobreescribe archivos del mismo nombre.
 
 **Antes del primer feature** (una vez por repo): genera el sustrato corriendo las skills `onboarding` y `reglas-negocio` desde Claude Code. Producen `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md`.
 
@@ -223,7 +225,7 @@ stark/
                                                         la fuente única de estructura son los skills
 ```
 
-Este árbol es el repo de **stark**. En **tu proyecto**, solo se commitea `docs/` (y tu código): `.claude/`, `templates/`, `scripts/` y el workflow de CI son herramienta — gitignoreados, viven solo en tu disco (ver la regla de oro del Quick Start).
+Este árbol es el repo de **stark**. En **tu proyecto** solo se commitea lo que tú escribes: tu código y tus specs de `docs/`. Todo lo demás es herramienta, y por eso va gitignoreado y vive solo en tu disco — `.claude/`, `templates/`, `scripts/`, el workflow de CI, `docs/documentacion/`, `docs/features/README.md` y `LICENSE.stark` (ver la regla de oro del Quick Start).
 
 ---
 
