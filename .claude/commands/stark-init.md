@@ -31,7 +31,7 @@ Muestra la secuencia stark del caso ([ ] = opcional) y cuál comando sigue:
 
 - **NUEVO** → asegura que exista `docs/inputs/`. Indícale **explícitamente al humano** que el siguiente paso es suyo: debe colocar su material de levantamiento (transcripciones, notas, entrevistas, imágenes, PDFs) dentro de `docs/inputs/` **antes** de correr `/stark-requirements`, porque sin material el analista no tiene de dónde partir. Siguiente: el humano llena `docs/inputs/` y luego invoca `/stark-requirements`.
 
-- **REINGENIERÍA** → genera el sustrato sobre el código vivo: corre la skill `onboarding` (produce `docs/CLAUDE.md` y `docs/BIG_PICTURE.md`) y la skill `reglas-negocio` (produce `docs/REGLAS_DE_NEGOCIO.md`). Indícale **explícitamente al humano** que, si tiene material de arqueología previa, lo coloque en `docs/analysis/` antes de requirements. Siguiente: `/stark-requirements`.
+- **REINGENIERÍA** → genera el sustrato sobre el código vivo: corre la skill `onboarding` (produce `docs/CLAUDE.md`, el mapa estructural `docs/.stark/grafo.json` y `docs/BIG_PICTURE.md`) y la skill `reglas-negocio` (produce `docs/REGLAS_DE_NEGOCIO.md`). Indícale **explícitamente al humano** que, si tiene material de arqueología previa, lo coloque en `docs/analysis/` antes de requirements. Siguiente: `/stark-requirements`.
 
 - **MANTENIMIENTO** → genera el sustrato (skills `onboarding` + `reglas-negocio`). Pregunta al humano el **slug del feature** (kebab-case, ej. `exportar-reportes-pdf` — `$ARGUMENTS` es el caso de uso, NO el slug) y crea `docs/features/<slug>/intent.md` desde `templates/intent.md` para capturar la intención de la feature. Siguiente: el humano llena el `intent.md` y luego invoca `/stark-requirements <slug>`.
 

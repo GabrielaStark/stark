@@ -119,7 +119,7 @@ rm -rf /tmp/stark
 
 Todo lo que ese comando copia es herramienta y todo queda gitignoreado: `.claude/` y `templates/` (agentes y plantillas), `docs/documentacion/` (este manual), `docs/features/README.md` (el índice que stark trae, no tus features) y `LICENSE.stark` (el aviso MIT que exige la licencia al copiar la herramienta). El git del cliente no se ensucia con nada de esto. Lo que sí se commitea son **tus** specs: `docs/features/<slug>/` en adelante. Si alguna de esas carpetas ya existe con contenido tuyo, revisa antes: `cp -r` sobreescribe archivos del mismo nombre.
 
-**Antes del primer feature** (una vez por repo): genera el sustrato corriendo las skills `onboarding` y `reglas-negocio` desde Claude Code. Producen `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md`.
+**Antes del primer feature** (una vez por repo): genera el sustrato corriendo las skills `onboarding` y `reglas-negocio` desde Claude Code. Producen `docs/CLAUDE.md`, `docs/BIG_PICTURE.md`, `docs/REGLAS_DE_NEGOCIO.md` y el mapa estructural `docs/.stark/grafo.json` (memoria del código para los agentes).
 
 **Por cada feature nuevo**:
 
@@ -192,11 +192,12 @@ stark/
 │       ├── sdd-requirements-mantenimiento/SKILL.md   ← mantenimiento
 │       ├── sdd-design-delta/SKILL.md                 ← mantenimiento
 │       ├── sdd-tasks-risk/SKILL.md                   ← mantenimiento
-│       ├── onboarding/SKILL.md                       ← auxiliar: genera CLAUDE.md + BIG_PICTURE.md
+│       ├── onboarding/SKILL.md                       ← auxiliar: genera CLAUDE.md + BIG_PICTURE.md + grafo.json
 │       └── reglas-negocio/SKILL.md                   ← auxiliar: genera REGLAS_DE_NEGOCIO.md
 │   └── scripts/
-│       └── sello.py                                  ← autoridad RDD: receipts sha256, tags de
-│                                                       lote, hook pre-push
+│       ├── sello.py                                  ← autoridad RDD: receipts sha256, tags de
+│       │                                               lote, hook pre-push
+│       └── valida_grafo.py                           ← valida el mapa grafo.json contra el disco
 ├── docs/
 │   ├── inputs/                                       ← material crudo (nuevo)
 │   ├── analysis/                                     ← análisis previo (reingeniería)
@@ -216,8 +217,9 @@ stark/
 │       └── DECISIONES.md                             ← decisiones de diseño (prototipo + mantenimiento)
 ├── scripts/
 │   ├── verificar.py                                  ← auto-verificación del framework
-│   └── test_sello.py                                 ← suite RDD: 50+ escenarios en repos git
-│                                                       temporales (CI corre ambos en cada push)
+│   ├── test_sello.py                                 ← suite RDD: 50+ escenarios en repos git
+│   │                                                   temporales
+│   └── test_valida_grafo.py                          ← suite del validador del mapa estructural
 └── templates/
     ├── intent.md                                     ← se copia y llena (input de mantenimiento)
     ├── CONSTITUTION.md                               ← se copia a la raíz y llena (decisiones
@@ -321,9 +323,9 @@ entrevistas               codigo                       mantenimiento
   - Nuevo: entrevistas, transcripciones, formularios
   - Reingeniería: código legacy + arqueología previa
   - Mantenimiento: código en producción + descripción del feature
-- (Mantenimiento recomendado) Skills auxiliares `onboarding` y `reglas-negocio` (ya incluidas en `.claude/skills/`) para generar el sustrato (`CLAUDE.md`, `BIG_PICTURE.md`, `REGLAS_DE_NEGOCIO.md`)
+- (Mantenimiento recomendado) Skills auxiliares `onboarding` y `reglas-negocio` (ya incluidas en `.claude/skills/`) para generar el sustrato (`CLAUDE.md`, `BIG_PICTURE.md`, `REGLAS_DE_NEGOCIO.md` y el mapa `docs/.stark/grafo.json`)
 
-El repo se auto-verifica: `python3 scripts/verificar.py` (requiere PyYAML: `pip install -r requirements-dev.txt`) valida frontmatters, fences, links y nombres citados, y `python3 scripts/test_sello.py` (sin dependencias) corre los 50+ escenarios RDD; el CI ejecuta ambos en cada push. En tus proyectos, los sellos los verifica `python3 .claude/scripts/sello.py` (receipts sha256, tags de lote, hook pre-push).
+El repo se auto-verifica: `python3 scripts/verificar.py` (requiere PyYAML: `pip install -r requirements-dev.txt`) valida frontmatters, fences, links y nombres citados; `python3 scripts/test_sello.py` (sin dependencias) corre los 50+ escenarios RDD y `python3 scripts/test_valida_grafo.py` (sin dependencias) prueba el validador del mapa estructural; el CI ejecuta los tres en cada push. En tus proyectos, los sellos los verifica `python3 .claude/scripts/sello.py` (receipts sha256, tags de lote, hook pre-push).
 
 ---
 

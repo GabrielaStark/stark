@@ -14,3 +14,4 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: python3 scripts/verificar.py
       - run: python3 scripts/test_sello.py
+      - run: python3 scripts/test_valida_grafo.py

@@ -538,11 +538,12 @@ docs/features/<slug-del-feature>/
 
 ## B6. El sustrato: CLAUDE.md, BIG_PICTURE.md, REGLAS_DE_NEGOCIO.md
 
-Estos tres archivos viven en `docs/` raíz (no dentro de `features/`) porque aplican al sistema completo:
+Estos artefactos viven en `docs/` raíz — el mapa estructural en `docs/.stark/` — y no dentro de `features/`, porque aplican al sistema completo:
 
 - **`docs/CLAUDE.md`** — guía del repo. Generada por la skill `onboarding` (incluida en `.claude/skills/onboarding/`). Contiene: cómo se levanta el ambiente, comandos de build/test, convenciones de naming, estructura de carpetas, dependencias clave. El agente de mantenimiento la usa para saber cómo correr los tests existentes.
 - **`docs/BIG_PICTURE.md`** — radiografía arquitectónica. Generada también por `onboarding`. Contiene: capas, módulos, flujo de datos, integraciones externas, patrones usados. El agente de mantenimiento la usa para saber qué arquitectura es "lo heredado e inmutable".
 - **`docs/REGLAS_DE_NEGOCIO.md`** — reglas de negocio explícitas. Generada por la skill `reglas-negocio` (incluida en `.claude/skills/reglas-negocio/`). Contiene: roles, permisos, flujos de estados, validaciones, mapa funcional. El agente de mantenimiento la usa para identificar invariantes con seguridad.
+- **`docs/.stark/grafo.json`** — mapa estructural del código: módulos, entidades con líneas aproximadas, aristas archivo-a-archivo con evidencia citada (`vista`/`inferida`) y huecos declarados (`sin_mapear`). Generado también por `onboarding` (su Fase 3), en la misma pasada que ya lee todo el código — costo marginal cero. Es la memoria estructural del proyecto: los agentes lo leen para orientarse sin re-explorar el código en cada sesión; si no existe, operan como antes (Glob/Grep). **Decisión: lo escribe el LLM, no un parser.** stark es agnóstico al lenguaje, y una toolchain de parsing (una gramática por lenguaje) rompería esa promesa justo en los stacks legacy donde más se necesita. Trade-off aceptado: el mapa orienta, no jura — la exactitud de líneas no es su promesa. Lo verificable por máquina sin parsear código (rutas existen, rangos caben en el archivo, aristas con evidencia, vigencia vía commit) lo valida `.claude/scripts/valida_grafo.py` — stdlib pura, sin pip, con suite en `scripts/test_valida_grafo.py`.
 
 Si no existen, el agente puede continuar pero recomienda al humano correrlas primero. La calidad del análisis mejora ~10x con el sustrato.
 

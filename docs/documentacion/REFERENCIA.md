@@ -147,11 +147,11 @@ Pipeline para agregar un feature a un sistema en producción sin romper lo que y
 Antes del primer feature, una sola vez por repo, corre estas dos skills desde Claude Code:
 
 ```
-/onboarding         → genera docs/CLAUDE.md y docs/BIG_PICTURE.md
+/onboarding         → genera docs/CLAUDE.md, docs/.stark/grafo.json y docs/BIG_PICTURE.md
 /reglas-negocio     → genera docs/REGLAS_DE_NEGOCIO.md
 ```
 
-Los tres archivos viven en `docs/` raíz (no dentro de `features/`) porque aplican a todo el sistema. El agente de mantenimiento los lee como contexto base. **Si no los generas:** el pipeline funciona igual, pero el agente infiere más del código y aumenta la probabilidad de perder invariantes. Inversión: 5–10 minutos cada skill, una vez por sistema.
+Los tres archivos viven en `docs/` raíz y el mapa estructural en `docs/.stark/grafo.json` (no dentro de `features/`) porque aplican a todo el sistema. El agente de mantenimiento los lee como contexto base. **Si no los generas:** el pipeline funciona igual, pero el agente infiere más del código y aumenta la probabilidad de perder invariantes. Inversión: 5–10 minutos cada skill, una vez por sistema.
 
 Al validar el sustrato no solo revises lo encontrado: `REGLAS_DE_NEGOCIO.md` trae estado de procedencia por regla (`confirmada` / `inferida` / `en-duda`) y una sección 11 de **Descubrimiento** con contradicciones, zonas no comprendidas y preguntas abiertas para el Stakeholder técnico. Cada respuesta con nombre promueve la regla a `confirmada`; lo que quede `en-duda` exigirá decisión explícita en cada feature que lo toque (`DECISIONES.md` B-D11 y B-D12).
 
@@ -774,7 +774,7 @@ Rompe siempre, sin excepción:
 - **Delta:** el conjunto de cambios que un feature de mantenimiento introduce. Los artefactos del pipeline de mantenimiento describen solo el delta, no el sistema completo.
 - **Surface of Contact:** tabla en el `requirements.md` de mantenimiento que lista exhaustivamente los módulos, archivos, endpoints, tablas que el feature toca, lee, modifica o explícitamente NO toca. Cada fila con nivel de riesgo (alto / medio / bajo / — no se toca).
 - **Invariantes Preservadas:** lista numerada (I.1, I.2, ...) de comportamientos del sistema existente que **NO deben cambiar** tras el feature. Cada una con referencia al código fuente (`<!-- source: archivo:líneas -->`), su estado de procedencia (`confirmada` | `inferida` — lo `en-duda` no puede ser invariante) y un test (existente o de blindaje) que la valida.
-- **Sustrato** (de mantenimiento): los tres archivos `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md` que documentan el sistema existente. Generados por las skills auxiliares `onboarding` y `reglas-negocio` (incluidas en `.claude/skills/`). Recomendados pero no obligatorios. Su sección 11 (Descubrimiento) lista lo que el análisis no pudo determinar.
+- **Sustrato** (de mantenimiento): los tres archivos `docs/CLAUDE.md`, `docs/BIG_PICTURE.md` y `docs/REGLAS_DE_NEGOCIO.md`, más el mapa estructural `docs/.stark/grafo.json`, que documentan el sistema existente. Generados por las skills auxiliares `onboarding` y `reglas-negocio` (incluidas en `.claude/skills/`). Recomendados pero no obligatorios. Su sección 11 (Descubrimiento) lista lo que el análisis no pudo determinar.
 - **Intent.md:** archivo de entrada del pipeline de mantenimiento. Lo escribe el humano describiendo el feature en lenguaje de negocio. Vive en `docs/features/<slug>/intent.md`.
 - **Regression Shield:** primera sección del `tasks.md` de mantenimiento. Tareas de blindaje (verbo Blindar) que escriben tests de regresión sobre código existente que el feature va a tocar. Se ejecutan **ANTES** de cualquier modificación.
 - **No-Regression Validation:** última sección obligatoria del `tasks.md` de mantenimiento. Tarea de verbo Verificar regresión que corre suite completa + verifica cada invariante manualmente antes de cerrar el feature.
@@ -787,7 +787,7 @@ Rompe siempre, sin excepción:
 
 ### Skills auxiliares del framework (usadas como sustrato del pipeline de mantenimiento)
 
-- **onboarding** (skill): protocolo de reconocimiento para proyectos heredados. Genera `CLAUDE.md` (guía del repo) y `BIG_PICTURE.md` (radiografía arquitectónica). Recomendada antes del primer feature de mantenimiento sobre un sistema. Vive en `.claude/skills/onboarding/`.
+- **onboarding** (skill): protocolo de reconocimiento para proyectos heredados. Genera `CLAUDE.md` (guía del repo), `BIG_PICTURE.md` (radiografía arquitectónica) y el mapa estructural `docs/.stark/grafo.json` (módulos, entidades y aristas con evidencia; lo valida `.claude/scripts/valida_grafo.py`, sin dependencias). Recomendada antes del primer feature de mantenimiento sobre un sistema. Vive en `.claude/skills/onboarding/`.
 - **reglas-negocio** (skill): extrae roles, permisos, flujos de estados, validaciones, mapa funcional del código existente. Genera `docs/REGLAS_DE_NEGOCIO.md`. Recomendada antes del primer feature de mantenimiento. Vive en `.claude/skills/reglas-negocio/`.
 
 Aunque son de stark, son agnósticas al pipeline SDD per se — sirven para analizar cualquier repo, no solo proyectos que usen SDD. El pipeline de mantenimiento las usa porque su output es exactamente el sustrato que el agente `analista-feature-mantenimiento` necesita.

@@ -34,9 +34,12 @@ Dos fuentes:
 
 2. **Código fuente del sistema legacy**: en el repo. Accesible vía Read, Glob, Grep.
 
+3. **Mapa estructural (opcional)**: `docs/.stark/grafo.json`, generado por la skill `onboarding` durante `/stark-init`. Si existe, trae módulos, entidades, aristas con evidencia y huecos declarados (`sin_mapear`) — te ahorra la exploración a ciegas. Si no existe, trabajas como siempre.
+
 Empieza siempre por:
 
 ```
+Read docs/.stark/grafo.json  (si existe — el mapa del código)
 Glob docs/analysis/**/*.md   (o el path que indique el humano)
 Glob <code_root>             (para conocer la estructura del código)
 ```
@@ -66,12 +69,14 @@ Niveles de confianza:
 
 Los criterios con `low` deben validarse con el humano antes de cerrar. Idealmente, ningún criterio `low` sobrevive al cierre — o se promueve a `medium`/`high` con más evidencia, o se mueve a `## Open Questions`, o se elimina.
 
+**Regla del mapa**: `grafo.json` (si existe) te orienta hacia el archivo correcto, pero todo `source:` sale de LEER el archivo real — nunca copies rangos del mapa: sus líneas son aproximadas por contrato.
+
 ## Workflow obligatorio
 
 ### Fase 1 — Inventario doble
 
 1. Lista y lee TODOS los `.md` de arqueología previa. Resume al humano qué encontraste.
-2. Mapea la estructura del código legacy (carpetas top-level, archivos clave, tecnología). No leas todo el código todavía.
+2. Mapea la estructura del código legacy. Si existe `docs/.stark/grafo.json`, ese es tu punto de partida: módulos, entidades, aristas y huecos ya están ahí — verifica su vigencia (si su `commit` difiere del HEAD actual, avisa al humano que conviene refrescarlo con la skill `onboarding`). Si no existe, mapea con Glob (carpetas top-level, archivos clave, tecnología). No leas todo el código todavía.
 3. Reporta al humano: "Encontré arqueología en [X] archivos cubriendo [temas]. El código está en [estructura]. ¿Confirmas que ese es el alcance, o falta algo?"
 4. No avances hasta que el humano confirme.
 
@@ -79,13 +84,14 @@ Los criterios con `low` deben validarse con el humano antes de cerrar. Idealment
 
 Para cada área funcional identificada en la arqueología:
 
-1. Localiza el código correspondiente con Grep/Glob.
+1. Localiza el código correspondiente: con las aristas de `grafo.json` si existe (quién usa qué, con evidencia), o con Grep/Glob.
 2. Lee los archivos relevantes.
 3. Verifica: ¿lo que dice la arqueología coincide con lo que hace el código?
    - Si coincide: alta confianza, toma nota.
    - Si la arqueología es más vaga que el código: el código manda, refina.
    - Si la arqueología contradice al código: **alerta al humano** y pregunta cuál es la verdad.
 4. Identifica comportamiento que aparece en el código pero NO en la arqueología. Esto es típicamente comportamiento implícito que el analista previo no detectó.
+5. Con el mapa a la mano: los archivos que no son destino de ninguna arista ni figuran en `entradas` son candidatos a código muerto — verifícalos leyendo; los confirmados van a `## Detected Anomalies`.
 
 ### Fase 3 — Clasificación feature vs bug
 
@@ -133,7 +139,9 @@ resolver al momento. Quedan pendientes para resolución futura.]
 [Tabla simple: módulo del código legacy → Requirement(s) que lo cubren.
 Sirve para detectar código sin requirements (¿es legacy muerto?
 ¿lo perdimos?) y requirements sin código (¿lo soñamos?
-¿es deuda técnica documentada que no se implementó?).]
+¿es deuda técnica documentada que no se implementó?).
+Si existe docs/.stark/grafo.json, contrástala: cada módulo del mapa
+aparece en la tabla o justificas su ausencia.]
 ```
 
 ### Fase 6 — Auto-validación

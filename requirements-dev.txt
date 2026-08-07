@@ -1,3 +1,3 @@
 # Dependencias de desarrollo del framework stark (no del proyecto que construyas).
-# scripts/verificar.py las necesita; scripts/test_sello.py y sello.py no dependen de pip.
+# scripts/verificar.py las necesita; test_sello.py, test_valida_grafo.py, sello.py y valida_grafo.py no dependen de pip.
 pyyaml==6.0.2
