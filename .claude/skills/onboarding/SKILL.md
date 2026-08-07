@@ -57,6 +57,7 @@ Contrato del artefacto (esquema v1 — todos los campos presentes; las listas pu
 
 ```json
 {
+  "_que_es": "Mapa estructural del código, generado por la skill onboarding de stark. Se valida con: python3 .claude/scripts/valida_grafo.py",
   "version": 1,
   "commit": "<salida de git rev-parse HEAD al momento de mapear>",
   "entradas": ["public/index.php"],

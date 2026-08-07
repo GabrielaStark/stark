@@ -104,7 +104,7 @@ Si todo eso está, di explícitamente algo como **"aprobado, sigue con design"**
 
 ### 2B. Reingeniería — usando `arqueologo-codigo`
 
-Mete en `docs/analysis/` tus `.md` de análisis arqueológico previo. Asegúrate de que el código legacy esté accesible. Invocación:
+Mete en `docs/analysis/` tus `.md` de análisis arqueológico previo. Asegúrate de que el código legacy esté accesible. Si corriste `/stark-init reingenieria`, el sustrato ya incluye el mapa estructural `docs/.stark/grafo.json`: el arqueólogo lo lee para orientarse en vez de explorar a ciegas, y avisa si quedó desactualizado respecto al código. Invocación:
 
 ```
 Use the arqueologo-codigo subagent to produce docs/requirements.md
@@ -171,7 +171,7 @@ El agente va a ejecutar 7 fases internamente. Tu trabajo es responder cuando pre
 
 | Fase del agente | Qué hace | Tu trabajo |
 |--|--|--|
-| 1. Lectura del intent + sustrato | Lee `intent.md`, `docs/CLAUDE.md`, `docs/BIG_PICTURE.md`, `docs/REGLAS_DE_NEGOCIO.md` (si existen), mapea estructura del código. Reporta qué encontró. | Confirmar la lectura inicial. Si malinterpretó algo, corrígelo. Si falta sustrato, el agente te avisa — decide si pausas para correrlo o continúas. |
+| 1. Lectura del intent + sustrato | Lee `intent.md`, `docs/CLAUDE.md`, `docs/BIG_PICTURE.md`, `docs/REGLAS_DE_NEGOCIO.md` y el mapa `docs/.stark/grafo.json` (si existen), mapea estructura del código. Reporta qué encontró. | Confirmar la lectura inicial. Si malinterpretó algo, corrígelo. Si falta sustrato, el agente te avisa — decide si pausas para correrlo o continúas. |
 | 2. Triangulación intent ↔ código | Para cada capacidad del intent, localiza módulos relacionados en el código y mapea Surface of Contact (qué módulos toca el feature, lee, modifica, o NO toca). | Validar el mapa preliminar. |
 | 3. Identificación de invariantes | Infiere invariantes preservadas (comportamientos del sistema que NO deben cambiar) con referencias al código y su estado de procedencia. Te las presenta numeradas (I.1, I.2, ...). | Confirmar o descartar cada invariante numerada; lo `en-duda` no se blinda — va a decisión explícita. Mejor sobre-listar y descartar que omitir. |
 | 4. Resolución de huecos | Preguntas numeradas sobre actores, casos borde, NFR del feature, out-of-scope, términos ambiguos. | Responder **TODAS** las preguntas por número. |

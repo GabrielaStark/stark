@@ -343,6 +343,7 @@ Si en el repo existen los artefactos:
 
 - `docs/CLAUDE.md` (generado por skill `onboarding`)
 - `docs/BIG_PICTURE.md` (generado por skill `onboarding`)
+- `docs/.stark/grafo.json` (generado por skill `onboarding`) — mapa estructural: módulos, entidades y aristas con evidencia; sus aristas son la primera candidata a Surface of Contact
 - `docs/REGLAS_DE_NEGOCIO.md` (generado por skill `reglas-negocio`)
 
 El agente DEBE leerlos como sustrato antes de inferir Surface of Contact e Invariantes. De `REGLAS_DE_NEGOCIO.md` hereda además el estado de procedencia de cada regla (`confirmada` / `inferida` / `en-duda`) — ver §4.5. Estos archivos no se duplican en el requirements.md — se **referencian** cuando aplique:
