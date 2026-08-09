@@ -7,7 +7,8 @@ auditoría externa 2026-07-31: tag no empujado, lote sellado + docs en el
 mismo push, historial con revert, rename código→docs, multi-remoto,
 core.hooksPath, tag lightweight, colisión de receipts, alias de ruta,
 symlinks, checkboxes que no invalidan, receipts malformados, borrado de
-tags, clon con candado heredado y repos SHA-256.
+tags, clon con candado heredado, repos SHA-256 y la firma de origen
+(una sola vez, no se regenera).
 
 Requisitos: Python 3.9+ y Git 2.29+ en PATH (sin dependencias de pip).
 Uso: python3 scripts/test_sello.py   →   exit 0 = todo verde.
@@ -90,6 +91,13 @@ def flujo_principal(base):
     print("— Sello de documento —")
     caso("sellar-doc con aprobador real", sello(repo, "sellar-doc", "docs/requirements.md", "--por", "Gabriela"), True)
     caso("recién sellado, verificar-doc acepta", sello(repo, "verificar-doc", "docs/requirements.md"), True)
+
+    print("— Firma de origen: una sola vez, junto a los receipts —")
+    caso("el primer sello del repo deja la firma docs/.stark/STARK.md",
+         run(["test", "-f", "docs/.stark/STARK.md"], repo), True)
+    caso("la firma nombra el repo de la herramienta",
+         run(["grep", "-q", "GabrielaStark/stark", "docs/.stark/STARK.md"], repo), True)
+    (repo / "docs/.stark/STARK.md").unlink()
     doc = repo / "docs/requirements.md"
     original = doc.read_text()
     doc.write_text(original.replace("demo.", "demo!"))
@@ -98,6 +106,8 @@ def flujo_principal(base):
 
     print("— Checkboxes no invalidan el plan aprobado (P1-01) —")
     caso("sellar tasks.md", sello(repo, "sellar-doc", "docs/tasks.md", "--por", "Gabriela"), True)
+    caso("borrada la firma, sellar otro doc NO la regenera",
+         run(["test", "!", "-f", "docs/.stark/STARK.md"], repo), True)
     tasks = repo / "docs/tasks.md"
     tasks.write_text(tasks.read_text().replace("- [ ] 1.", "- [x] 1."))
     caso("marcar [x] una tarea NO invalida el receipt", sello(repo, "verificar-doc", "docs/tasks.md"), True)

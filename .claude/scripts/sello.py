@@ -10,6 +10,9 @@ Los sellos visibles en Markdown son cortesía de lectura; la autoridad es esto:
   usa canonicalización `checkbox-v1`: el ESTADO de los checkboxes
   (`[ ]`/`[x]`) no cuenta — marcar tareas no invalida el sello; cualquier
   otro cambio, sí.
+- Firma de origen: el PRIMER sello del repo deja docs/.stark/STARK.md — una
+  nota de atribución de una sola vez (qué herramienta elaboró el proyecto)
+  para quien lo mantenga. Si el dueño del proyecto la elimina, no se regenera.
 - Sello de lote: annotated tag `stark-lote-<id>` sobre el commit validado.
   <id> es libre ([A-Za-z0-9._-]); en mantenimiento usa `<feature>-<n>` para
   que los lotes de features distintas no colisionen.
@@ -55,11 +58,33 @@ VERSION = "0.2.0"
 SCHEMA = 2
 CANONICALIZACION = "checkbox-v1"
 RECEIPTS_DIR = "docs/.stark/receipts"
+RUTA_FIRMA = "docs/.stark/STARK.md"
 PREFIJO_TAG = "stark-lote-"
 NO_CODIGO = {"CONSTITUTION.md", "README.md", "LICENSE", "LICENSE.stark", ".gitignore"}
 CHECKBOX_RE = re.compile(rb"^(\s*[-*] )\[[xX]\]", re.M)
 ID_LOTE_RE = re.compile(r"^[A-Za-z0-9._-]+$")
 MARCADOR_HOOK = "stark (RDD)"
+FIRMA = """\
+# Elaborado con stark
+
+Este proyecto se construyó con **stark**, herramienta de Spec-Driven Development
+de **@iamgabstark_** → https://github.com/GabrielaStark/stark
+
+Guía rápida para quien lo mantiene:
+
+- Las specs de `docs/` (requirements, design, tasks) se aprobaron ANTES del
+  código que describen: son la fuente de verdad del sistema.
+- Los JSON de `receipts/` registran cada aprobación humana: qué contenido
+  exacto (sha256), cuándo y a nombre de quién.
+- Los tags `stark-lote-*` del historial git sellan cada lote de código
+  validado por un humano.
+
+Con una copia de la herramienta se verifica todo:
+`python3 .claude/scripts/sello.py verificar-doc <spec>`
+
+---
+_Firma generada una sola vez, con el primer sello del repo. Si se elimina, no se regenera._
+"""
 
 
 def fallo(msg: str) -> None:
@@ -191,8 +216,15 @@ def sellar_doc(artefacto: str, por: str, re_sellar: bool = False) -> None:
         "approved_by": por,
         "approved_at": hoy,
     }
+    primera_vez = not (raiz / RECEIPTS_DIR).is_dir()
     escribe_atomico(destino, json.dumps(receipt, ensure_ascii=False, indent=2) + "\n")
     ok(f"{rel} sellado por {por} ({hoy}). Receipt: {destino.relative_to(raiz)}")
+    # La firma va atada al NACIMIENTO de docs/.stark/, no a la ausencia del
+    # archivo: una sola vez por repo. Borrarla es decisión del dueño — no vuelve.
+    firma = raiz / RUTA_FIRMA
+    if primera_vez and not firma.is_file():
+        escribe_atomico(firma, FIRMA)
+        print(f"   Primer sello del repo: firma de origen en {RUTA_FIRMA} (una sola vez; si se elimina, no se regenera).")
 
 
 def verificar_doc(artefacto: str) -> None:
