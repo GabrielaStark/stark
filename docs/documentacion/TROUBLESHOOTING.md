@@ -64,11 +64,19 @@ Es el sello RDD haciendo su trabajo: el receipt (`docs/.stark/receipts/`) guarda
 
 ### "git me bloquea el push (código sin sellar / working tree sucio)"
 
-El hook pre-push revisa cada commit empujado y solo deja pasar código sellado (los pushes que solo tocan documentación pasan libres, y el candado se activa con el primer sello).
+El hook pre-push revisa cada commit empujado y solo deja pasar código sellado (los pushes que solo tocan documentación pasan libres — aunque el candado de secretos sí los revisa, ver la entrada siguiente — y el candado se activa con el primer sello).
 
 - Si empujas un lote validado: deja el tree limpio (commitea o descarta todo), `python3 .claude/scripts/sello.py sellar-lote <id> --por "<nombre>"` (`<feature>-<n>` en mantenimiento), y empuja rama y tag juntos: `git push <remoto> <rama> refs/tags/stark-lote-<id>`.
 - Si el bloqueo te sorprende, esa sorpresa es el punto: algo cambió después de la validación. Revalida con el humano antes de entregar.
 - `git push --no-verify` salta el candado — úsalo solo sabiendo que rompes la cadena de evidencia.
+
+### "git me bloquea el push: 'posibles CREDENCIALES'"
+
+Es el candado de secretos del mismo hook: escanea cada commit empujado — docs incluidos, ahí la exención de documentación no aplica — con patrones de alta precisión (llaves cloud, tokens, private keys, credencial literal asignada).
+
+1. Si es una credencial real: NO basta borrarla del archivo — git no olvida. Sácala del historial (reescribe los commits aún no empujados) y **rótala**: un secreto que tocó un commit se invalida y se genera uno nuevo, que vive en una variable de entorno.
+2. Si es un falso positivo (fixture de test, ejemplo en docs): añade `stark:no-secreto` como comentario en esa línea y vuelve a empujar.
+3. El candado corre siempre, haya sellos o no, y prioriza precisión sobre exhaustividad: para una auditoría profunda del historial usa una herramienta dedicada (p. ej. gitleaks).
 
 ### "Ya tenía un hook pre-push propio y stark no quiere instalarse"
 
