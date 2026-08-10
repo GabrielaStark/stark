@@ -121,6 +121,7 @@ Antes de escribir EARS, identifica preguntas explícitas sobre el feature:
 - **Actores**: ¿quién usa el feature? ¿hay roles distintos? ¿qué permisos necesita?
 - **Casos borde**: ¿qué pasa si el input es inválido? ¿si no hay conexión? ¿si el usuario cancela a mitad?
 - **NFR del feature**: performance esperada, restricciones de plataforma.
+- **Datos sensibles del delta**: ¿el feature toca o introduce datos sensibles (personales, financieros, salud, credenciales de terceros)? ¿quién puede verlos y quién editarlos? La respuesta aterriza en Non-Functional Requirements del delta.
 - **Out of scope**: ¿qué del intent NO va a estar en este feature?
 - **Términos ambiguos** del intent: jerga del cliente.
 

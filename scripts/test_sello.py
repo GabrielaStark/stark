@@ -7,8 +7,9 @@ auditoría externa 2026-07-31: tag no empujado, lote sellado + docs en el
 mismo push, historial con revert, rename código→docs, multi-remoto,
 core.hooksPath, tag lightweight, colisión de receipts, alias de ruta,
 symlinks, checkboxes que no invalidan, receipts malformados, borrado de
-tags, clon con candado heredado, repos SHA-256 y la firma de origen
-(una sola vez, no se regenera).
+tags, clon con candado heredado, repos SHA-256, la firma de origen
+(una sola vez, no se regenera) y el candado de secretos (siempre activo,
+docs incluidos, marcador stark:no-secreto).
 
 Requisitos: Python 3.9+ y Git 2.29+ en PATH (sin dependencias de pip).
 Uso: python3 scripts/test_sello.py   →   exit 0 = todo verde.
@@ -320,6 +321,63 @@ def sha256_repo(base):
          run(["git", "push", "-q", "-u", "origin", "main", "refs/tags/stark-lote-s1"], repo), True)
 
 
+def candado_secretos(base):
+    print("— Candado de secretos: siempre activo, docs incluidos —")
+    remoto = base / "remoto-sec.git"
+    run(["git", "init", "-q", "--bare", str(remoto)], base)
+    repo = nuevo_repo(base, "proyecto-sec")
+    (repo / "app.py").write_text("v1\n")
+    (repo / "docs/notas.md").write_text("notas\n")
+    commit_todo(repo, "inicial")
+    git(repo, "remote", "add", "origin", str(remoto))
+    caso("instalar-hook", sello(repo, "instalar-hook"), True)
+    caso("push limpio sin sellos pasa", run(["git", "push", "-q", "-u", "origin", "main"], repo), True)
+
+    # Fakes construidos por partes: que el propio candado no muerda este test.
+    aws = "AKIA" + "0123456789ABCDEF"
+    llave = "-----BEGIN RSA PRIVATE " + "KEY-----"
+
+    punto = git(repo, "rev-parse", "HEAD")
+    (repo / "config.py").write_text(f'AWS_KEY = "{aws}"\n')
+    commit_todo(repo, "config con llave")
+    caso("llave AWS en código bloquea el push aun SIN sellos",
+         run(["git", "push", "-q", "origin", "main"], repo), False)
+    git(repo, "reset", "-q", "--hard", punto)
+
+    (repo / "config.py").write_text(f'AWS_KEY = "{aws}"  # ejemplo, stark:no-secreto\n')
+    commit_todo(repo, "config con marcador")
+    caso("falso positivo marcado con stark:no-secreto pasa",
+         run(["git", "push", "-q", "origin", "main"], repo), True)
+
+    punto = git(repo, "rev-parse", "HEAD")
+    (repo / "docs/notas.md").write_text(f"{llave}\nMIIEow\n")
+    commit_todo(repo, "private key en docs")
+    caso("private key en docs/ TAMBIÉN bloquea (exención RDD no aplica a secretos)",
+         run(["git", "push", "-q", "origin", "main"], repo), False)
+    git(repo, "reset", "-q", "--hard", punto)
+
+    (repo / "settings.py").write_text('password = "hunter2hunter2"\n')
+    commit_todo(repo, "credencial literal")
+    caso("credencial literal asignada bloquea",
+         run(["git", "push", "-q", "origin", "main"], repo), False)
+    git(repo, "reset", "-q", "--hard", punto)
+
+    (repo / "settings.py").write_text('password = "${DB_PASSWORD}"\ntoken = "<pon-tu-token>"\n')
+    commit_todo(repo, "placeholders")
+    caso("placeholders ${VAR} y <...> NO cuentan como secretos",
+         run(["git", "push", "-q", "origin", "main"], repo), True)
+
+    (repo / "docs/doc.md").write_text("# Doc\n\n> Estado: PENDIENTE\n\nx\n")
+    commit_todo(repo, "doc")
+    caso("sellar doc (activa candado RDD)", sello(repo, "sellar-doc", "docs/doc.md", "--por", "Gabriela"), True)
+    commit_todo(repo, "doc sellado")
+    (repo / "app.py").write_text(f'v2\nTOKEN = "{aws}"\n')
+    commit_todo(repo, "lote con fuga")
+    caso("sellar-lote s1", sello(repo, "sellar-lote", "s1", "--por", "Gabriela"), True)
+    caso("ni un lote sellado cuela un secreto: push bloqueado",
+         run(["git", "push", "-q", "origin", "main", "refs/tags/stark-lote-s1"], repo), False)
+
+
 def untracked_oculto(base):
     print("— Config local no debilita el sello (P2-02) —")
     repo = nuevo_repo(base, "proyecto-unt", status_showUntrackedFiles="no")
@@ -337,6 +395,7 @@ def main():
         hooks_path(base)
         hook_ajeno(base)
         untracked_oculto(base)
+        candado_secretos(base)
         sha256_repo(base)
     finally:
         shutil.rmtree(base, ignore_errors=True)

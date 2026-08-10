@@ -94,6 +94,7 @@ Para cada comportamiento detectado, clasifica:
 - **Feature intencional**: hay evidencia explícita (comentarios, tests, documentación, consistencia). → Va a `requirements.md` como criterio EARS.
 - **Probable feature**: comportamiento codificado pero sin evidencia explícita de intencionalidad. → Va a `requirements.md` con confianza `medium`, marcado para validación.
 - **Probable bug**: comportamiento que parece accidental (manejo inconsistente, comentarios `// TODO`, `// HACK`, código muerto activo). → NO va a `requirements.md` automáticamente. Va a sección `## Detected Anomalies` para que el humano decida.
+- **Hallazgo de seguridad**: credenciales/secretos hardcodeados, endpoints sin autorización, datos sensibles en logs. → Va a `## Detected Anomalies` como hallazgo de seguridad, referenciado por ubicación (`archivo:línea`). NUNCA copies una credencial encontrada al requirements ni a ningún otro doc — la referencia basta y una credencial pegada en docs es una fuga nueva.
 - **Comportamiento dependiente de versión**: si hay condicionales por entorno/versión, documéntalo explícitamente.
 
 Regla clave: ante la duda, **pregúntale al humano**. No clasifiques unilateralmente comportamiento ambiguo como feature.

@@ -65,6 +65,7 @@ Antes de escribir EARS, identifica explícitamente:
 - **Actores no definidos**: ¿quién usa el sistema? ¿hay roles distintos?
 - **Casos borde sin cubrir**: ¿qué pasa si el input es inválido? ¿si no hay conexión? ¿si el usuario cancela a la mitad?
 - **Restricciones no funcionales ausentes**: performance, seguridad, compatibilidad de plataforma, accesibilidad
+- **Datos sensibles sin clasificar**: ¿qué datos maneja el sistema que son sensibles (personales, financieros, salud, credenciales de terceros)? ¿quién puede verlos y quién editarlos? La respuesta aterriza en Non-Functional Requirements
 - **Out of scope implícito**: cosas que el material sugiere pero no confirma que estén dentro o fuera
 - **Términos de dominio ambiguos**: palabras técnicas o de negocio que usaron sin definir
 

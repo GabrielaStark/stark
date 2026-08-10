@@ -24,6 +24,14 @@ Los sellos visibles en Markdown son cortesía de lectura; la autoridad es esto:
   documentación (docs/, README, LICENSE, CONSTITUTION, .gitignore) pasan.
   El candado se activa con el primer sello (tag local O receipts
   commiteados — un clon con receipts ya nace con el candado puesto).
+- Candado de secretos (mismo hook, Principio 2): cada commit empujado se
+  escanea contra patrones de ALTA precisión (llaves cloud, tokens, private
+  keys, credencial literal asignada). Corre SIEMPRE — con o sin sellos — y
+  también sobre docs/: ahí la exención RDD no aplica, una credencial pegada
+  en un requirements es una fuga igual. Falso positivo: marca la línea con
+  `stark:no-secreto`. Límite: el diff propio de un merge no se escanea;
+  para auditoría profunda de historial usa una herramienta dedicada
+  (p. ej. gitleaks).
 
 Límites (dichos de frente): el sello REGISTRA identidad y la declaración
 `Tests: PASS` — no los firma criptográficamente ni ejecuta la suite; eso lo
@@ -63,6 +71,20 @@ PREFIJO_TAG = "stark-lote-"
 NO_CODIGO = {"CONSTITUTION.md", "README.md", "LICENSE", "LICENSE.stark", ".gitignore"}
 CHECKBOX_RE = re.compile(rb"^(\s*[-*] )\[[xX]\]", re.M)
 ID_LOTE_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+MARCADOR_NO_SECRETO = "stark:no-secreto"
+# Alta precisión sobre exhaustividad: un candado que casi nunca se equivoca
+# se respeta; uno que grita por todo se aprende a saltar.
+PATRONES_SECRETO = [
+    (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY"), "bloque PRIVATE KEY"),
+    (re.compile(r"\bAKIA[0-9A-Z]{16}\b"), "AWS access key"),
+    (re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})\b"), "token de GitHub"),
+    (re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{20,}\b"), "token de Slack"),
+    (re.compile(r"\b[sr]k_live_[A-Za-z0-9]{20,}\b"), "clave live de Stripe"),
+    (re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b"), "API key de Google"),
+    (re.compile(r"\bsk-(?:proj|ant)-[A-Za-z0-9_-]{20,}\b"), "API key (OpenAI/Anthropic)"),
+    # (?![$<{]) exime placeholders: "${VAR}", "<tu-password>", "{{tpl}}".
+    (re.compile(r"(?i)\b(?:pass(?:word|wd)?|contrase[nñ]a|secret|api[_-]?key|token|clave)\b\s*[:=]\s*[\"'](?![$<{])[^\"'\s]{8,}[\"']"), "credencial literal asignada"),
+]
 MARCADOR_HOOK = "stark (RDD)"
 FIRMA = """\
 # Elaborado con stark
@@ -366,6 +388,53 @@ def candado_activo(raiz: Path) -> bool:
     return receipts.is_dir() and any(receipts.glob("*.json"))
 
 
+def secretos_en_commit(sha: str) -> list:
+    # --unified=0: solo líneas añadidas, sin contexto. Sin -c/-m: el diff
+    # propio de un merge no se escanea (límite documentado). Bytes + replace:
+    # archivos legacy no-UTF8 no revientan el hook.
+    r = subprocess.run(
+        ["git", "diff-tree", "-r", "-p", "--root", "--no-commit-id", "--unified=0", "--no-renames", sha],
+        capture_output=True,
+    )
+    if r.returncode != 0:
+        fallo(f"no pude obtener el diff del commit {sha[:12]}: {r.stderr.decode(errors='replace').strip()}")
+    hallazgos = []
+    for linea in r.stdout.decode("utf-8", errors="replace").splitlines():
+        if not linea.startswith("+") or linea.startswith("+++"):
+            continue
+        contenido = linea[1:]
+        if MARCADOR_NO_SECRETO in contenido:
+            continue
+        for patron, nombre in PATRONES_SECRETO:
+            if patron.search(contenido):
+                hallazgos.append((nombre, contenido.strip()[:80]))
+                break
+    return hallazgos
+
+
+def exige_sin_secretos(ramas: list, remoto: "str | None") -> None:
+    hallazgos = []
+    vistos = set()
+    for local_sha, _remote_ref, remote_sha in ramas:
+        if es_sha_cero(local_sha):
+            continue
+        for c in commits_introducidos(local_sha, remote_sha, remoto):
+            for nombre, linea in secretos_en_commit(c):
+                h = f"commit {c[:12]} · {nombre}: {linea}"
+                if h not in vistos:
+                    vistos.add(h)
+                    hallazgos.append(h)
+    if hallazgos:
+        muestra = "\n".join(f"   - {h}" for h in hallazgos[:10])
+        extra = f"\n   … y {len(hallazgos) - 10} más." if len(hallazgos) > 10 else ""
+        fallo(
+            "el push contiene posibles CREDENCIALES (Principio 2: secretos fuera del código):\n"
+            + muestra + extra + "\n"
+            "   Si es real: sácala del historial y RÓTALA — git no olvida; un secreto empujado se invalida, no se borra.\n"
+            f"   Si es falso positivo: añade `{MARCADOR_NO_SECRETO}` como comentario en esa línea."
+        )
+
+
 def verificar_push(remoto: "str | None" = None, url: "str | None" = None) -> None:
     raiz = raiz_repo()
     updates = []
@@ -374,6 +443,23 @@ def verificar_push(remoto: "str | None" = None, url: "str | None" = None) -> Non
             partes = linea.split()
             if len(partes) == 4:
                 updates.append(partes)
+
+    tags_del_push = set()
+    ramas = []
+    for _local_ref, local_sha, remote_ref, remote_sha in updates:
+        if remote_ref.startswith("refs/tags/" + PREFIJO_TAG):
+            tag = remote_ref[len("refs/tags/"):]
+            if es_sha_cero(local_sha):
+                fallo(f"borrar el tag remoto {tag} está prohibido: los sellos de lote son inmutables.")
+            if not es_sha_cero(remote_sha):
+                fallo(f"mover/actualizar el tag remoto {tag} está prohibido: los sellos de lote son inmutables.")
+            tags_del_push.add(tag)
+        else:
+            ramas.append((local_sha, remote_ref, remote_sha))
+
+    # El candado de secretos corre SIEMPRE que se empujan refs: un secreto
+    # no espera al primer sello ni goza de la exención de docs/.
+    exige_sin_secretos(ramas, remoto)
 
     if not candado_activo(raiz):
         ok("aún no hay sellos en este repo — el candado se activa con el primer sello. Push permitido.")
@@ -391,19 +477,6 @@ def verificar_push(remoto: "str | None" = None, url: "str | None" = None) -> Non
             )
         ok(f"HEAD {head[:12]} está sellado ({tag}). Pre-vuelo OK — el hook validará las refs del push real.")
         return
-
-    tags_del_push = set()
-    ramas = []
-    for _local_ref, local_sha, remote_ref, remote_sha in updates:
-        if remote_ref.startswith("refs/tags/" + PREFIJO_TAG):
-            tag = remote_ref[len("refs/tags/"):]
-            if es_sha_cero(local_sha):
-                fallo(f"borrar el tag remoto {tag} está prohibido: los sellos de lote son inmutables.")
-            if not es_sha_cero(remote_sha):
-                fallo(f"mover/actualizar el tag remoto {tag} está prohibido: los sellos de lote son inmutables.")
-            tags_del_push.add(tag)
-        else:
-            ramas.append((local_sha, remote_ref, remote_sha))
 
     hay_codigo = False
     detalle = []
